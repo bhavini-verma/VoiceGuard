@@ -156,20 +156,6 @@ Upload mode: drop any WAV file → instant analysis
 
 ---
 
-##  Test Results
-
-| Voice Source | Expected | Result |
-|---|---|---|
-| Real human voices (10+) | 🟢 LOW | ✅ |
-| ElevenLabs generated | 🔴 HIGH | ✅ |
-| Play.ht / Murf.ai | 🔴 HIGH | ✅ |
-| Google TTS | 🔴 HIGH | ✅ |
-| RVC voice clone | 🔴 HIGH | ✅ |
-| Noisy environment | 🟡 MEDIUM | ✅ |
-| Short clips (<5s) | Edge case | Tested |
-
----
-
 ##  VLSI / FPGA Hardware Acceleration
 
 The MFCC feature extraction block is implemented in Verilog for near-zero latency at telecom scale:
