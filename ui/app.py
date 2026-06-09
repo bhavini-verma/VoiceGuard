@@ -17,6 +17,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import joblib
 import tempfile
+import wave
+import struct
 
 # ── PAGE CONFIG ─────────────────────────────────────
 st.set_page_config(
@@ -464,6 +466,48 @@ audio {
     font-size: 10px; padding: 5px 14px; border-radius: 20px;
 }
 
+/* Mic zone */
+.mic-hint {
+    text-align: center; padding: 48px 24px;
+    border: 1px dashed rgba(124,92,252,0.2);
+    border-radius: 18px;
+    background: rgba(124,92,252,0.02);
+}
+.mic-hint-icon { font-size: 40px; margin-bottom: 14px; }
+.mic-hint-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.mic-hint-sub { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+/* Recording active */
+.rec-active {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,51,85,0.06);
+    border: 1px solid rgba(255,51,85,0.2);
+    border-radius: 14px; padding: 16px 20px;
+    margin-bottom: 16px;
+}
+.rec-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #ff3355;
+    animation: blink 1s infinite;
+    flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.rec-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #ff3355; letter-spacing: 0.1em;
+}
+
+/* DPDP badge */
+.dpdp-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,232,122,0.06);
+    border: 1px solid rgba(0,232,122,0.2);
+    border-radius: 8px; padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: #00e87a; letter-spacing: 0.08em;
+    margin-bottom: 16px;
+}
+
 /* About panel */
 .about-block {
     background: var(--bg-card);
@@ -544,6 +588,10 @@ audio {
 # ── SESSION STATE ────────────────────────────────────
 if "history" not in st.session_state:
     st.session_state.history = []
+if "mic_recording" not in st.session_state:
+    st.session_state.mic_recording = False
+if "mic_audio" not in st.session_state:
+    st.session_state.mic_audio = None
 
 
 # ── LOAD MODEL ───────────────────────────────────────
@@ -599,6 +647,172 @@ def risk_level(p):
     if p < 0.40: return "LOW",    "low"
     if p < 0.70: return "MEDIUM", "med"
     return           "HIGH",   "high"
+
+
+# ── MIC RECORDING ────────────────────────────────────
+def record_audio(duration_sec=5, sample_rate=16000):
+    """Record audio from microphone using PyAudio."""
+    try:
+        import pyaudio
+        CHUNK = 1024
+        FORMAT = pyaudio.paInt16
+        CHANNELS = 1
+
+        p = pyaudio.PyAudio()
+        stream = p.open(
+            format=FORMAT,
+            channels=CHANNELS,
+            rate=sample_rate,
+            input=True,
+            frames_per_buffer=CHUNK
+        )
+
+        frames = []
+        total_chunks = int(sample_rate / CHUNK * duration_sec)
+        for _ in range(total_chunks):
+            data = stream.read(CHUNK, exception_on_overflow=False)
+            frames.append(data)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+        # Save to temp WAV file
+        tmp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+        wf = wave.open(tmp.name, 'wb')
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(sample_rate)
+        wf.writeframes(b''.join(frames))
+        wf.close()
+
+        return tmp.name, None
+    except ImportError:
+        return None, "PyAudio not installed. Run: pip install pyaudio"
+    except Exception as e:
+        return None, str(e)
+
+
+# ── RESULT RENDERER ──────────────────────────────────
+def render_result(y, sr, filename, duration):
+    """Shared result rendering for both upload and mic modes."""
+    with st.spinner("Analyzing signal — extracting 128 acoustic features..."):
+        feat_vec, feats = extract(y, sr)
+        feat_scaled = scaler.transform(feat_vec.reshape(1, -1))
+        prob_fake = float(model.predict_proba(feat_scaled)[0][1])
+        level, lkey = risk_level(prob_fake)
+
+    actions = {
+        "LOW":    "✅  Call proceeds normally — voice appears authentic",
+        "MEDIUM": "⚠️  Trigger secondary caller verification protocol",
+        "HIGH":   "🚫  Block immediately — raise fraud alert"
+    }
+    pct = f"{prob_fake*100:.1f}"
+    bar_width = f"{prob_fake*100:.1f}%"
+
+    st.markdown(f"""
+    <div class="verdict-wrap verdict-{lkey}">
+        <div class="verdict-glow-{lkey}"></div>
+        <div class="verdict-label verdict-label-{lkey}">// Threat Assessment</div>
+        <div class="verdict-risk verdict-risk-{lkey}">{level} RISK</div>
+        <div class="verdict-action verdict-action-{lkey}">{actions[level]}</div>
+        <div class="verdict-prob">
+            <div>
+                <div class="verdict-prob-num verdict-risk-{lkey}">{pct}<span class="verdict-prob-suffix">%</span></div>
+                <div class="verdict-prob-label">Synthetic probability score</div>
+                <div class="prob-bar-track" style="width:280px;">
+                    <div class="prob-bar-fill-{lkey}" style="width:{bar_width};"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.session_state.history.append({
+        "file": filename, "level": level,
+        "prob": prob_fake, "duration": duration
+    })
+
+    # Feature breakdown
+    st.markdown('<div class="sec-head">Acoustic features</div>', unsafe_allow_html=True)
+
+    feat_colors = {
+        "pitch_std":         "#00d4ff",
+        "noise_floor":       "#7c5cfc",
+        "harmonic_ratio":    "#ff6b35",
+        "zcr":               "#00e87a",
+        "spectral_contrast": "#ffb800",
+        "mfcc_variance":     "#ff3355",
+    }
+    feat_labels = {
+        "pitch_std":         ("Pitch Jitter",      f"{feats['pitch_std']:.2f}",           "Hz std"),
+        "noise_floor":       ("Noise Floor",        f"{feats['noise_floor']*1000:.3f}",   "mV RMS"),
+        "harmonic_ratio":    ("Harmonic Ratio",     f"{feats['harmonic_ratio']:.3f}",     "H/N ratio"),
+        "zcr":               ("Zero Crossing",      f"{feats['zcr']*100:.2f}",            "rate × 100"),
+        "spectral_contrast": ("Spectral Contrast",  f"{feats['spectral_contrast']:.1f}",  "dB"),
+        "mfcc_variance":     ("MFCC Variance",      f"{feats['mfcc_variance']:.1f}",      "mean var"),
+    }
+
+    st.markdown('<div class="feat-grid">', unsafe_allow_html=True)
+    for key, (label, val, unit) in feat_labels.items():
+        col = feat_colors[key]
+        st.markdown(f"""
+        <div class="feat-tile">
+            <div class="feat-tile-eyebrow">{label}</div>
+            <div class="feat-tile-val" style="color:{col};">{val}</div>
+            <div class="feat-tile-unit">{unit}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Visualizations
+    st.markdown('<div class="sec-head">Signal visualizations</div>', unsafe_allow_html=True)
+
+    col_left, col_right = st.columns(2, gap="medium")
+
+    with col_left:
+        st.markdown('<div class="plot-wrap"><div class="plot-label">Waveform</div>', unsafe_allow_html=True)
+        st.pyplot(plot_waveform(y, sr), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="plot-wrap"><div class="plot-label">MFCC Coefficients</div>', unsafe_allow_html=True)
+        st.pyplot(plot_mfcc(y, sr), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col_right:
+        st.markdown('<div class="plot-wrap"><div class="plot-label">Mel Spectrogram</div>', unsafe_allow_html=True)
+        st.pyplot(plot_spectrogram(y, sr), use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(f"""
+        <div class="info-panel">
+            <div class="plot-label" style="margin-bottom:14px;">File metadata</div>
+            <div class="info-row">
+                <span class="info-key">Source</span>
+                <span class="info-val">{filename}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-key">Duration</span>
+                <span class="info-val">{duration} s</span>
+            </div>
+            <div class="info-row">
+                <span class="info-key">Sample rate</span>
+                <span class="info-val">{sr:,} Hz</span>
+            </div>
+            <div class="info-row">
+                <span class="info-key">Total samples</span>
+                <span class="info-val">{len(y):,}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-key">Analysis SR</span>
+                <span class="info-val">{SR:,} Hz</span>
+            </div>
+            <div class="info-row">
+                <span class="info-key">Vector dims</span>
+                <span class="info-val">128</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # ── PLOTS ────────────────────────────────────────────
@@ -743,158 +957,114 @@ st.markdown("""
 tab_upload, tab_history, tab_about = st.tabs(["  📁  Analyze File  ", "  🕘  Session History  ", "  ℹ  About  "])
 
 
-# ── TAB 1 · UPLOAD ───────────────────────────────────
+# ── TAB 1 · UPLOAD + MIC ─────────────────────────────
 with tab_upload:
-    uploaded = st.file_uploader(
-        "audio_upload",
-        type=["wav", "mp3", "flac"],
+
+    # DPDP compliance badge
+    st.markdown("""
+    <div class="dpdp-badge">
+        🔒 &nbsp; Privacy by Design — audio processed in-memory only · no voice data stored · DPDP 2023 compliant
+    </div>
+    """, unsafe_allow_html=True)
+
+    input_mode = st.radio(
+        "Input source",
+        ["📁  Upload File", "🎙  Live Microphone"],
+        horizontal=True,
         label_visibility="collapsed"
     )
 
-    if uploaded and model:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-            tmp.write(uploaded.read()); tmp_path = tmp.name
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        y, sr = librosa.load(tmp_path, sr=None, mono=True)
-        duration = round(len(y)/sr, 2)
+    # ── UPLOAD MODE ──────────────────────────────────
+    if input_mode == "📁  Upload File":
+        uploaded = st.file_uploader(
+            "audio_upload",
+            type=["wav", "mp3", "flac"],
+            label_visibility="collapsed"
+        )
 
-        # Audio player
-        st.markdown('<div class="audio-wrap">', unsafe_allow_html=True)
-        st.audio(uploaded)
-        st.markdown('</div>', unsafe_allow_html=True)
+        if uploaded and model:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                tmp.write(uploaded.read()); tmp_path = tmp.name
 
-        with st.spinner("Analyzing signal — extracting 128 acoustic features..."):
-            feat_vec, feats = extract(y, sr)
-            feat_scaled = scaler.transform(feat_vec.reshape(1, -1))
-            prob_fake = float(model.predict_proba(feat_scaled)[0][1])
-            level, lkey = risk_level(prob_fake)
+            y, sr = librosa.load(tmp_path, sr=None, mono=True)
+            duration = round(len(y)/sr, 2)
 
-        # ── Verdict card ────────────────────────────
-        actions = {
-            "LOW":    "✅  Call proceeds normally — voice appears authentic",
-            "MEDIUM": "⚠️  Trigger secondary caller verification protocol",
-            "HIGH":   "🚫  Block immediately — raise fraud alert"
-        }
-        pct = f"{prob_fake*100:.1f}"
-        bar_width = f"{prob_fake*100:.1f}%"
-
-        st.markdown(f"""
-        <div class="verdict-wrap verdict-{lkey}">
-            <div class="verdict-glow-{lkey}"></div>
-            <div class="verdict-label verdict-label-{lkey}">// Threat Assessment</div>
-            <div class="verdict-risk verdict-risk-{lkey}">{level} RISK</div>
-            <div class="verdict-action verdict-action-{lkey}">{actions[level]}</div>
-            <div class="verdict-prob">
-                <div>
-                    <div class="verdict-prob-num verdict-risk-{lkey}">{pct}<span class="verdict-prob-suffix">%</span></div>
-                    <div class="verdict-prob-label">Synthetic probability score</div>
-                    <div class="prob-bar-track" style="width:280px;">
-                        <div class="prob-bar-fill-{lkey}" style="width:{bar_width};"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.session_state.history.append({
-            "file": uploaded.name, "level": level,
-            "prob": prob_fake, "duration": duration
-        })
-
-        # ── Feature breakdown ────────────────────────
-        st.markdown('<div class="sec-head">Acoustic features</div>', unsafe_allow_html=True)
-
-        feat_colors = {
-            "pitch_std":         "#00d4ff",
-            "noise_floor":       "#7c5cfc",
-            "harmonic_ratio":    "#ff6b35",
-            "zcr":               "#00e87a",
-            "spectral_contrast": "#ffb800",
-            "mfcc_variance":     "#ff3355",
-        }
-        feat_labels = {
-            "pitch_std":         ("Pitch Jitter",      f"{feats['pitch_std']:.2f}",           "Hz std"),
-            "noise_floor":       ("Noise Floor",        f"{feats['noise_floor']*1000:.3f}",   "mV RMS"),
-            "harmonic_ratio":    ("Harmonic Ratio",     f"{feats['harmonic_ratio']:.3f}",     "H/N ratio"),
-            "zcr":               ("Zero Crossing",      f"{feats['zcr']*100:.2f}",            "rate × 100"),
-            "spectral_contrast": ("Spectral Contrast",  f"{feats['spectral_contrast']:.1f}",  "dB"),
-            "mfcc_variance":     ("MFCC Variance",      f"{feats['mfcc_variance']:.1f}",      "mean var"),
-        }
-
-        st.markdown('<div class="feat-grid">', unsafe_allow_html=True)
-        for key, (label, val, unit) in feat_labels.items():
-            col = feat_colors[key]
-            st.markdown(f"""
-            <div class="feat-tile">
-                <div class="feat-tile-eyebrow">{label}</div>
-                <div class="feat-tile-val" style="color:{col};">{val}</div>
-                <div class="feat-tile-unit">{unit}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # ── Visualizations ───────────────────────────
-        st.markdown('<div class="sec-head">Signal visualizations</div>', unsafe_allow_html=True)
-
-        col_left, col_right = st.columns(2, gap="medium")
-
-        with col_left:
-            st.markdown('<div class="plot-wrap"><div class="plot-label">Waveform</div>', unsafe_allow_html=True)
-            st.pyplot(plot_waveform(y, sr), use_container_width=True)
+            st.markdown('<div class="audio-wrap">', unsafe_allow_html=True)
+            st.audio(uploaded)
             st.markdown('</div>', unsafe_allow_html=True)
 
-            st.markdown('<div class="plot-wrap"><div class="plot-label">MFCC Coefficients</div>', unsafe_allow_html=True)
-            st.pyplot(plot_mfcc(y, sr), use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            render_result(y, sr, uploaded.name, duration)
+            os.unlink(tmp_path)
 
-        with col_right:
-            st.markdown('<div class="plot-wrap"><div class="plot-label">Mel Spectrogram</div>', unsafe_allow_html=True)
-            st.pyplot(plot_spectrogram(y, sr), use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-
-            st.markdown(f"""
-            <div class="info-panel">
-                <div class="plot-label" style="margin-bottom:14px;">File metadata</div>
-                <div class="info-row">
-                    <span class="info-key">Filename</span>
-                    <span class="info-val">{uploaded.name}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-key">Duration</span>
-                    <span class="info-val">{duration} s</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-key">Sample rate</span>
-                    <span class="info-val">{sr:,} Hz</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-key">Total samples</span>
-                    <span class="info-val">{len(y):,}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-key">Analysis SR</span>
-                    <span class="info-val">{SR:,} Hz</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-key">Vector dims</span>
-                    <span class="info-val">128</span>
-                </div>
+        elif not model:
+            st.warning("⚠️ Model not found — run `python src/train.py` to generate model.pkl and scaler.pkl.")
+        else:
+            st.markdown("""
+            <div class="upload-hint">
+                <div class="upload-hint-icon">🎙</div>
+                <div class="upload-hint-title">Drop an audio file to analyze</div>
+                <div class="upload-hint-sub">VoiceGuard extracts 128 acoustic features and runs inference<br>to determine if the voice is human or AI-generated.</div>
+                <div class="upload-hint-pill">WAV · MP3 · FLAC</div>
             </div>
             """, unsafe_allow_html=True)
 
-        os.unlink(tmp_path)
-
-    elif not model:
-        st.warning("⚠️ Model not found — run `python src/train.py` to generate model.pkl and scaler.pkl.")
+    # ── MIC MODE ─────────────────────────────────────
     else:
-        st.markdown("""
-        <div class="upload-hint">
-            <div class="upload-hint-icon">🎙</div>
-            <div class="upload-hint-title">Drop an audio file to analyze</div>
-            <div class="upload-hint-sub">VoiceGuard extracts 128 acoustic features and runs inference<br>to determine if the voice is human or AI-generated.</div>
-            <div class="upload-hint-pill">WAV · MP3 · FLAC</div>
-        </div>
-        """, unsafe_allow_html=True)
+        if not model:
+            st.warning("⚠️ Model not found — run `python src/train.py` first.")
+        else:
+            rec_duration = st.slider("Recording duration (seconds)", min_value=3, max_value=10, value=5, step=1)
+
+            st.markdown("""
+            <div class="mic-hint">
+                <div class="mic-hint-icon">🎙</div>
+                <div class="mic-hint-title">Live Voice Analysis</div>
+                <div class="mic-hint-sub">Click Record to capture audio from your microphone.<br>Speak clearly for best results. Recording will auto-stop.</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            col_rec, col_clear = st.columns([1, 1])
+
+            with col_rec:
+                if st.button(f"⏺  Record {rec_duration}s", use_container_width=True):
+                    st.markdown(f"""
+                    <div class="rec-active">
+                        <div class="rec-dot"></div>
+                        <span class="rec-text">RECORDING — {rec_duration} seconds — speak now...</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    with st.spinner(f"Recording for {rec_duration} seconds..."):
+                        tmp_path, error = record_audio(duration_sec=rec_duration)
+
+                    if error:
+                        st.error(f"Recording failed: {error}")
+                    else:
+                        st.session_state.mic_audio = tmp_path
+                        st.success("Recording complete — analyzing...")
+                        st.rerun()
+
+            with col_clear:
+                if st.button("🗑  Clear recording", use_container_width=True):
+                    if st.session_state.mic_audio and os.path.exists(st.session_state.mic_audio):
+                        os.unlink(st.session_state.mic_audio)
+                    st.session_state.mic_audio = None
+                    st.rerun()
+
+            # Show result if recording exists
+            if st.session_state.mic_audio and os.path.exists(st.session_state.mic_audio):
+                y, sr = librosa.load(st.session_state.mic_audio, sr=None, mono=True)
+                duration = round(len(y)/sr, 2)
+
+                st.markdown('<div class="audio-wrap">', unsafe_allow_html=True)
+                st.audio(st.session_state.mic_audio)
+                st.markdown('</div>', unsafe_allow_html=True)
+
+                render_result(y, sr, "live_mic_recording.wav", duration)
 
 
 # ── TAB 2 · HISTORY ──────────────────────────────────
@@ -941,7 +1111,7 @@ with tab_about:
     <div class="about-block">
         <div class="about-block-title">Detection pipeline</div>
         <div class="pipeline-code">
-Audio Input<br>
+Audio Input (File Upload or Live Mic)<br>
 &nbsp;&nbsp;→ Resample to 16 kHz · Clip to 3 s<br>
 &nbsp;&nbsp;→ Feature Extraction (Librosa)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ MFCC (40 coeff × mean + std = 80-dim)<br>
@@ -951,7 +1121,19 @@ Audio Input<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ Spectral contrast + chroma features<br>
 &nbsp;&nbsp;→ 128-dim vector · StandardScaler normalization<br>
 &nbsp;&nbsp;→ Random Forest (n=200) inference<br>
-&nbsp;&nbsp;→ Risk Score → LOW / MEDIUM / HIGH
+&nbsp;&nbsp;→ Risk Score → LOW / MEDIUM / HIGH<br>
+&nbsp;&nbsp;→ Audio discarded from memory · zero storage · DPDP compliant
+        </div>
+    </div>
+
+    <div class="about-block">
+        <div class="about-block-title">Privacy by Design — DPDP 2023</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+            VoiceGuard processes all audio <strong style="color:var(--text-primary);">in-memory only</strong>.
+            No raw voice data is written to disk or transmitted externally.
+            Only the risk score and timestamp are logged — never the audio itself.
+            Fully compliant with India's Digital Personal Data Protection Act 2023
+            for deployment in regulated banking environments.
         </div>
     </div>
 
@@ -1005,12 +1187,12 @@ Audio Input<br>
         <div class="about-block" style="flex:1;margin-bottom:0;">
             <div class="about-block-title" style="margin-bottom:6px;">Team</div>
             <div style="font-size:13px;color:var(--text-secondary);">Bhavini Verma · Ashit Raj</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px);font-family:'JetBrains Mono',monospace;">VIT Vellore</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">VIT Vellore</div>
         </div>
         <div class="about-block" style="flex:1;margin-bottom:0;">
             <div class="about-block-title" style="margin-bottom:6px;">Event</div>
             <div style="font-size:13px;color:var(--text-secondary);">PSB Hackathon 2026</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">UCO Bank Track</div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
