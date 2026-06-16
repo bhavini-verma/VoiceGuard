@@ -1,0 +1,16 @@
+librosa
+numpy
+scipy
+scikit-learn
+pyaudio
+streamlit
+matplotlib
+seaborn
+joblib
+imbalanced-learn
+pandas
+xgboost
+soundfile
+tqdm
+torch
+transformers

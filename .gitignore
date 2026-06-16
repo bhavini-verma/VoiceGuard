@@ -7,6 +7,17 @@ __pycache__/
 # Datasets and large audio files
 data/
 KAGGLE/
+DEMONSTRATION/dummy_*
+
+# Large feature CSVs (exceeding GitHub limits)
+features/bio_features.csv
+features/deep_features.csv
+
+# Local utilities and archives
+aria2.zip
+aria2/
+final_implementation_plan.txt
+peek_zip.py
 
 # Local environments
 venv/
@@ -16,3 +27,4 @@ env/
 # IDE files
 .vscode/
 .idea/
+
