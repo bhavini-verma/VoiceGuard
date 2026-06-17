@@ -5,7 +5,9 @@ import time
 import random
 import wave
 
-API_KEY = "sk_4ad1d048d7bae0fd065e797e4de56f5034fa835e42c86853"
+API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
+if not API_KEY:
+    print("Warning: ELEVENLABS_API_KEY environment variable not set.")
 HEADERS = {
     "xi-api-key": API_KEY,
     "Content-Type": "application/json"
