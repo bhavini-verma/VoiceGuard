@@ -971,7 +971,7 @@ async function runAnalysis(file){
   }, 500);
 
   try{
-    const result = await apiPostFile('/predict', file);
+   const result = await apiPostFile('/analyze', file);
     clearInterval(timelineInterval);
     advanceTimelineTo(PIPELINE_STEPS.length-1);
     setTimeout(()=>{
