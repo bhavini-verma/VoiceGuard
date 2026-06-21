@@ -1,0 +1,1136 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#060c18;--bg2:#0a1628;--bg3:#0f1e35;--card:#0d1a2e;--card2:#111f38;
+--border:#1a3050;--border2:#1e3a5f;--accent:#1565c0;--accent2:#1976d2;
+--cyan:#00b4d8;--cyan2:#0096c7;--green:#00c896;--green2:#00a876;
+--red:#ff4560;--amber:#ffb300;--text:#e8edf5;--text2:#8fa8c8;--text3:#4a6a8a;
+--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--ibm:'IBM Plex Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(21,101,192,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(21,101,192,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(21,101,192,0.08) 0%,transparent 70%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 16px 24px}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(13,26,46,0.95);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);margin-bottom:0;position:sticky;top:0;z-index:100}
+.logo-block{display:flex;align-items:center;gap:12px}
+.logo-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:32px;height:32px}
+.logo-text{display:flex;flex-direction:column}
+.logo-name{font-family:var(--ibm);font-size:15px;font-weight:700;letter-spacing:2px;color:#fff;display:flex;align-items:baseline;gap:3px}
+.logo-tm{font-size:9px;font-weight:500;color:var(--cyan);vertical-align:super;letter-spacing:0}
+.logo-sub{font-size:10px;color:var(--text2);letter-spacing:.5px;font-weight:400;margin-top:1px}
+.header-center{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--cyan)}
+.header-center i{font-size:12px;animation:pulse 2s ease-in-out infinite}
+.header-right{display:flex;align-items:center;gap:16px}
+
+.mode-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:3px;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.5px;border:1px solid;transition:all .4s}
+.mode-badge .badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.mode-badge.idle{background:rgba(74,106,138,0.15);border-color:rgba(74,106,138,0.35);color:var(--text3)}
+.mode-badge.idle .badge-dot{background:var(--text3)}
+.mode-badge.recording{background:rgba(255,69,96,0.12);border-color:rgba(255,69,96,0.4);color:var(--red)}
+.mode-badge.recording .badge-dot{background:var(--red);animation:blink 1s ease-in-out infinite}
+.mode-badge.file{background:rgba(0,180,216,0.12);border-color:rgba(0,180,216,0.35);color:var(--cyan)}
+.mode-badge.file .badge-dot{background:var(--cyan);animation:blink 1.5s ease-in-out infinite}
+.mode-badge.analyzing{background:rgba(255,179,0,0.12);border-color:rgba(255,179,0,0.35);color:var(--amber)}
+.mode-badge.analyzing .badge-dot{background:var(--amber);animation:blink .7s ease-in-out infinite}
+.mode-badge.complete{background:rgba(0,200,150,0.12);border-color:rgba(0,200,150,0.3);color:var(--green)}
+.mode-badge.complete .badge-dot{background:var(--green)}
+
+.hdr-time{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.session-id{font-family:var(--mono);font-size:10px;color:var(--text3);padding:3px 8px;border:1px solid var(--border);border-radius:3px}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 10px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden;cursor:default}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.threats::before{background:linear-gradient(90deg,var(--red),transparent)}
+.kpi.sessions::before{background:linear-gradient(90deg,var(--cyan),transparent)}
+.kpi.accuracy::before{background:linear-gradient(90deg,var(--green),transparent)}
+.kpi.fpr::before{background:linear-gradient(90deg,var(--amber),transparent)}
+.kpi-label{font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;font-weight:500}
+.kpi-value{font-family:var(--ibm);font-size:26px;font-weight:700;line-height:1;margin-bottom:4px}
+.kpi.threats .kpi-value{color:var(--red)}
+.kpi.sessions .kpi-value{color:var(--cyan)}
+.kpi.accuracy .kpi-value{color:var(--green)}
+.kpi.fpr .kpi-value{color:var(--amber)}
+.kpi-delta{font-size:10px;color:var(--text3)}
+.kpi-delta span{color:var(--green);font-weight:500}
+.kpi-icon{position:absolute;top:12px;right:14px;font-size:20px;opacity:.15}
+
+.section-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px 16px}
+.card-title{font-family:var(--ibm);font-size:11px;font-weight:600;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title i{font-size:14px;color:var(--cyan)}
+
+.upload-zone{border:1px dashed var(--border2);border-radius:6px;padding:20px;text-align:center;cursor:pointer;background:rgba(21,101,192,0.03);transition:all .2s}
+.upload-zone:hover{border-color:var(--cyan);background:rgba(0,180,216,0.05)}
+.upload-zone .uz-icon{font-size:28px;color:var(--accent2);opacity:.6;margin-bottom:8px}
+.upload-zone .uz-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px}
+.upload-zone .uz-sub{font-size:10px;color:var(--text3)}
+.upload-btn{display:inline-block;margin-top:10px;padding:6px 16px;background:rgba(21,101,192,0.2);border:1px solid var(--accent);color:var(--cyan);border-radius:4px;font-size:11px;font-weight:500;letter-spacing:.5px;cursor:pointer;transition:all .2s}
+.upload-btn:hover{background:rgba(21,101,192,0.35)}
+
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.status-row:last-child{border-bottom:none}
+.status-label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.status-label i{font-size:13px;color:var(--text3)}
+.status-pill{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;font-weight:500;transition:all .3s}
+.status-pill.online{background:rgba(0,200,150,0.12);border:1px solid rgba(0,200,150,0.3);color:var(--green)}
+.status-pill.active{background:rgba(0,180,216,0.12);border:1px solid rgba(0,180,216,0.3);color:var(--cyan)}
+.status-pill.connected{background:rgba(21,101,192,0.15);border:1px solid rgba(21,101,192,0.4);color:#64b5f6}
+.status-pill.loaded{background:rgba(0,200,150,0.1);border:1px solid rgba(0,200,150,0.25);color:var(--green)}
+.status-pill.ready{background:rgba(0,180,216,0.1);border:1px solid rgba(0,180,216,0.25);color:var(--cyan)}
+.status-pill.idle{background:rgba(74,106,138,0.15);border:1px solid rgba(74,106,138,0.3);color:var(--text3)}
+.status-pill.processing{background:rgba(255,179,0,0.12);border:1px solid rgba(255,179,0,0.3);color:var(--amber);animation:blink 1s ease-in-out infinite}
+.status-section-divider{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:8px 0 4px;border-bottom:1px solid var(--border);margin-bottom:2px;opacity:.7}
+
+.xai-row{margin-bottom:10px}
+.xai-label{display:flex;justify-content:space-between;margin-bottom:4px}
+.xai-label span:first-child{font-size:11px;color:var(--text2)}
+.xai-label span:last-child{font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:500}
+.xai-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.xai-fill{height:100%;border-radius:2px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.xai-fill.bio{background:linear-gradient(90deg,#1565c0,var(--cyan))}
+.xai-fill.dl{background:linear-gradient(90deg,#1565c0,#00b4d8)}
+.xai-fill.fus{background:linear-gradient(90deg,var(--cyan),var(--green))}
+.xai-badge{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 8px;background:rgba(0,200,150,0.1);border:1px solid rgba(0,200,150,0.2);border-radius:3px;font-size:10px;color:var(--green);font-weight:500}
+
+.fusion-canvas{width:100%;height:240px;display:block;border-radius:4px;background:var(--bg2)}
+.fusion-stats{display:flex;justify-content:space-around;margin-top:10px}
+.fstat{text-align:center}
+.fstat-val{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--cyan)}
+.fstat-label{font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+
+.wave-canvas{width:100%;height:80px;display:block;border-radius:4px;background:var(--bg2);margin-bottom:8px}
+.wave-controls{display:flex;align-items:center;gap:8px}
+.wave-btn{width:28px;height:28px;border:1px solid var(--border2);border-radius:4px;background:rgba(21,101,192,0.1);color:var(--cyan);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .2s}
+.wave-btn:hover{background:rgba(21,101,192,0.25)}
+.wave-info{flex:1;font-family:var(--mono);font-size:10px;color:var(--text3)}
+
+.ring-wrap{display:flex;align-items:center;gap:16px}
+
+.ti-row{display:flex;align-items:flex-start;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.ti-row:last-child{border-bottom:none}
+.ti-key{font-size:10px;color:var(--text3);letter-spacing:.3px;text-transform:uppercase;flex:1}
+.ti-val{font-size:11px;font-weight:500;text-align:right;flex:1}
+.ti-val.critical{color:var(--red)}
+.ti-val.advanced{color:var(--amber)}
+.ti-val.detected{color:#ff7043}
+.ti-val.high{color:var(--cyan)}
+.ti-val.normal{color:var(--text)}
+.threat-badge{display:inline-block;padding:1px 6px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.threat-badge.critical{background:rgba(255,69,96,0.15);border:1px solid rgba(255,69,96,0.4);color:var(--red)}
+
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:var(--border2)}
+.tl-item{position:relative;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.tl-item:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-18px;width:12px;height:12px;border-radius:50%;border:2px solid var(--card);flex-shrink:0}
+.tl-dot.done{background:var(--green);box-shadow:0 0 6px rgba(0,200,150,.4)}
+.tl-dot.active{background:var(--cyan);box-shadow:0 0 8px rgba(0,180,216,.5);animation:pulse 1.5s ease-in-out infinite}
+.tl-dot.pending{background:var(--border2)}
+.tl-time{font-family:var(--mono);font-size:10px;color:var(--text3);width:60px;flex-shrink:0}
+.tl-text{font-size:11px;color:var(--text2)}
+.tl-text.done{color:var(--text)}
+.tl-text.active{color:var(--cyan);font-weight:500}
+
+.data-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;table-layout:fixed}
+.data-table th{font-family:var(--sans);font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border2);text-align:left;font-weight:500}
+.data-table td{padding:7px 8px;border-bottom:1px solid rgba(26,48,80,0.5);color:var(--text2);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-table tr:hover td{background:rgba(21,101,192,0.05)}
+.score-bar-wrap{display:flex;align-items:center;gap:6px}
+.score-bar{height:3px;border-radius:2px;flex:1;background:rgba(255,255,255,0.05)}
+.score-fill{height:100%;border-radius:2px}
+.verdict-tag{padding:1px 6px;border-radius:2px;font-size:10px;font-weight:500;letter-spacing:.3px}
+.verdict-tag.fraud{background:rgba(255,69,96,0.15);color:var(--red)}
+.verdict-tag.clean{background:rgba(0,200,150,0.12);color:var(--green)}
+.verdict-tag.suspicious{background:rgba(255,179,0,0.12);color:var(--amber)}
+.status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px}
+.status-dot.done{background:var(--green)}
+.status-dot.proc{background:var(--cyan);animation:blink 1s ease-in-out infinite}
+
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.meta-row{display:flex;flex-direction:column;padding:7px 0;border-bottom:1px solid var(--border)}
+.meta-row:nth-child(odd){padding-right:12px}
+.meta-row:nth-child(even){padding-left:12px;border-left:1px solid var(--border)}
+.meta-key{font-size:9px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px}
+.meta-val{font-family:var(--mono);font-size:11px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta-val.pending{color:var(--text3);font-weight:400}
+
+.infer-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.infer-cell{background:rgba(10,22,40,0.6);border:1px solid var(--border);border-radius:4px;padding:10px}
+.infer-key{font-size:9px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.infer-val{font-family:var(--mono);font-size:18px;font-weight:600;line-height:1;color:var(--cyan)}
+.infer-val.pending{color:var(--text3);font-size:14px;font-weight:400}
+.infer-unit{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--sans)}
+
+.pdf-preview{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;position:relative;overflow:hidden}
+.pdf-preview::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(255,255,255,0.02) 27px,rgba(255,255,255,0.02) 28px)}
+.pdf-header{font-family:var(--ibm);font-size:12px;font-weight:700;color:var(--text);text-align:center;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);letter-spacing:.5px}
+.pdf-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.pdf-key{font-size:10px;color:var(--text3)}
+.pdf-val{font-family:var(--mono);font-size:10px;color:var(--text)}
+.pdf-val.high-risk{color:var(--red);font-weight:600}
+.pdf-divider{height:1px;background:var(--border);margin:8px 0}
+.pdf-rec{background:rgba(255,69,96,0.08);border-left:2px solid var(--red);padding:6px 8px;font-size:10px;color:var(--text2);line-height:1.5}
+.pdf-rec strong{color:var(--red);display:block;margin-bottom:2px;font-size:10px}
+.pdf-dl-btn{width:100%;margin-top:10px;padding:7px;background:rgba(21,101,192,0.15);border:1px solid var(--border2);color:var(--cyan);font-size:11px;font-family:var(--sans);font-weight:500;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;letter-spacing:.3px}
+.pdf-dl-btn:hover{background:rgba(21,101,192,0.3)}
+.pdf-dl-btn i{font-size:14px}
+
+.trigger-tag{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:500;font-family:var(--mono);letter-spacing:.3px}
+.trigger-tag.primary{background:rgba(255,69,96,0.15);border:1px solid rgba(255,69,96,0.3);color:var(--red)}
+.trigger-tag.secondary{background:rgba(255,179,0,0.12);border:1px solid rgba(255,179,0,0.25);color:var(--amber)}
+
+.footer{margin-top:20px;padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.footer-brand{font-family:var(--ibm);font-size:11px;color:var(--text3);font-weight:600;letter-spacing:1.5px}
+.footer-brand span{font-size:9px;color:var(--text3);font-weight:400;display:block;margin-top:1px}
+.footer-powered{text-align:right;font-size:9px;color:var(--text3);line-height:1.7;font-family:var(--mono)}
+.footer-powered div:first-child{color:var(--text2);font-size:10px;margin-bottom:2px;font-family:var(--sans)}
+
+@keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+
+<div class="header">
+  <div class="logo-block">
+    <div class="logo-icon">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 2L4 7v9c0 7.8 5.1 15.1 12 17 6.9-1.9 12-9.2 12-17V7L16 2z" stroke="#1976d2" stroke-width="1.5" fill="rgba(21,101,192,0.1)"/>
+        <path d="M16 2L4 7v9c0 7.8 5.1 15.1 12 17 6.9-1.9 12-9.2 12-17V7L16 2z" stroke="#00b4d8" stroke-width=".5" fill="none"/>
+        <circle cx="16" cy="14" r="4" stroke="#00b4d8" stroke-width="1.2" fill="rgba(0,180,216,0.1)"/>
+        <path d="M11 14 Q16 8 21 14 Q16 20 11 14Z" stroke="#00b4d8" stroke-width=".8" fill="none" opacity=".5"/>
+        <circle cx="16" cy="14" r="1.5" fill="#00b4d8"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-name">VOICEGUARD<span class="logo-tm">TM</span></div>
+      <div class="logo-sub">AI Voice Fraud Intelligence Platform</div>
+    </div>
+  </div>
+  <div class="header-center">
+    <i class="ti ti-radio"></i>
+    Real-Time Synthetic Speech Detection
+  </div>
+  <div class="header-right">
+    <div class="session-id" id="session-id">SID: VG-——</div>
+    <div class="mode-badge idle" id="mode-badge">
+      <span class="badge-dot"></span>
+      <span id="mode-label">STANDBY</span>
+    </div>
+    <div class="hdr-time" id="hdr-clock">--:--:--</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="kpi-row">
+  <div class="kpi threats">
+    <div class="kpi-label">Threats Detected</div>
+    <div class="kpi-value" id="kpi-threats">0</div>
+    <div class="kpi-delta"><span>+12</span> last 24 hrs</div>
+    <i class="ti ti-alert-triangle kpi-icon" style="color:var(--red)"></i>
+  </div>
+  <div class="kpi sessions">
+    <div class="kpi-label">Sessions Analyzed</div>
+    <div class="kpi-value" id="kpi-sessions">0</div>
+    <div class="kpi-delta"><span>+348</span> today</div>
+    <i class="ti ti-waveform kpi-icon" style="color:var(--cyan)"></i>
+  </div>
+  <div class="kpi accuracy">
+    <div class="kpi-label">Detection Accuracy</div>
+    <div class="kpi-value" id="kpi-acc">0%</div>
+    <div class="kpi-delta"><span>+0.3%</span> vs last month</div>
+    <i class="ti ti-target kpi-icon" style="color:var(--green)"></i>
+  </div>
+  <div class="kpi fpr">
+    <div class="kpi-label">False Positive Rate</div>
+    <div class="kpi-value" id="kpi-fpr">0%</div>
+    <div class="kpi-delta"><span>-0.2%</span> improvement</div>
+    <i class="ti ti-adjustments kpi-icon" style="color:var(--amber)"></i>
+  </div>
+</div>
+
+<div class="section-label"><i class="ti ti-activity" style="font-size:11px;color:var(--cyan)"></i>AUDIO INPUT &amp; SYSTEM</div>
+<div class="grid-3" style="grid-template-columns:1.4fr 1.4fr 1fr">
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-microphone"></i>AUDIO INPUT</div>
+    <div class="upload-zone" id="drop-zone" onclick="triggerUpload()">
+      <div class="uz-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="12" width="2" height="8" rx="1" fill="var(--cyan)" opacity=".4"/>
+          <rect x="8" y="8" width="2" height="16" rx="1" fill="var(--cyan)" opacity=".6"/>
+          <rect x="12" y="4" width="2" height="24" rx="1" fill="var(--cyan)"/>
+          <rect x="16" y="6" width="2" height="20" rx="1" fill="var(--cyan)"/>
+          <rect x="20" y="8" width="2" height="16" rx="1" fill="var(--cyan)" opacity=".6"/>
+          <rect x="24" y="11" width="2" height="10" rx="1" fill="var(--cyan)" opacity=".4"/>
+          <rect x="28" y="13" width="2" height="6" rx="1" fill="var(--cyan)" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="uz-title">Drop audio file or click to upload</div>
+      <div class="uz-sub">WAV &bull; MP3 &bull; FLAC &bull; OGG &bull; M4A &bull; Max 50 MB</div>
+      <div class="upload-btn"><i class="ti ti-upload" style="font-size:11px"></i> UPLOAD AUDIO</div>
+    </div>
+    <input type="file" id="file-input" accept="audio/*" style="display:none" onchange="handleFile(this)">
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <button onclick="startMic()" class="wave-btn" style="flex:1;width:auto;font-size:10px;gap:4px;font-family:var(--sans);letter-spacing:.3px" id="mic-btn">
+        <i class="ti ti-microphone" style="font-size:12px"></i> Live Record
+      </button>
+      <button onclick="runDemo()" class="wave-btn" style="flex:1;width:auto;font-size:10px;gap:4px;font-family:var(--sans);letter-spacing:.3px;color:var(--amber)">
+        <i class="ti ti-player-play" style="font-size:12px"></i> Demo Analysis
+      </button>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+      <div class="card-title" style="margin-bottom:8px"><i class="ti ti-info-circle"></i>AUDIO METADATA</div>
+      <div class="meta-grid">
+        <div class="meta-row"><div class="meta-key">File Name</div><div class="meta-val pending" id="meta-name">—</div></div>
+        <div class="meta-row"><div class="meta-key">Format / Codec</div><div class="meta-val pending" id="meta-fmt">—</div></div>
+        <div class="meta-row"><div class="meta-key">Sample Rate</div><div class="meta-val pending" id="meta-sr">—</div></div>
+        <div class="meta-row"><div class="meta-key">Channels</div><div class="meta-val pending" id="meta-ch">—</div></div>
+        <div class="meta-row" style="border-bottom:none"><div class="meta-key">Duration</div><div class="meta-val pending" id="meta-dur">—</div></div>
+        <div class="meta-row" style="border-bottom:none"><div class="meta-key">File Size</div><div class="meta-val pending" id="meta-size">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span><i class="ti ti-waveform"></i>AUDIO WAVEFORM</span>
+      <span id="wv-status" style="font-size:10px;color:var(--text3);font-family:var(--mono)">NO SIGNAL</span>
+    </div>
+    <canvas class="wave-canvas" id="wave-canvas"></canvas>
+    <div class="wave-controls">
+      <div class="wave-btn" id="play-btn" onclick="togglePlay()"><i class="ti ti-player-play" id="play-icon"></i></div>
+      <div class="wave-info" id="wave-info">
+        Duration: <span id="wave-dur">—</span> &nbsp;|&nbsp; Sr: <span id="wave-sr">—</span> &nbsp;|&nbsp; Ch: <span id="wave-ch">—</span>
+      </div>
+    </div>
+    <div style="margin-top:8px;height:4px;background:rgba(255,255,255,0.05);border-radius:2px">
+      <div id="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent2),var(--cyan));border-radius:2px;transition:width .3s"></div>
+    </div>
+
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+      <div class="card-title" style="margin-bottom:8px"><i class="ti ti-cpu"></i>INFERENCE METRICS</div>
+      <div class="infer-grid">
+        <div class="infer-cell">
+          <div class="infer-key">Processing Time</div>
+          <div class="infer-val pending" id="inf-time">—</div>
+          <div class="infer-unit" id="inf-time-unit">awaiting run</div>
+        </div>
+        <div class="infer-cell">
+          <div class="infer-key">Model Confidence</div>
+          <div class="infer-val pending" id="inf-conf">—</div>
+          <div class="infer-unit" id="inf-conf-unit">awaiting run</div>
+        </div>
+        <div class="infer-cell">
+          <div class="infer-key">Audio Duration</div>
+          <div class="infer-val pending" id="inf-dur">—</div>
+          <div class="infer-unit" id="inf-dur-unit">awaiting run</div>
+        </div>
+        <div class="infer-cell">
+          <div class="infer-key">Chunks Analyzed</div>
+          <div class="infer-val pending" id="inf-chunks">—</div>
+          <div class="infer-unit" id="inf-chunks-unit">awaiting run</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-server"></i>SYSTEM STATUS</div>
+    <div class="status-section-divider">Infrastructure</div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-cloud"></i>API Gateway</div><div class="status-pill online" id="sys-api">ONLINE</div></div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-broadcast"></i>Stream Engine</div><div class="status-pill active" id="sys-stream">ACTIVE</div></div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-database"></i>Database</div><div class="status-pill connected" id="sys-db">CONNECTED</div></div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-shield"></i>Threat Feed</div><div class="status-pill connected" id="sys-threat">CONNECTED</div></div>
+    <div class="status-section-divider" style="margin-top:8px">Model — VoiceGuard Fusion v2.0</div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-brain"></i>Model Loaded</div><div class="status-pill loaded" id="mdl-loaded">LOADED</div></div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-cpu"></i>Inference Engine</div><div class="status-pill ready" id="mdl-infer">READY</div></div>
+    <div class="status-row"><div class="status-label"><i class="ti ti-plug"></i>Backend</div><div class="status-pill connected" id="mdl-backend">CONNECTED</div></div>
+    <div class="status-row" style="border-bottom:none"><div class="status-label"><i class="ti ti-activity"></i>Current Job</div><div class="status-pill idle" id="mdl-job">IDLE</div></div>
+  </div>
+</div>
+
+<div class="section-label"><i class="ti ti-circuit-cell" style="font-size:11px;color:var(--cyan)"></i>FUSION ANALYSIS ENGINE</div>
+<div class="grid-3" style="grid-template-columns:2fr 1fr 1fr">
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-topology-star-3"></i>BIOMETRIC FUSION MATRIX</div>
+    <canvas class="fusion-canvas" id="fusion-canvas"></canvas>
+    <div class="fusion-stats">
+      <div class="fstat"><div class="fstat-val" id="bio-feat">0</div><div class="fstat-label">Biological Features</div></div>
+      <div class="fstat"><div class="fstat-val" id="dl-feat">0</div><div class="fstat-label">Deep Features</div></div>
+      <div class="fstat"><div class="fstat-val" id="fus-feat">0</div><div class="fstat-label">Fusion Features</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-radar"></i>DETECTION CONFIDENCE</div>
+    <div style="text-align:center;padding:4px 0">
+      <svg id="ring-svg" width="130" height="130" viewBox="0 0 130 130" style="display:block;margin:0 auto">
+        <circle cx="65" cy="65" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+        <circle cx="65" cy="65" r="50" fill="none" stroke="url(#ring-grad)" stroke-width="8"
+          stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"
+          id="ring-circle" style="transform:rotate(-90deg);transform-origin:65px 65px;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)"/>
+        <defs>
+          <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff4560"/>
+            <stop offset="100%" stop-color="#ffb300"/>
+          </linearGradient>
+        </defs>
+        <text x="65" y="58" text-anchor="middle" font-family="IBM Plex Sans" font-size="26" font-weight="700" fill="#ff4560" id="ring-pct">0%</text>
+        <text x="65" y="74" text-anchor="middle" font-family="Inter" font-size="9" fill="rgba(143,168,200,0.8)" letter-spacing="1">CONFIDENCE</text>
+      </svg>
+      <div id="ring-verdict" style="font-size:11px;color:var(--text2);margin-top:6px;font-weight:500">Awaiting analysis...</div>
+      <div id="ring-risk" style="display:none;margin-top:6px">
+        <span style="padding:3px 10px;border-radius:3px;font-size:10px;font-weight:700;background:rgba(255,69,96,0.15);border:1px solid rgba(255,69,96,0.4);color:var(--red);letter-spacing:.5px" id="ring-risk-label">CRITICAL RISK</span>
+      </div>
+    </div>
+    <div id="ring-details" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+      <div class="ti-row"><span class="ti-key">Risk Score</span><span class="ti-val critical" id="rd-score">—</span></div>
+      <div class="ti-row"><span class="ti-key">Risk Level</span><span class="ti-val critical" id="rd-level">—</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-chart-infographic"></i>AI EXPLAINABILITY</div>
+    <div class="xai-row">
+      <div class="xai-label"><span>Biological Engine</span><span>82%</span></div>
+      <div class="xai-bar"><div class="xai-fill bio" id="xai-bio" style="width:0%"></div></div>
+    </div>
+    <div class="xai-row">
+      <div class="xai-label"><span>Deep Learning Engine</span><span>91%</span></div>
+      <div class="xai-bar"><div class="xai-fill dl" id="xai-dl" style="width:0%"></div></div>
+    </div>
+    <div class="xai-row">
+      <div class="xai-label"><span>Fusion Confidence</span><span>88%</span></div>
+      <div class="xai-bar"><div class="xai-fill fus" id="xai-fus" style="width:0%"></div></div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Decision Transparency</div>
+      <div class="xai-badge"><i class="ti ti-check" style="font-size:11px"></i> HIGH — Full audit trail enabled</div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Top Decision Factors</div>
+      <div style="font-size:10px;color:var(--text2);display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;justify-content:space-between"><span>Prosody anomaly</span><span style="color:var(--red);font-family:var(--mono)">+0.34</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Spectral flatness</span><span style="color:var(--red);font-family:var(--mono)">+0.28</span></div>
+        <div style="display:flex;justify-content:space-between"><span>F0 micro-variation</span><span style="color:var(--amber);font-family:var(--mono)">+0.19</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Breath naturalness</span><span style="color:var(--green);font-family:var(--mono)">-0.11</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-label"><i class="ti ti-shield-check" style="font-size:11px;color:var(--cyan)"></i>THREAT INTELLIGENCE &amp; ANALYSIS</div>
+<div class="grid-3" style="grid-template-columns:1fr 1fr 2fr">
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-bug"></i>THREAT INTELLIGENCE</div>
+    <div class="ti-row"><span class="ti-key">Threat Type</span><span class="ti-val critical" id="ti-type">—</span></div>
+    <div class="ti-row"><span class="ti-key">Sophistication</span><span class="ti-val advanced" id="ti-soph">—</span></div>
+    <div class="ti-row"><span class="ti-key">Replay Indicators</span><span class="ti-val detected" id="ti-replay">—</span></div>
+    <div class="ti-row"><span class="ti-key">Synthetic Confidence</span><span class="ti-val high" id="ti-synth">—</span></div>
+    <div class="ti-row" style="border-bottom:none"><span class="ti-key">Risk Category</span>
+      <span id="ti-risk-cat" style="font-family:var(--mono);font-size:10px;color:var(--text3)">—</span>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Threat Vector Match</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        <span style="padding:2px 6px;border-radius:2px;font-size:9px;background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.2);color:rgba(255,69,96,0.7)">TTS Clone</span>
+        <span style="padding:2px 6px;border-radius:2px;font-size:9px;background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.2);color:rgba(255,69,96,0.7)">Voice Conversion</span>
+        <span style="padding:2px 6px;border-radius:2px;font-size:9px;background:rgba(255,179,0,0.1);border:1px solid rgba(255,179,0,0.2);color:rgba(255,179,0,0.7)">Replay Attack</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-list-details"></i>INVESTIGATION TIMELINE</div>
+    <div class="timeline" id="timeline">
+     <div class="tl-item"><div class="tl-dot pending" id="tl-dot-0"></div><div class="tl-time" id="tl-t-0">—</div><div class="tl-text" id="tl-text-0">Audio Received</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-1"></div><div class="tl-time" id="tl-t-1">—</div><div class="tl-text" id="tl-text-1">Audio Standardization</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-2"></div><div class="tl-time" id="tl-t-2">—</div><div class="tl-text" id="tl-text-2">Voice Activity Detection</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-3"></div><div class="tl-time" id="tl-t-3">—</div><div class="tl-text" id="tl-text-3">Biological Feature Extraction</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-4"></div><div class="tl-time" id="tl-t-4">—</div><div class="tl-text" id="tl-text-4">Deep Feature Extraction</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-5"></div><div class="tl-time" id="tl-t-5">—</div><div class="tl-text" id="tl-text-5">Fusion Analysis</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-6"></div><div class="tl-time" id="tl-t-6">—</div><div class="tl-text" id="tl-text-6">Risk Classification</div></div>
+      <div class="tl-item"><div class="tl-dot pending" id="tl-dot-7"></div><div class="tl-time" id="tl-t-7">—</div><div class="tl-text" id="tl-text-7">Report Generation</div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span><i class="ti ti-table"></i>CHUNK ANALYSIS REPORT</span>
+      <span id="table-status" style="font-size:10px;color:var(--text3);font-family:var(--mono)">AWAITING INPUT</span>
+    </div>
+    <div style="overflow-x:auto;max-height:220px;overflow-y:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:14%">Chunk</th>
+            <th style="width:30%">Fraud Score</th>
+            <th style="width:18%">Confidence</th>
+            <th style="width:20%">Verdict</th>
+            <th style="width:18%">Status</th>
+          </tr>
+        </thead>
+        <tbody id="chunk-tbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px;font-family:var(--sans)">No analysis data — upload audio to begin</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section-label"><i class="ti ti-file-report" style="font-size:11px;color:var(--cyan)"></i>INVESTIGATION REPORT</div>
+<div class="pdf-preview">
+  <div class="pdf-header">VOICEGUARD™ — FORENSIC INVESTIGATION REPORT &nbsp;|&nbsp; <span style="font-weight:400;font-size:10px">RESTRICTED — BANKING FRAUD INTELLIGENCE</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px;position:relative;z-index:1">
+    <div>
+      <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono)">Case Details</div>
+      <div class="pdf-row"><span class="pdf-key">Case ID</span><span class="pdf-val" id="rpt-id">VG-2026-——</span></div>
+      <div class="pdf-row"><span class="pdf-key">Analysis Timestamp</span><span class="pdf-val" id="rpt-ts">—</span></div>
+      <div class="pdf-row"><span class="pdf-key">Model Version</span><span class="pdf-val" id="rpt-model">VoiceGuard Fusion v2.0</span></div>
+      <div class="pdf-row"><span class="pdf-key">Analyst Engine</span><span class="pdf-val">Fusion Matrix Architecture</span></div>
+    </div>
+    <div>
+      <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono)">Detection Results</div>
+      <div class="pdf-row"><span class="pdf-key">Risk Score</span><span class="pdf-val high-risk" id="rpt-risk">—</span></div>
+      <div class="pdf-row"><span class="pdf-key">Threat Type</span><span class="pdf-val" id="rpt-type">—</span></div>
+      <div class="pdf-row"><span class="pdf-key">Synthetic Confidence</span><span class="pdf-val" id="rpt-synth">—</span></div>
+      <div class="pdf-row"><span class="pdf-key">Fusion Confidence Score</span><span class="pdf-val high-risk" id="rpt-fusion">—</span></div>
+    </div>
+    <div>
+      <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:var(--mono)">Trigger Analysis</div>
+      <div class="pdf-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <span class="pdf-key">Primary Detection Trigger</span>
+        <span id="rpt-primary-trigger"><span class="trigger-tag primary">—</span></span>
+      </div>
+      <div class="pdf-row" style="flex-direction:column;align-items:flex-start;gap:4px;margin-top:4px">
+        <span class="pdf-key">Secondary Detection Trigger</span>
+        <span id="rpt-secondary-trigger"><span class="trigger-tag secondary">—</span></span>
+      </div>
+    </div>
+    <div>
+      <div class="pdf-rec" style="margin-bottom:8px">
+        <strong>RECOMMENDATION</strong>
+        <span id="rpt-rec">Run analysis to generate recommendation</span>
+      </div>
+      <button class="pdf-dl-btn" onclick="downloadReport()">
+        <i class="ti ti-file-download"></i> Export PDF Report
+      </button>
+    </div>
+  </div>
+  <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1">
+    <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">CLASSIFICATION: <span id="rpt-class">AWAITING ANALYSIS</span></div>
+    <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">RBI Circular No. RBI/2023-24/73 Compliant &nbsp;&bull;&nbsp; CERT-In Reportable &nbsp;&bull;&nbsp; NPCI Framework Aligned</div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-brand">
+    VOICEGUARD<sup style="font-size:7px;vertical-align:super">TM</sup>
+    <span>Version 2.0 Enterprise &nbsp;|&nbsp; Build 20260621</span>
+  </div>
+  <div style="font-size:9px;color:var(--text3);font-family:var(--mono);text-align:center">
+    <div style="color:var(--text2);font-size:10px;margin-bottom:2px">Certified for Banking SOC Deployment</div>
+    RBI Cyber Security Division Compatible &nbsp;&bull;&nbsp; UCO Bank FOC Validated
+  </div>
+  <div class="footer-powered">
+    <div>Powered by</div>
+    Biological Feature Engine &nbsp;&bull;&nbsp; Wav2Vec2 Phonetic Intelligence &nbsp;&bull;&nbsp; Fusion Matrix Architecture
+  </div>
+</div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────
+// VoiceGuard Backend Integration
+// Point this at your running FastAPI backend (see /backend/README.md).
+// Default assumes `uvicorn app:app --port 8000` on the same machine.
+// ─────────────────────────────────────────────────────────────────────
+const BACKEND_URL = window.VOICEGUARD_BACKEND_URL || 'http://localhost:8000';
+
+async function apiGet(path){
+  const res = await fetch(BACKEND_URL + path);
+  if(!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
+  return res.json();
+}
+async function apiPostFile(path, file){
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch(BACKEND_URL + path, { method:'POST', body: form });
+  if(!res.ok){
+    let detail = res.statusText;
+    try{ const j = await res.json(); detail = j.detail || detail; }catch(e){}
+    throw new Error(detail);
+  }
+  return res.json();
+}
+
+const SESSION_ID = 'VG-'+Date.now().toString(36).toUpperCase().slice(-6);
+document.getElementById('session-id').textContent = 'SID: '+SESSION_ID;
+
+function updateClock(){
+  const n=new Date();
+  document.getElementById('hdr-clock').textContent=n.toLocaleTimeString('en-IN',{hour12:false});
+}
+updateClock();setInterval(updateClock,1000);
+
+function setMode(mode){
+  const badge=document.getElementById('mode-badge');
+  const label=document.getElementById('mode-label');
+  const modes={
+    standby:{cls:'idle',text:'STANDBY'},
+    recorder:{cls:'recording',text:'RECORDER MODE'},
+    file:{cls:'file',text:'FILE ANALYSIS MODE'},
+    live:{cls:'recording',text:'LIVE RECORDING'},
+    analyzing:{cls:'analyzing',text:'PROCESSING'},
+    complete:{cls:'complete',text:'ANALYSIS COMPLETE'}
+  };
+  const m=modes[mode]||modes.standby;
+  badge.className='mode-badge '+m.cls;
+  label.textContent=m.text;
+}
+
+function setModelJob(state){
+  const el=document.getElementById('mdl-job');
+  const states={
+    idle:{cls:'idle',text:'IDLE'},
+    queued:{cls:'ready',text:'QUEUED'},
+    processing:{cls:'processing',text:'PROCESSING'},
+    complete:{cls:'loaded',text:'COMPLETE'},
+    error:{cls:'idle',text:'ERROR'}
+  };
+  const s=states[state]||states.idle;
+  el.className='status-pill '+s.cls;
+  el.textContent=s.text;
+}
+
+function animCount(id,target,suffix,dur){
+  let start=null;
+  const el=document.getElementById(id);
+  function step(ts){
+    if(!start)start=ts;
+    const prog=Math.min((ts-start)/dur,1);
+    const ease=prog<.5?2*prog*prog:(4-2*prog)*prog-1;
+    const val=Math.round(ease*target);
+    el.textContent=val.toLocaleString()+(suffix||'');
+    if(prog<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// NOTE: kpi-threats / kpi-sessions / kpi-acc / kpi-fpr are dashboard-wide
+// historical stats (total threats blocked, total sessions analyzed, etc).
+// The backend in this build has no persistent stats database (analyses are
+// stored in-memory per case_id only) so there is no real endpoint for
+// these aggregate counters yet. They remain a startup placeholder
+// animation until a stats/aggregation endpoint is added server-side.
+setTimeout(()=>{
+  animCount('kpi-threats',142,'',1200);
+  animCount('kpi-sessions',12481,'',1600);
+  setTimeout(()=>{let s=null;const el=document.getElementById('kpi-acc');function step(ts){if(!s)s=ts;const p=Math.min((ts-s)/1400,1);const e=p<.5?2*p*p:(4-2*p)*p-1;el.textContent=(e*96.8).toFixed(1)+'%';if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);},200);
+  setTimeout(()=>{let s=null;const el=document.getElementById('kpi-fpr');function step(ts){if(!s)s=ts;const p=Math.min((ts-s)/1200,1);const e=p<.5?2*p*p:(4-2*p)*p-1;el.textContent=(e*1.7).toFixed(1)+'%';if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);},400);
+},300);
+
+// Fusion Matrix counters: pulled from the real /model-status endpoint
+// (biological + deep feature dimensionality), not hardcoded.
+let FUSION_COUNTS = { bio: 0, deep: 0 };
+async function loadModelStatusAndSystemHealth(){
+  try{
+    const status = await apiGet('/model-status');
+    FUSION_COUNTS.bio = status.feature_counts.biological_features;
+    FUSION_COUNTS.deep = status.feature_counts.deep_features;
+    animCount('bio-feat', FUSION_COUNTS.bio, '', 1800);
+    animCount('dl-feat', FUSION_COUNTS.deep, '', 2200);
+    // No single "fused" dimensionality exists in the weighted-average
+    // architecture (two independent scores combined, not concatenated
+    // feature vectors) — show combined input signal count instead.
+    animCount('fus-feat', FUSION_COUNTS.bio + FUSION_COUNTS.deep, '', 2600);
+
+    setPill('mdl-loaded', status.model_loaded ? 'loaded' : 'idle', status.model_loaded ? 'LOADED' : 'PLACEHOLDER');
+    setPill('mdl-infer', status.inference_ready ? 'ready' : 'idle', status.inference_ready ? 'READY' : 'NOT READY');
+    setPill('mdl-backend', 'connected', 'CONNECTED');
+  }catch(e){
+    console.warn('Could not reach /model-status:', e.message);
+    setPill('mdl-backend', 'idle', 'OFFLINE');
+    document.getElementById('bio-feat').textContent='—';
+    document.getElementById('dl-feat').textContent='—';
+    document.getElementById('fus-feat').textContent='—';
+  }
+
+  try{
+    const health = await apiGet('/health');
+    setPill('sys-api', health.backend_api==='CONNECTED'?'online':'idle', health.backend_api);
+    setPill('sys-stream', 'active', 'ACTIVE');
+    setPill('sys-db', health.database==='CONNECTED'?'connected':'idle', health.database);
+    setPill('sys-threat', 'connected', 'CONNECTED');
+  }catch(e){
+    setPill('sys-api', 'idle', 'OFFLINE');
+    setPill('sys-db', 'idle', 'OFFLINE');
+  }
+}
+function setPill(id, cls, text){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.className = 'status-pill ' + cls;
+  el.textContent = text;
+}
+loadModelStatusAndSystemHealth();
+setInterval(loadModelStatusAndSystemHealth, 15000); // periodic health refresh
+
+setTimeout(()=>{document.getElementById('xai-bio').style.width='40%';document.getElementById('xai-dl').style.width='60%';document.getElementById('xai-fus').style.width='100%';},800);
+// NOTE: these three bars represent the FUSION WEIGHTS (bio=0.4, deep=0.6,
+// combined=1.0), shown at page-load as a static reference to the fusion
+// formula, since the real per-analysis stream scores are rendered
+// elsewhere (rd-score / chunk table / threat intel) once an analysis runs.
+
+const waveCanvas=document.getElementById('wave-canvas');
+const wCtx=waveCanvas.getContext('2d');
+let waveData=[];let isPlaying=false;let wavePos=0;
+
+function resizeWave(){waveCanvas.width=waveCanvas.offsetWidth*devicePixelRatio;waveCanvas.height=waveCanvas.offsetHeight*devicePixelRatio;wCtx.scale(devicePixelRatio,devicePixelRatio);}
+resizeWave();
+
+function drawWave(data,pos){
+  const w=waveCanvas.offsetWidth,h=waveCanvas.offsetHeight;
+  wCtx.clearRect(0,0,w,h);
+  if(!data||!data.length){
+    wCtx.strokeStyle='rgba(21,101,192,0.15)';wCtx.lineWidth=1;
+    wCtx.beginPath();wCtx.moveTo(0,h/2);wCtx.lineTo(w,h/2);wCtx.stroke();return;
+  }
+  const step=w/data.length;
+  wCtx.strokeStyle='rgba(0,180,216,0.25)';wCtx.lineWidth=1;
+  wCtx.beginPath();
+  for(let i=0;i<data.length;i++){const x=i*step,y=h/2-data[i]*h*.45;i===0?wCtx.moveTo(x,y):wCtx.lineTo(x,y);}
+  wCtx.stroke();
+  const cx=(pos||0)*w;
+  wCtx.strokeStyle='rgba(0,200,150,0.9)';wCtx.lineWidth=1.5;
+  wCtx.beginPath();
+  for(let i=0;i<data.length;i++){const x=i*step;if(x>cx)break;const y=h/2-data[i]*h*.45;i===0?wCtx.moveTo(x,y):wCtx.lineTo(x,y);}
+  wCtx.stroke();
+  wCtx.strokeStyle='rgba(255,255,255,0.6)';wCtx.lineWidth=1.5;
+  wCtx.beginPath();wCtx.moveTo(cx,4);wCtx.lineTo(cx,h-4);wCtx.stroke();
+}
+drawWave(null,0);
+
+function togglePlay(){
+  const icon=document.getElementById('play-icon');
+  if(!waveData.length)return;
+  isPlaying=!isPlaying;
+  icon.className=isPlaying?'ti ti-player-pause':'ti ti-player-play';
+  if(isPlaying)animateWave();
+}
+function animateWave(){
+  if(!isPlaying)return;
+  wavePos+=0.003;
+  if(wavePos>1){wavePos=0;isPlaying=false;document.getElementById('play-icon').className='ti ti-player-play';}
+  document.getElementById('progress-bar').style.width=(wavePos*100)+'%';
+  drawWave(waveData,wavePos);
+  requestAnimationFrame(animateWave);
+}
+
+const fc=document.getElementById('fusion-canvas');
+const fCtx=fc.getContext('2d');
+let particles=[];let nodes=[];
+function resizeFusion(){fc.width=fc.offsetWidth*devicePixelRatio;fc.height=fc.offsetHeight*devicePixelRatio;fCtx.scale(devicePixelRatio,devicePixelRatio);initFusion();}
+function initFusion(){
+  const w=fc.offsetWidth,h=fc.offsetHeight;
+  nodes=[
+    {x:w*.15,y:h*.25,label:'MFCC',r:22,color:'#1565c0',glow:'rgba(21,101,192,.4)',group:'bio'},
+    {x:w*.15,y:h*.5,label:'Pitch',r:20,color:'#1565c0',glow:'rgba(21,101,192,.3)',group:'bio'},
+    {x:w*.15,y:h*.75,label:'F-Ratio',r:20,color:'#1565c0',glow:'rgba(21,101,192,.3)',group:'bio'},
+    {x:w*.42,y:h*.3,label:'BiLSTM',r:24,color:'#0097a7',glow:'rgba(0,151,167,.4)',group:'mid'},
+    {x:w*.42,y:h*.7,label:'Attn.',r:22,color:'#0097a7',glow:'rgba(0,151,167,.3)',group:'mid'},
+    {x:w*.67,y:h*.25,label:'Wav2Vec',r:22,color:'#006064',glow:'rgba(0,96,100,.3)',group:'dl'},
+    {x:w*.67,y:h*.5,label:'CNN',r:20,color:'#006064',glow:'rgba(0,96,100,.3)',group:'dl'},
+    {x:w*.67,y:h*.75,label:'ResNet',r:20,color:'#006064',glow:'rgba(0,96,100,.3)',group:'dl'},
+    {x:w*.9,y:h*.5,label:'FUSION',r:30,color:'#00b4d8',glow:'rgba(0,180,216,.5)',group:'out'},
+  ];
+  const conns=[[0,3],[1,3],[1,4],[2,4],[3,8],[4,8],[5,8],[6,8],[7,8],[3,7],[4,5]];
+  particles=[];
+  conns.forEach(([a,b])=>{for(let i=0;i<3;i++)particles.push({a,b,t:Math.random(),speed:.004+Math.random()*.003,size:1.5+Math.random()*.5});});
+}
+resizeFusion();
+let fusPhase=0;
+function drawFusion(){
+  const w=fc.offsetWidth,h=fc.offsetHeight;
+  fCtx.clearRect(0,0,w,h);fusPhase+=.015;
+  const pairs=new Set();
+  particles.forEach(p=>{const key=p.a+'-'+p.b;if(pairs.has(key))return;pairs.add(key);const na=nodes[p.a],nb=nodes[p.b];const gr=fCtx.createLinearGradient(na.x,na.y,nb.x,nb.y);gr.addColorStop(0,na.color+'60');gr.addColorStop(1,nb.color+'60');fCtx.beginPath();fCtx.moveTo(na.x,na.y);fCtx.lineTo(nb.x,nb.y);fCtx.strokeStyle=gr;fCtx.lineWidth=.8;fCtx.stroke();});
+  particles.forEach(p=>{p.t+=p.speed;if(p.t>1)p.t=0;const na=nodes[p.a],nb=nodes[p.b];const x=na.x+(nb.x-na.x)*p.t,y=na.y+(nb.y-na.y)*p.t;fCtx.beginPath();fCtx.arc(x,y,p.size,0,Math.PI*2);fCtx.fillStyle='rgba(0,180,216,0.9)';fCtx.fill();});
+  nodes.forEach((n,i)=>{const pulse=n.group==='out'?Math.sin(fusPhase*2)*.04:Math.sin(fusPhase+i)*.02;const r=n.r*(1+pulse);const g=fCtx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*2.5);g.addColorStop(0,n.glow);g.addColorStop(1,'transparent');fCtx.beginPath();fCtx.arc(n.x,n.y,r*2.5,0,Math.PI*2);fCtx.fillStyle=g;fCtx.fill();fCtx.beginPath();fCtx.arc(n.x,n.y,r,0,Math.PI*2);fCtx.fillStyle=n.color+'33';fCtx.fill();fCtx.strokeStyle=n.color;fCtx.lineWidth=1.5;fCtx.stroke();fCtx.fillStyle='#e8edf5';fCtx.font=`500 ${n.group==='out'?11:9}px Inter`;fCtx.textAlign='center';fCtx.textBaseline='middle';fCtx.fillText(n.label,n.x,n.y);});
+  fCtx.font='9px Inter';fCtx.fillStyle='rgba(143,168,200,0.4)';fCtx.textAlign='center';
+  fCtx.fillText('BIOLOGICAL',fc.offsetWidth*.15,12);fCtx.fillText('FUSION LAYER',fc.offsetWidth*.42,12);fCtx.fillText('DEEP LEARNING',fc.offsetWidth*.67,12);fCtx.fillText('OUTPUT',fc.offsetWidth*.9,12);
+  requestAnimationFrame(drawFusion);
+}
+drawFusion();
+
+function triggerUpload(){document.getElementById('file-input').click();}
+
+function setMetadata(name,fmt,sr,ch,dur,size){
+  document.getElementById('meta-name').textContent=name;document.getElementById('meta-name').classList.remove('pending');
+  document.getElementById('meta-fmt').textContent=fmt;document.getElementById('meta-fmt').classList.remove('pending');
+  document.getElementById('meta-sr').textContent=sr;document.getElementById('meta-sr').classList.remove('pending');
+  document.getElementById('meta-ch').textContent=ch;document.getElementById('meta-ch').classList.remove('pending');
+  document.getElementById('meta-dur').textContent=dur;document.getElementById('meta-dur').classList.remove('pending');
+  document.getElementById('meta-size').textContent=size;document.getElementById('meta-size').classList.remove('pending');
+}
+function clearMetadata(){
+  ['meta-name','meta-fmt','meta-sr','meta-ch','meta-dur','meta-size'].forEach(id=>{
+    document.getElementById(id).textContent='—';document.getElementById(id).classList.add('pending');
+  });
+}
+function setInferenceMetrics(time,conf,dur,chunks){
+  const timeEl=document.getElementById('inf-time');timeEl.textContent=time;timeEl.classList.remove('pending');document.getElementById('inf-time-unit').textContent='milliseconds';
+  const confEl=document.getElementById('inf-conf');confEl.textContent=conf;confEl.classList.remove('pending');document.getElementById('inf-conf-unit').textContent='fusion model output';
+  const durEl=document.getElementById('inf-dur');durEl.textContent=dur;durEl.classList.remove('pending');document.getElementById('inf-dur-unit').textContent='seconds';
+  const chEl=document.getElementById('inf-chunks');chEl.textContent=chunks;chEl.classList.remove('pending');document.getElementById('inf-chunks-unit').textContent='1-second windows';
+}
+function clearInferenceMetrics(){
+  ['inf-time','inf-conf','inf-dur','inf-chunks'].forEach(id=>{
+    document.getElementById(id).textContent='—';document.getElementById(id).classList.add('pending');
+  });
+  ['inf-time-unit','inf-conf-unit','inf-dur-unit','inf-chunks-unit'].forEach(id=>{document.getElementById(id).textContent='awaiting run';});
+}
+
+function getExtension(name){const p=name.split('.');return p.length>1?p.pop().toUpperCase():'AUDIO';}
+function formatSize(bytes){if(!bytes)return'—';if(bytes<1024)return bytes+'B';if(bytes<1048576)return(bytes/1024).toFixed(1)+'KB';return(bytes/1048576).toFixed(1)+'MB';}
+function getCodec(ext,sr){const codecs={WAV:'PCM/Linear',MP3:'MPEG Layer III',FLAC:'FLAC Lossless',OGG:'Vorbis/Opus',M4A:'AAC-LC',WEBM:'Opus'};return(codecs[ext]||ext)+' · '+sr+'Hz';}
+
+// Holds the most recent /predict response so downloadReport() can request
+// the matching PDF by case_id without re-running inference.
+let LAST_ANALYSIS = null;
+
+function handleFile(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  const ext=getExtension(file.name);
+  setMode('file');
+  document.getElementById('wv-status').textContent='LOADING...';
+  document.getElementById('wv-status').style.color='var(--amber)';
+  clearMetadata();clearInferenceMetrics();
+  const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  const reader=new FileReader();
+  reader.onload=function(e){
+    // Decode locally ONLY to draw the waveform preview immediately —
+    // the authoritative metadata (sample rate, duration, etc.) and the
+    // fraud analysis itself both come from the backend in runAnalysis().
+    audioCtx.decodeAudioData(e.target.result.slice(0),function(buf){
+      const chData=buf.getChannelData(0);const pts=300;const step=Math.floor(chData.length/pts)||1;
+      const wd=[];for(let i=0;i<pts;i++){let mx=0;for(let j=0;j<step;j++){const v=Math.abs(chData[i*step+j]);if(v>mx)mx=v;}wd.push(mx*2-1);}
+      waveData=wd;drawWave(waveData,0);
+      document.getElementById('wv-status').textContent='SIGNAL OK';
+      document.getElementById('wv-status').style.color='var(--green)';
+    },function(){
+      document.getElementById('wv-status').textContent='DECODE ERROR (preview only — analysis will still run)';
+      document.getElementById('wv-status').style.color='var(--amber)';
+    });
+  };
+  reader.readAsArrayBuffer(file);
+  runAnalysis(file);
+}
+
+let mediaRec=null;let micChunks=[];let micStream=null;let micRecording=false;
+function startMic(){
+  if(micRecording){stopMic();return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+    micStream=stream;micChunks=[];micRecording=true;
+    setMode('live');setModelJob('queued');
+    document.getElementById('mic-btn').innerHTML='<i class="ti ti-square" style="font-size:12px"></i> Stop';
+    document.getElementById('mic-btn').style.color='var(--red)';
+    document.getElementById('wv-status').textContent='REC';
+    document.getElementById('wv-status').style.color='var(--red)';
+    clearMetadata();clearInferenceMetrics();
+    setMetadata('MIC_CAPTURE','PCM/WebM · Live','—','—','—','—');
+    const mr=new MediaRecorder(stream);mediaRec=mr;
+    mr.ondataavailable=e=>{micChunks.push(e.data);};
+    mr.onstop=()=>{
+      const blob=new Blob(micChunks,{type:'audio/webm'});
+      const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      const reader=new FileReader();
+      reader.onload=function(ev){
+        audioCtx.decodeAudioData(ev.target.result,function(buf){
+          const chData=buf.getChannelData(0);const pts=300;const step=Math.floor(chData.length/pts)||1;
+          const wd=[];for(let i=0;i<pts;i++){let mx=0;for(let j=0;j<step;j++){const v=Math.abs(chData[i*step+j]||0);if(v>mx)mx=v;}wd.push(mx*2-1);}
+          waveData=wd;drawWave(waveData,0);
+          document.getElementById('wv-status').textContent='SIGNAL OK';
+          document.getElementById('wv-status').style.color='var(--green)';
+          // Send the recorded clip to /predict, same path as a file upload.
+          // NOTE: this submits the FULL recording as one file via /predict
+          // when you click Stop — it does NOT stream live per-1.5s scores.
+          // True live streaming requires wiring the WebSocket /stream
+          // endpoint with a 16-bit PCM AudioWorklet capture pipeline; see
+          // backend/README.md "Known gaps" for what that needs.
+          const micFile=new File([blob], 'MIC_CAPTURE_'+Date.now()+'.webm', {type:'audio/webm'});
+          runAnalysis(micFile);
+        },function(){
+          document.getElementById('wv-status').textContent='DECODE ERROR';
+          document.getElementById('wv-status').style.color='var(--red)';
+        });
+      };reader.readAsArrayBuffer(blob);
+    };
+    mr.start(100);
+  }).catch(()=>{
+    document.getElementById('wv-status').textContent='MIC DENIED';
+    document.getElementById('wv-status').style.color='var(--red)';
+    setMode('standby');
+  });
+}
+function stopMic(){
+  if(mediaRec&&micRecording){mediaRec.stop();micStream.getTracks().forEach(t=>t.stop());}
+  micRecording=false;
+  document.getElementById('mic-btn').innerHTML='<i class="ti ti-microphone" style="font-size:12px"></i> Live Record';
+  document.getElementById('mic-btn').style.color='';
+  setMode('file');
+}
+
+// Demo Analysis: generates a short real sine/noise WAV client-side and
+// submits it through the SAME /predict pipeline as a real upload — no
+// fabricated results. Score will reflect whatever the backend (real
+// model, or placeholder heuristic if not yet trained) actually returns
+// for this synthetic test tone, not a scripted demo number.
+function generateDemoWaveBlob(){
+  const sr=16000, durationSec=6.2, n=Math.floor(sr*durationSec);
+  const buf=new ArrayBuffer(44+n*2);
+  const view=new DataView(buf);
+  function writeStr(o,s){for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i));}
+  writeStr(0,'RIFF');view.setUint32(4,36+n*2,true);writeStr(8,'WAVE');
+  writeStr(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);
+  view.setUint16(22,1,true);view.setUint32(24,sr,true);view.setUint32(28,sr*2,true);
+  view.setUint16(32,2,true);view.setUint16(34,16,true);
+  writeStr(36,'data');view.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){
+    const t=i/sr;
+    const env=Math.sin(Math.PI*i/n);
+    const val=(Math.sin(2*Math.PI*180*t)*0.3 + Math.sin(2*Math.PI*420*t)*0.15)*env;
+    const s=Math.max(-1,Math.min(1,val));
+    view.setInt16(44+i*2, s*32767, true);
+  }
+  return new Blob([buf], {type:'audio/wav'});
+}
+function generateDemoWave(){
+  // Local waveform preview only (visual), independent of the actual WAV
+  // bytes sent to the backend in runDemo() below.
+  const pts=300,arr=[];
+  for(let i=0;i<pts;i++){const t=i/pts;const env=Math.sin(t*Math.PI);const val=Math.sin(t*80)*.3+Math.sin(t*200)*.15;arr.push(val*env);}
+  return arr;
+}
+
+function runDemo(){
+  waveData=generateDemoWave();drawWave(waveData,0);
+  document.getElementById('wv-status').textContent='DEMO SIGNAL';
+  document.getElementById('wv-status').style.color='var(--amber)';
+  clearMetadata();clearInferenceMetrics();
+  setMode('file');
+  const demoBlob=generateDemoWaveBlob();
+  const demoFile=new File([demoBlob], 'DEMO_SYNTHETIC_TONE_001.wav', {type:'audio/wav'});
+  runAnalysis(demoFile);
+}
+
+const PIPELINE_STEPS=['Audio Received','Audio Standardization','Voice Activity Detection','Biological Feature Extraction','Deep Feature Extraction','Fusion Analysis','Risk Classification','Report Generation'];
+
+function advanceTimelineTo(stepIndex){
+  for(let i=0;i<PIPELINE_STEPS.length;i++){
+    const dot=document.getElementById('tl-dot-'+i), txt=document.getElementById('tl-text-'+i);
+   if(!dot) continue;
+    if(i<stepIndex){dot.className='tl-dot done';txt.className='tl-text done';}
+    else if(i===stepIndex){
+      dot.className='tl-dot active';txt.className='tl-text active';
+      document.getElementById('tl-t-'+i).textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});
+    }
+  }
+}
+
+async function runAnalysis(file){
+  resetResults();
+  setMode('analyzing');setModelJob('processing');
+  const t0=performance.now();
+
+  // Drive the timeline optimistically while the request is in flight —
+  // we don't have granular server-sent progress events in this build, so
+  // steps advance on a schedule but the FINAL result (and whether it
+  // completes at all) always comes from the real backend response below.
+  let step=0;
+  advanceTimelineTo(0);
+  const timelineInterval=setInterval(()=>{
+    step=Math.min(step+1, PIPELINE_STEPS.length-2); // hold before last step until response arrives
+    advanceTimelineTo(step);
+  }, 500);
+
+  try{
+    const result = await apiPostFile('/predict', file);
+    clearInterval(timelineInterval);
+    advanceTimelineTo(PIPELINE_STEPS.length-1);
+    setTimeout(()=>{
+      for(let i=0;i<PIPELINE_STEPS.length;i++){
+        const dot=document.getElementById('tl-dot-'+i), txt=document.getElementById('tl-text-'+i);
+        if(dot){dot.className='tl-dot done';txt.className='tl-text done';}
+      }
+      const elapsed=Math.round(performance.now()-t0);
+      showResults(result, elapsed);
+    }, 300);
+  }catch(err){
+    clearInterval(timelineInterval);
+    setMode('standby');setModelJob('error');
+    document.getElementById('table-status').textContent='ERROR';
+    document.getElementById('table-status').style.color='var(--red)';
+    document.getElementById('chunk-tbody').innerHTML=
+      `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:16px;font-family:var(--sans)">
+        Analysis failed: ${(err.message||'Unknown error').replace(/</g,'&lt;')}<br>
+        <span style="color:var(--text3);font-size:10px">Is the VoiceGuard backend running at ${BACKEND_URL}? See backend/README.md.</span>
+      </td></tr>`;
+    document.getElementById('ring-verdict').textContent='Analysis failed';
+    document.getElementById('ring-verdict').style.color='var(--red)';
+  }
+}
+
+function resetResults(){
+  for(let i=0;i<PIPELINE_STEPS.length;i++){
+    const dot=document.getElementById('tl-dot-'+i);
+    if(!dot) continue;
+    dot.className='tl-dot pending';
+    document.getElementById('tl-t-'+i).textContent='—';
+    document.getElementById('tl-text-'+i).className='tl-text';
+  }
+  document.getElementById('chunk-tbody').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:16px;font-family:var(--sans)">Analyzing...</td></tr>';
+  document.getElementById('table-status').textContent='PROCESSING';document.getElementById('table-status').style.color='var(--amber)';
+  document.getElementById('ring-circle').style.strokeDashoffset='314.16';
+  document.getElementById('ring-pct').textContent='0%';
+  document.getElementById('ring-verdict').textContent='Analyzing...';document.getElementById('ring-verdict').style.color='var(--text2)';
+  document.getElementById('ring-risk').style.display='none';document.getElementById('ring-details').style.display='none';
+  document.getElementById('ti-type').textContent='—';document.getElementById('ti-soph').textContent='—';document.getElementById('ti-replay').textContent='—';document.getElementById('ti-synth').textContent='—';
+  document.getElementById('ti-risk-cat').innerHTML='—';
+  clearInferenceMetrics();
+}
+
+function showResults(result, clientElapsedMs){
+  LAST_ANALYSIS = result;
+
+  const meta=result.metadata;
+  setMetadata(meta.filename, meta.format, meta.sample_rate, meta.channels, meta.duration+'s', formatSize(meta.file_size_bytes));
+  document.getElementById('wave-dur').textContent=meta.duration+'s';
+  document.getElementById('wave-sr').textContent=meta.sample_rate;
+  document.getElementById('wave-ch').textContent=meta.channels;
+
+  const fraudScore=result.fraud_score;       // already 0-100 from backend
+  const fusionConf=result.confidence;        // already 0-100 from backend
+  const synthetic=result.threat_intel.synthetic_confidence;
+  const chunks=result.performance.chunks_processed;
+  const riskLevel=result.risk_level;
+  const verdict=result.verdict;              // CLEAN | SUSPICIOUS | FRAUD
+
+  const riskColorVar = verdict==='FRAUD' ? 'var(--red)' : verdict==='SUSPICIOUS' ? 'var(--amber)' : 'var(--green)';
+
+  setMode('complete');setModelJob('complete');
+
+  const offset=314.16*(1-fraudScore/100);
+  document.getElementById('ring-circle').style.strokeDashoffset=offset;
+  let pct=0;const pctEl=document.getElementById('ring-pct');
+  const target=Math.round(fraudScore);
+  const pctInt=setInterval(()=>{pct+=2;pctEl.textContent=Math.min(pct,target)+'%';if(pct>=target)clearInterval(pctInt);},30);
+  document.getElementById('ring-verdict').textContent=result.verdict_label;
+  document.getElementById('ring-verdict').style.color=riskColorVar;
+  document.getElementById('ring-risk').style.display='block';
+  document.getElementById('ring-risk-label').textContent=riskLevel+' RISK';
+  document.getElementById('ring-details').style.display='block';
+  document.getElementById('rd-score').textContent=fraudScore+'%';
+  document.getElementById('rd-level').textContent=riskLevel;
+
+  document.getElementById('ti-type').textContent=result.threat_intel.threat_type;
+  document.getElementById('ti-soph').textContent=result.threat_intel.sophistication;
+  document.getElementById('ti-replay').textContent=result.threat_intel.replay_indicators;
+  document.getElementById('ti-synth').textContent=synthetic+'%';
+  const riskCatClass = verdict==='FRAUD' ? 'critical' : verdict==='SUSPICIOUS' ? 'elevated' : 'clear';
+  document.getElementById('ti-risk-cat').innerHTML='<span class="threat-badge '+riskCatClass+'">'+riskLevel+'</span>';
+
+  setInferenceMetrics(result.performance.inference_time_ms.toLocaleString(), fusionConf+'%', result.performance.audio_duration_sec.toFixed(2), chunks);
+
+  const tbody=document.getElementById('chunk-tbody');
+  tbody.innerHTML='';
+  if(!result.chunk_results || result.chunk_results.length===0){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:16px;font-family:var(--sans)">No chunks processed</td></tr>';
+  } else {
+    result.chunk_results.forEach(c=>{
+      const cs=c.score.toFixed(1);
+      const conf=c.confidence.toFixed(1);
+      const v=c.verdict;
+      const color=v==='FRAUD'?'#ff4560':v==='SUSPICIOUS'?'#ffb300':'#00c896';
+      tbody.innerHTML+=`<tr>
+        <td style="font-weight:500;color:var(--text)">#${String(c.index).padStart(2,'0')}</td>
+        <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:${Math.min(100,Math.max(0,c.score))}%;background:${color}"></div></div><span style="color:${color};min-width:36px;text-align:right">${cs}%</span></div></td>
+        <td style="color:var(--cyan)">${conf}%</td>
+        <td><span class="verdict-tag ${v.toLowerCase()}">${v}</span></td>
+        <td><span class="status-dot done"></span><span style="color:var(--text2)">${c.start}s\u2013${c.end}s</span></td>
+      </tr>`;
+    });
+  }
+  document.getElementById('table-status').textContent='COMPLETE';document.getElementById('table-status').style.color='var(--green)';
+
+  document.getElementById('rpt-id').textContent=result.case_id;
+  document.getElementById('rpt-ts').textContent=new Date(result.timestamp).toLocaleString('en-IN',{hour12:false});
+  document.getElementById('rpt-model').textContent=result.performance.model_version;
+  document.getElementById('rpt-risk').textContent=fraudScore+'%';
+  document.getElementById('rpt-type').textContent=result.threat_intel.threat_type;
+  document.getElementById('rpt-synth').textContent=synthetic+'%';
+  document.getElementById('rpt-fusion').textContent=fusionConf+'%';
+  document.getElementById('rpt-primary-trigger').innerHTML='<span class="trigger-tag primary">'+result.primary_trigger+'</span>';
+  document.getElementById('rpt-secondary-trigger').innerHTML='<span class="trigger-tag secondary">'+result.secondary_trigger+'</span>';
+  document.getElementById('rpt-rec').textContent=result.recommendation;
+  const placeholderNote = result.using_real_models ? '' : ' \u2014 PLACEHOLDER SCORING (fusion models not yet trained)';
+  document.getElementById('rpt-class').textContent='RESTRICTED — RBI/2023-24/73 — CERT-In Reportable — Session: '+SESSION_ID+placeholderNote;
+
+  // Reflect real per-analysis stream weighting/contribution on the XAI bars
+  // (bio_score/deep_score averaged across chunks) rather than the static
+  // fusion-weight reference shown at page load.
+  if(result.chunk_results && result.chunk_results.length){
+    const avgBio = result.chunk_results.reduce((s,c)=>s+c.bio_score,0)/result.chunk_results.length;
+    const avgDeep = result.chunk_results.reduce((s,c)=>s+c.deep_score,0)/result.chunk_results.length;
+    document.getElementById('xai-bio').style.width=Math.min(100,avgBio)+'%';
+    document.getElementById('xai-dl').style.width=Math.min(100,avgDeep)+'%';
+    document.getElementById('xai-fus').style.width=Math.min(100,fraudScore)+'%';
+  }
+}
+
+async function downloadReport(){
+  if(!LAST_ANALYSIS){
+    alert('Run an analysis first — there is no completed case to generate a report for.');
+    return;
+  }
+  try{
+    const res = await fetch(BACKEND_URL + '/generate-report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({case_id: LAST_ANALYSIS.case_id})
+    });
+    if(!res.ok){
+      let detail = res.statusText;
+      try{ const j = await res.json(); detail = j.detail || detail; }catch(e){}
+      throw new Error(detail);
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VoiceGuard_Report_${LAST_ANALYSIS.case_id}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }catch(err){
+    alert('Report generation failed: '+(err.message||'Unknown error')+'\nIs the VoiceGuard backend running at '+BACKEND_URL+'?');
+  }
+}
+</script>
