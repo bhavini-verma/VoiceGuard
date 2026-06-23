@@ -59,6 +59,21 @@ def main():
     df_deep = df_deep[df_deep['Label'].isin([0, 1])]
 
     df = pd.merge(df_deep, df_bio, on=['Filename', 'Label'], suffixes=('_deep', '_bio'))
+
+    # Load hard validation/user feedback features if present and combine
+    hard_bio_path = os.path.join(base_dir, 'features', 'hard_val_bio.csv')
+    hard_deep_path = os.path.join(base_dir, 'features', 'hard_val_deep.csv')
+    if os.path.exists(hard_bio_path) and os.path.exists(hard_deep_path):
+        df_hard_bio = pd.read_csv(hard_bio_path).dropna()
+        df_hard_deep = pd.read_csv(hard_deep_path).dropna()
+        df_hard_bio = df_hard_bio[df_hard_bio['Label'].isin([0.0, 1.0, 0, 1])]
+        df_hard_deep = df_hard_deep[df_hard_deep['Label'].astype(str).str.strip().isin(['0.0', '1.0', '0', '1', '0.000000', '1.000000'])]
+        df_hard_deep['Label'] = df_hard_deep['Label'].astype(float).astype(int)
+        df_hard = pd.merge(df_hard_deep, df_hard_bio, on=['Filename', 'Label'], suffixes=('_deep', '_bio'))
+        print(f"Loaded {len(df_hard)} hard validation/user feedback samples.")
+        
+        df = pd.concat([df, df_hard], ignore_index=True)
+        print(f"Total combined features count: {len(df)}")
     
     # Assign Group IDs
     df['GroupID'] = df['Filename'].apply(extract_group_id)

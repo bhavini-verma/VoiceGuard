@@ -25,7 +25,7 @@ sys.path.append(os.path.join(base_dir, 'src'))
 from extract_bio import extract_bio_features, simulate_phone_codec
 from transformers import Wav2Vec2FeatureExtractor, AutoModel
 
-app = FastAPI(title="FraudRadar AI - Fixed Weight Fusion")
+app = FastAPI(title="FraudRadar AI - Fixed Weight Fusion (Retrained)")
 
 app.add_middleware(
     CORSMiddleware,
@@ -334,6 +334,21 @@ async def process_feedback(is_correct: str = Form(...), true_label: str = Form(.
         hard_val_bio = os.path.join(base_dir, 'features', 'hard_val_bio.csv')
         hard_val_deep = os.path.join(base_dir, 'features', 'hard_val_deep.csv')
         
+        # Align columns to prevent format corruption when appending via mode='a'
+        if os.path.exists(hard_val_bio):
+            existing_bio = pd.read_csv(hard_val_bio, nrows=0)
+            for col in existing_bio.columns:
+                if col not in df_bio_input.columns:
+                    df_bio_input[col] = 0.0
+            df_bio_input = df_bio_input[existing_bio.columns]
+            
+        if os.path.exists(hard_val_deep):
+            existing_deep = pd.read_csv(hard_val_deep, nrows=0)
+            for col in existing_deep.columns:
+                if col not in df_deep_input.columns:
+                    df_deep_input[col] = 0.0
+            df_deep_input = df_deep_input[existing_deep.columns]
+            
         df_bio_input.to_csv(hard_val_bio, mode='a', header=not os.path.exists(hard_val_bio), index=False)
         df_deep_input.to_csv(hard_val_deep, mode='a', header=not os.path.exists(hard_val_deep), index=False)
         
