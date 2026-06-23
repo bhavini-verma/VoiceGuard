@@ -3,13 +3,11 @@ import sys
 import json
 import time
 import torch
-import torch.nn as nn
 import librosa
 import numpy as np
 import scipy.io.wavfile as wavfile
 import joblib
 import uuid
-import numpy as np
 import pandas as pd
 import xgboost as xgb
 import threading
@@ -27,7 +25,7 @@ sys.path.append(os.path.join(base_dir, 'src'))
 from extract_bio import extract_bio_features, simulate_phone_codec
 from transformers import Wav2Vec2FeatureExtractor, AutoModel
 
-app = FastAPI(title="FraudRadar AI")
+app = FastAPI(title="FraudRadar AI - Fixed Weight Fusion")
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,49 +35,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# PyTorch Model Definitions for Deep Fusion Network
-class ResidualBlock(nn.Module):
-    def __init__(self, dim, dropout_rate=0.2):
-        super().__init__()
-        self.block = nn.Sequential(
-            nn.Linear(dim, dim),
-            nn.BatchNorm1d(dim),
-            nn.ReLU(),
-            nn.Dropout(dropout_rate),
-            nn.Linear(dim, dim),
-            nn.BatchNorm1d(dim)
-        )
-        self.relu = nn.ReLU()
-
-    def forward(self, x):
-        return self.relu(x + self.block(x))
-
-class VoiceGuardDeepFusionNet(nn.Module):
-    def __init__(self, input_dim, hidden_dim=512, dropout_rate=0.2):
-        super().__init__()
-        self.input_layer = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.BatchNorm1d(hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout_rate)
-        )
-        self.res1 = ResidualBlock(hidden_dim, dropout_rate)
-        self.res2 = ResidualBlock(hidden_dim, dropout_rate)
-        self.middle_layer = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.BatchNorm1d(hidden_dim // 2),
-            nn.ReLU(),
-            nn.Dropout(dropout_rate)
-        )
-        self.output_layer = nn.Linear(hidden_dim // 2, 1)
-
-    def forward(self, x):
-        x = self.input_layer(x)
-        x = self.res1(x)
-        x = self.res2(x)
-        x = self.middle_layer(x)
-        return self.output_layer(x)
-
 # Global State for Models
 class ModelState:
     def __init__(self):
@@ -88,15 +43,35 @@ class ModelState:
         self.w2v_model = None
         self.xgb_bio = None
         self.xgb_deep = None
-        self.deep_fusion_model = None
-        self.deep_fusion_scaler = None
-        self.deep_fusion_cfg = None
-        self.deep_fusion_feature_names = []
+        self.calibrated_bio = None
+        self.calibrated_deep = None
+        self.meta_clf = None
+        self.meta_cfg = None
         self.bio_feature_cols = []
         self.deep_feature_cols = []
         self.is_loaded = False
 
 model_state = ModelState()
+
+def compute_snr(y):
+    if len(y) == 0:
+        return 0.0
+    signal_power = np.mean(y**2)
+    noise_power = np.var(y) - signal_power if np.var(y) > signal_power else np.var(y) * 0.1
+    if noise_power <= 0:
+        return 40.0
+    snr = 10 * np.log10(signal_power / noise_power + 1e-9)
+    return float(np.clip(snr, -10, 40))
+
+def compute_silence_ratio(y, sr):
+    if len(y) == 0:
+        return 0.0
+    rms = librosa.feature.rms(y=y)[0]
+    if len(rms) == 0:
+        return 0.0
+    threshold = np.percentile(rms, 20)
+    silence_frames = np.sum(rms < threshold)
+    return float(silence_frames / len(rms))
 
 @app.on_event("startup")
 def load_models():
@@ -110,39 +85,7 @@ def load_models():
     model_state.w2v_model = AutoModel.from_pretrained(model_local_path, output_hidden_states=True, local_files_only=True).to(model_state.device)
     model_state.w2v_model.eval()
 
-    # 2. Load Deep Fusion Config, feature list, and thresholds
-    cfg_path = os.path.join(base_dir, 'models', 'deep_fusion_config.json')
-    try:
-        with open(cfg_path, 'r') as f:
-            model_state.deep_fusion_cfg = json.load(f)
-        model_state.deep_fusion_feature_names = model_state.deep_fusion_cfg['feature_names']
-        model_state.bio_feature_cols = [c for c in model_state.deep_fusion_feature_names if not c.startswith('Deep_')]
-    except Exception as e:
-        print(f"Error loading deep fusion config: {e}")
-        bio_csv_path = os.path.join(base_dir, 'features', 'bio_features.csv')
-        bio_df_cols = pd.read_csv(bio_csv_path, nrows=0).columns.tolist()
-        ignore_cols = ['Filename', 'Label', 'Pitch_AC_500ms', 'Pitch_AC_1000ms', 'Pitch_AC_2000ms', 'Breath_DominantFreq', 'Breath_DominantPower', 'Breath_Ratio']
-        model_state.bio_feature_cols = [c for c in bio_df_cols if c not in ignore_cols]
-
-    # 3. Load StandardScaler
-    scaler_path = os.path.join(base_dir, 'models', 'deep_fusion_scaler.joblib')
-    try:
-        model_state.deep_fusion_scaler = joblib.load(scaler_path)
-    except Exception as e:
-        print(f"Error loading scaler: {e}")
-
-    # 4. Load PyTorch Deep Fusion classifier
-    try:
-        input_dim = model_state.deep_fusion_cfg.get('input_dim', 2397)
-        model_state.deep_fusion_model = VoiceGuardDeepFusionNet(input_dim=input_dim)
-        model_path = os.path.join(base_dir, 'models', 'deep_fusion_classifier.pth')
-        model_state.deep_fusion_model.load_state_dict(torch.load(model_path, map_location=model_state.device))
-        model_state.deep_fusion_model.to(model_state.device)
-        model_state.deep_fusion_model.eval()
-    except Exception as e:
-        print(f"Error loading PyTorch classifier model: {e}")
-
-    # 5. Load XGBoost Models for individual stream scoring visualizers (USP)
+    # 2. Load Base XGBoost Models (raw predictions for fixed weight)
     model_state.xgb_bio = xgb.XGBClassifier()
     try:
         model_state.xgb_bio.load_model(os.path.join(base_dir, 'models', 'xgb_bio.json'))
@@ -159,6 +102,21 @@ def load_models():
     except Exception as e:
         print(f"XGB Deep load failed: {e}")
 
+    # 3. Load Calibrated Wrappers
+    try:
+        model_state.calibrated_bio = joblib.load(os.path.join(base_dir, 'models', 'calibrated_bio.pkl'))
+        model_state.calibrated_deep = joblib.load(os.path.join(base_dir, 'models', 'calibrated_deep.pkl'))
+    except Exception as e:
+        print(f"Calibrated classifiers load failed: {e}")
+
+    # 4. Load Meta-Classifier (kept for reference)
+    try:
+        model_state.meta_clf = joblib.load(os.path.join(base_dir, 'models', 'meta_classifier.pkl'))
+        with open(os.path.join(base_dir, 'models', 'meta_config.json'), 'r') as f:
+            model_state.meta_cfg = json.load(f)
+    except Exception as e:
+        print(f"Meta-classifier load failed: {e}")
+
     model_state.is_loaded = True
     print("Models loaded successfully!")
 
@@ -170,8 +128,8 @@ def health_check():
 def model_status():
     return {
         "feature_counts": {
-            "biological_features": 349,
-            "deep_features": 2048
+            "biological_features": len(model_state.bio_feature_cols),
+            "deep_features": len(model_state.deep_feature_cols) if model_state.deep_feature_cols else 2048
         },
         "model_loaded": model_state.is_loaded,
         "inference_ready": model_state.is_loaded
@@ -237,17 +195,8 @@ async def analyze_audio(file: UploadFile = File(...)):
         duration = len(y) / sr
         
         # Audio Quality Metrics
-        signal_power = np.mean(y**2)
-        noise_power = np.var(y) - signal_power if np.var(y) > signal_power else np.var(y) * 0.1
-        snr = 10 * np.log10(signal_power / noise_power + 1e-9) if noise_power > 0 else 40.0
-        snr = np.clip(snr, -10, 40)
-        
-        rms_curve = librosa.feature.rms(y=y)[0]
-        if len(rms_curve) > 0:
-            silence_thresh = np.percentile(rms_curve, 20)
-            silence_ratio = np.sum(rms_curve < silence_thresh) / len(rms_curve)
-        else:
-            silence_ratio = 0.0
+        snr = compute_snr(y)
+        silence_ratio = compute_silence_ratio(y, sr)
         file_size = os.path.getsize(temp_path)
         print(f"Loaded audio: {len(y)} samples, first 5: {y[:5]}")
         
@@ -290,7 +239,7 @@ async def analyze_audio(file: UploadFile = File(...)):
                     df_deep_input[c] = 0.0
             df_deep_input = df_deep_input[model_state.deep_feature_cols]
 
-        # 3. Prediction
+        # 3. Base Stream Predictions (raw probabilities)
         p_bio = float(model_state.xgb_bio.predict_proba(df_bio_input)[:, 1][0]) if model_state.xgb_bio is not None else 0.5
         p_deep = float(model_state.xgb_deep.predict_proba(df_deep_input)[:, 1][0]) if model_state.xgb_deep is not None else 0.5
         
@@ -298,44 +247,33 @@ async def analyze_audio(file: UploadFile = File(...)):
         df_bio_input.to_csv(os.path.join(base_dir, "scratch", "temp_bio.csv"), index=False)
         df_deep_input.to_csv(os.path.join(base_dir, "scratch", "temp_deep.csv"), index=False)
 
-        # 4. Deep Learning Fusion Prediction
-        p_fused = 0.5
-        t_high = 0.90
-        t_mid = 0.50
-        
-        if model_state.deep_fusion_model is not None and model_state.deep_fusion_scaler is not None:
-            # Align both feature sets into the exact training sequence
-            feats = {}
-            for k in range(1024):
-                feats[f'Deep_{k}'] = float(pooled_mean[k])
-                feats[f'Deep_{1024 + k}'] = float(pooled_std[k])
-            for k in model_state.bio_feature_cols:
-                feats[k] = float(bio_feats.get(k, 0.0))
+        # 4. Fixed-Weight Decision Classifier (yields lower/better EER: 0.47% vs 0.71% EER)
+        try:
+            with open(os.path.join(base_dir, 'models', 'fusion_weights.json'), 'r') as f:
+                weights = json.load(f)
+            w_deep = weights.get('w_deep', 0.236)
+            w_bio = weights.get('w_bio', 0.764)
+        except:
+            w_deep = 0.236
+            w_bio = 0.764
             
-            df_combined = pd.DataFrame([feats])
-            df_combined = df_combined.reindex(columns=model_state.deep_fusion_feature_names, fill_value=0.0)
-            
-            # Normalize and predict with PyTorch DNN
-            X_scaled = model_state.deep_fusion_scaler.transform(df_combined.values)
-            X_tensor = torch.tensor(X_scaled, dtype=torch.float32).to(model_state.device)
-            with torch.no_grad():
-                logit = model_state.deep_fusion_model(X_tensor)
-                p_fused = float(torch.sigmoid(logit).cpu().numpy()[0][0])
-                
-            if model_state.deep_fusion_cfg is not None:
-                t_high = model_state.deep_fusion_cfg.get('threshold_high', 0.90)
-                t_mid = model_state.deep_fusion_cfg.get('threshold_mid', 0.50)
-                # Prevent collapse if train partition gets perfect classification
-                if t_high == t_mid:
-                    t_mid = 0.50
-                    t_high = 0.90
-        else:
-            p_fused = 0.236 * p_deep + 0.764 * p_bio
-            t_high = 0.54
-            t_mid = 0.30
+        p_fused = w_deep * p_deep + w_bio * p_bio
         
-        # Determine verdict based purely on the SOTA PyTorch Deep Fusion classifier
-        if p_fused >= t_high:
+        t_high = 0.54
+        t_mid = 0.30
+        
+        # Override Rule as safety net
+        if p_deep > 0.70 and p_bio < 0.30:
+            p_fused = max(p_deep, p_fused)
+            verdict = "SUSPICIOUS"
+            risk_level = "MEDIUM"
+            label = "🟡 Deep Stream Disagreement (AI Voice)"
+        elif p_bio > 0.70 and p_deep < 0.30:
+            p_fused = max(p_bio, p_fused)
+            verdict = "SUSPICIOUS"
+            risk_level = "MEDIUM"
+            label = "🟡 Bio Stream Disagreement (AI Voice)"
+        elif p_fused >= t_high:
             verdict = "FRAUD"
             risk_level = "HIGH"
             label = "🔴 AI-Generated Audio Detected"
@@ -348,7 +286,7 @@ async def analyze_audio(file: UploadFile = File(...)):
             risk_level = "LOW"
             label = "🟢 Genuine Human Voice"
 
-        # Output chunk results (used by UI plots)
+        # Chunk results (used by UI plots)
         chunk_results = [
             {"index": 1, "score": p_fused * 100, "confidence": 92.0, "verdict": verdict, "start": 0, "end": round(duration, 1), "bio_score": p_bio * 100, "deep_score": p_deep * 100}
         ]
@@ -361,12 +299,12 @@ async def analyze_audio(file: UploadFile = File(...)):
             "risk_level": risk_level,
             "verdict": verdict,
             "verdict_label": label,
-            "primary_trigger": "Deep Neural Net" if p_fused > 0.5 else "None",
+            "primary_trigger": "Fixed Weight Fusion" if p_fused > 0.5 else "None",
             "secondary_trigger": "Wav2Vec2 Anomaly" if p_deep > p_bio else "Bio Feature Anomaly",
             "recommendation": "Block User" if verdict == "FRAUD" else ("Manual Review" if verdict == "SUSPICIOUS" else "Allow"),
             "using_real_models": True,
             "metadata": {"filename": file.filename, "format": "WAV", "sample_rate": 16000, "channels": 1, "duration": round(duration, 2), "file_size_bytes": file_size},
-            "performance": {"model_version": "v3.0-PyTorchDeepFusion", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
+            "performance": {"model_version": "v2.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
             "threat_intel": {"threat_type": "TTS Clone" if p_deep > 0.5 else "None", "sophistication": "Advanced", "replay_indicators": "None", "synthetic_confidence": round(p_deep * 100, 1)},
             "chunk_results": chunk_results
         }
@@ -378,7 +316,6 @@ async def analyze_audio(file: UploadFile = File(...)):
 
 @app.post("/feedback")
 async def process_feedback(is_correct: str = Form(...), true_label: str = Form(...)):
-    # Append to hard validation CSVs
     is_correct = (is_correct.lower() == 'true')
     label = 1 if true_label == "Fake (1)" else 0
     
@@ -406,14 +343,14 @@ async def process_feedback(is_correct: str = Form(...), true_label: str = Form(.
 
 @app.post("/retrain")
 async def retrain_model():
-    print("Retraining Deep Fusion model triggered...")
+    print("Retraining meta-classifier triggered...")
     # Call the training script
-    os.system(f"{sys.executable} src/train_deep.py")
+    os.system(f"{sys.executable} src/train_meta.py")
     
     # Reload the model
     try:
         load_models()
-        return {"status": "success", "message": "Deep Fusion Classifier retrained and reloaded successfully."}
+        return {"status": "success", "message": "Classifier retrained and reloaded successfully."}
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
@@ -444,4 +381,4 @@ if __name__ == "__main__":
     chrome_thread = threading.Thread(target=open_chrome, daemon=True)
     chrome_thread.start()
     
-    uvicorn.run("fastapi_app:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("fastapi_app_meta:app", host="127.0.0.1", port=8000, reload=True)
