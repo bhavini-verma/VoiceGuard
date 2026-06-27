@@ -367,6 +367,10 @@ async def analyze_audio(file: UploadFile = File(...)):
             t_high = 0.54
             t_mid = 0.30
         
+        # Calculate dynamic confidence score (clamped between 70.0% and 99.9%)
+        raw_conf = 70.0 + 30.0 * (abs(p_fused - 0.5) / 0.5)
+        confidence = round(min(99.9, max(70.0, raw_conf)), 1)
+
         # Determine verdict based purely on the SOTA PyTorch Deep Fusion classifier
         if p_fused >= t_high:
             verdict = "FRAUD"
@@ -383,14 +387,14 @@ async def analyze_audio(file: UploadFile = File(...)):
 
         # Output chunk results (used by UI plots)
         chunk_results = [
-            {"index": 1, "score": p_fused * 100, "confidence": 92.0, "verdict": verdict, "start": 0, "end": round(duration, 1), "bio_score": p_bio * 100, "deep_score": p_deep * 100}
+            {"index": 1, "score": p_fused * 100, "confidence": confidence, "verdict": verdict, "start": 0, "end": round(duration, 1), "bio_score": p_bio * 100, "deep_score": p_deep * 100}
         ]
 
         result = {
             "case_id": f"VG-{uuid.uuid4().hex[:6].upper()}",
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "fraud_score": round(p_fused * 100, 1),
-            "confidence": 92.0,
+            "confidence": confidence,
             "risk_level": risk_level,
             "verdict": verdict,
             "verdict_label": label,
