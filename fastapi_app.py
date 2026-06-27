@@ -236,6 +236,39 @@ async def analyze_audio(file: UploadFile = File(...)):
             
         duration = len(y) / sr
         
+        # Apply 80Hz high-pass filter to remove low-frequency room rumble & fan hum
+        from scipy.signal import butter, lfilter
+        import soundfile as sf
+        
+        def butter_highpass(cutoff, fs, order=1):
+            nyq = 0.5 * fs
+            normal_cutoff = cutoff / nyq
+            b, a = butter(order, normal_cutoff, btype='high', analog=False)
+            return b, a
+            
+        def highpass_filter(data, cutoff=80, fs=16000, order=1):
+            b, a = butter_highpass(cutoff, fs, order=order)
+            return lfilter(b, a, data)
+            
+        y = highpass_filter(y, cutoff=80, fs=sr)
+        
+        # Loudness/Peak normalization (scale peak to 0.95 to match training dataset levels)
+        peak = np.max(np.abs(y))
+        if peak > 1e-4:
+            y = (y / peak) * 0.95
+            
+        # Save the filtered & normalized audio back to a WAV file so bio-extraction and librosa load it correctly
+        processed_path = temp_path.replace(ext, "_processed.wav")
+        sf.write(processed_path, y, sr, format='WAV', subtype='PCM_16')
+        
+        # Remove original raw file and point temp_path to the processed WAV path
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except:
+                pass
+        temp_path = processed_path
+        
         # Audio Quality Metrics
         signal_power = np.mean(y**2)
         noise_power = np.var(y) - signal_power if np.var(y) > signal_power else np.var(y) * 0.1
