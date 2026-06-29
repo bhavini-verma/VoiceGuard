@@ -1,0 +1,17 @@
+{
+    "threshold_high": 0.8776686983280378,
+    "threshold_mid": 0.8776686983280378,
+    "feature_names": [
+        "bio_score",
+        "deep_score",
+        "disagreement",
+        "max_score",
+        "min_score",
+        "snr",
+        "audio_dur",
+        "silence_ratio"
+    ],
+    "val_eer": 0.0,
+    "test_eer": 0.0,
+    "fixed_weight_test_eer": 0.0
+}

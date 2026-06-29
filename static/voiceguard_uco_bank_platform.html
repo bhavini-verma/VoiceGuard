@@ -1,0 +1,1140 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bank:#005BAC;--bank2:#1E88E5;--teal:#14B8A6;--success:#22C55E;--warn:#F59E0B;--danger:#EF4444;
+--bg:#F4F8FC;--bg2:#EAF2FB;--card:#FFFFFF;--border:#D6E3F5;
+--text:#1F2937;--text2:#6B7280;--text3:#9CA3AF;
+--sans:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;min-height:100vh}
+.header{background:var(--bank);padding:0 24px;display:flex;align-items:center;height:60px;gap:20px;box-shadow:0 2px 8px rgba(0,91,172,0.2)}
+.logo-wrap{display:flex;align-items:center;gap:12px;border-right:1px solid rgba(255,255,255,0.2);padding-right:20px}
+.uco-shield{width:34px;height:38px;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:4px 4px 10px 10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.uco-shield svg{width:20px;height:20px}
+.logo-text{color:#fff}
+.logo-name{font-size:16px;font-weight:700;letter-spacing:1.5px;line-height:1}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:.5px;margin-top:2px}
+.header-mid{flex:1;display:flex;align-items:center;gap:8px}
+.tagline{font-size:12px;color:rgba(255,255,255,0.6);letter-spacing:.3px}
+.sep{color:rgba(255,255,255,0.25);margin:0 4px}
+.header-right{display:flex;align-items:center;gap:12px}
+.status-chip{display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.chip-ready{background:rgba(34,197,94,0.2);color:#16A34A;border:1px solid rgba(34,197,94,0.3)}
+.chip-ready .chip-dot{background:#22C55E}
+.chip-analyzing{background:rgba(245,158,11,0.2);color:#D97706;border:1px solid rgba(245,158,11,0.3)}
+.chip-analyzing .chip-dot{background:#F59E0B;animation:blink .8s ease-in-out infinite}
+.chip-complete{background:rgba(20,184,166,0.15);color:#0F766E;border:1px solid rgba(20,184,166,0.3)}
+.chip-complete .chip-dot{background:#14B8A6}
+.chip-risk{background:rgba(239,68,68,0.15);color:#DC2626;border:1px solid rgba(239,68,68,0.3)}
+.chip-risk .chip-dot{background:#EF4444;animation:blink .6s ease-in-out infinite}
+.hdr-case{font-size:11px;color:rgba(255,255,255,0.6);font-family:var(--mono);padding:4px 10px;background:rgba(255,255,255,0.1);border-radius:4px;border:1px solid rgba(255,255,255,0.15)}
+.hdr-time{font-size:11px;color:rgba(255,255,255,0.7);font-family:var(--mono)}
+.hdr-notif{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:14px;position:relative}
+.notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:#F59E0B;border-radius:50%;border:1.5px solid var(--bank)}
+.hdr-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#E0F2FE,#BAE6FD);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bank);cursor:pointer}
+
+.layout{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:220px;background:#fff;border-right:1px solid var(--border);flex-shrink:0;padding:16px 0}
+.nav-section{margin-bottom:6px}
+.nav-label{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;padding:8px 20px 4px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;color:var(--text2);font-size:13px;transition:all .15s;border-left:3px solid transparent;position:relative}
+.nav-item:hover{background:#F4F8FC;color:var(--text)}
+.nav-item.active{background:rgba(0,91,172,0.07);color:var(--bank);font-weight:500;border-left-color:var(--bank)}
+.nav-item i{font-size:16px;width:18px}
+.nav-badge{margin-left:auto;padding:1px 7px;border-radius:20px;background:rgba(239,68,68,0.12);color:#DC2626;font-size:10px;font-weight:600}
+.nav-divider{height:1px;background:var(--border);margin:10px 20px}
+
+.content{flex:1;padding:20px 24px;overflow-x:hidden}
+
+.hero-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:0;margin-bottom:20px;overflow:hidden}
+.hero-top{background:linear-gradient(135deg,var(--bank) 0%,#0070CC 100%);padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+.hero-title{color:#fff;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;opacity:.8}
+.hero-status{font-size:26px;font-weight:700;color:#fff;line-height:1;margin-bottom:2px}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.7)}
+.hero-right{text-align:right}
+.hero-score{font-size:52px;font-weight:700;color:#fff;line-height:1;font-family:var(--mono)}
+.hero-score-label{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px}
+.hero-score.risk-score{color:#FCA5A5}
+.hero-body{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--border)}
+.hero-stat{padding:14px 16px;border-right:1px solid var(--border);text-align:center}
+.hero-stat:last-child{border-right:none}
+.hero-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-weight:500}
+.hero-stat-val{font-size:17px;font-weight:700;color:var(--text);font-family:var(--mono)}
+.hero-stat-val.warn{color:var(--warn)}
+.hero-stat-val.danger{color:var(--danger)}
+.hero-stat-val.success{color:var(--success)}
+.hero-rec{background:#FEF9EC;border-top:1px solid #FDE68A;padding:10px 20px;display:flex;align-items:center;gap:10px;font-size:12px;color:#92400E}
+.hero-rec i{color:#F59E0B;font-size:16px}
+
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
+.section-title i{font-size:15px;color:var(--bank)}
+.section-badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:#EAF2FB;color:var(--bank);border:1px solid rgba(0,91,172,0.15)}
+
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px}
+.card-title{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title i{font-size:14px;color:var(--bank)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;background:#FAFCFF;transition:all .2s}
+.upload-zone:hover{border-color:var(--bank2);background:#EAF2FB}
+.uz-icon{color:var(--bank);font-size:30px;margin-bottom:8px;opacity:.7}
+.uz-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.uz-sub{font-size:11px;color:var(--text3)}
+.upload-btn{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:7px 18px;background:var(--bank);color:#fff;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:background .2s}
+.upload-btn:hover{background:#004A8E}
+.action-btns{display:flex;gap:8px;margin-top:10px}
+.btn-outline{flex:1;padding:8px;border:1px solid var(--border);border-radius:5px;background:#fff;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.btn-outline:hover{border-color:var(--bank);color:var(--bank);background:#F0F7FF}
+.btn-record{color:var(--danger);border-color:rgba(239,68,68,0.35)}
+.btn-record:hover{background:rgba(239,68,68,0.05);border-color:var(--danger)}
+.btn-demo{color:#D97706;border-color:rgba(245,158,11,0.4)}
+.btn-demo:hover{background:rgba(245,158,11,0.05);border-color:var(--warn)}
+.meta-table{width:100%;font-size:12px}
+.meta-table tr td{padding:5px 0;border-bottom:1px solid var(--border)}
+.meta-table tr:last-child td{border-bottom:none}
+.meta-table td:first-child{color:var(--text3);width:45%}
+.meta-table td:last-child{font-family:var(--mono);color:var(--text);font-weight:500}
+.meta-val-pending{color:var(--text3) !important;font-weight:400 !important}
+
+canvas.wform{width:100%;height:90px;border-radius:6px;background:#F4F8FC;border:1px solid var(--border);display:block}
+.playbar{display:flex;align-items:center;gap:8px;margin-top:8px}
+.play-btn{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--bank);transition:all .15s}
+.play-btn:hover{background:#EAF2FB}
+.play-info{flex:1;font-size:11px;color:var(--text3);font-family:var(--mono)}
+.prog{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--bank),var(--teal));width:0%;transition:width .3s;border-radius:2px}
+
+canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#F0F9FF;border:1px solid var(--border)}
+.spec-axes{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)}
+.spec-legend{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:10px;color:var(--text3);justify-content:flex-end}
+.spec-leg-bar{width:60px;height:8px;border-radius:4px;background:linear-gradient(90deg,#0A2744,#005BAC,#14B8A6,#F59E0B,#fff)}
+.spec-desc{margin-top:8px;padding:8px 10px;background:#EAF2FB;border-radius:5px;font-size:11px;color:var(--text2);line-height:1.5;border-left:3px solid var(--bank)}
+
+.infer-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.infer-cell{background:#F4F8FC;border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center}
+.infer-key{font-size:9px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.infer-val{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--bank);line-height:1}
+.infer-val.pend{color:var(--text3);font-size:14px;font-weight:400}
+.infer-unit{font-size:10px;color:var(--text3);margin-top:2px}
+
+.sys-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
+.sys-row:last-child{border-bottom:none}
+.sys-label{font-size:12px;color:var(--text);display:flex;align-items:center;gap:6px}
+.sys-label i{font-size:13px;color:var(--text3)}
+.pill{font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;letter-spacing:.3px}
+.pill-on{background:rgba(34,197,94,0.12);color:#15803D;border:1px solid rgba(34,197,94,0.3)}
+.pill-active{background:rgba(20,184,166,0.12);color:#0F766E;border:1px solid rgba(20,184,166,0.3)}
+.pill-conn{background:rgba(0,91,172,0.1);color:var(--bank);border:1px solid rgba(0,91,172,0.25)}
+.pill-idle{background:#F4F8FC;color:var(--text3);border:1px solid var(--border)}
+.pill-proc{background:rgba(245,158,11,0.12);color:#D97706;border:1px solid rgba(245,158,11,0.3);animation:blink .8s ease-in-out infinite}
+.sys-divider{font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;padding:8px 0 4px;border-bottom:1px solid var(--border);margin-bottom:2px;opacity:.7;font-weight:600}
+
+.risk-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.risk-top{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.risk-score-big{text-align:center}
+.risk-score-num{font-size:46px;font-weight:700;font-family:var(--mono);line-height:1}
+.risk-score-num.hi{color:var(--danger)}
+.risk-score-num.med{color:var(--warn)}
+.risk-score-num.lo{color:var(--success)}
+.risk-label-big{font-size:11px;color:var(--text3);margin-top:4px;letter-spacing:.5px}
+.risk-badge-big{display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.risk-badge-hi{background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.3)}
+.risk-badge-med{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.3)}
+.risk-badge-lo{background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.3)}
+.risk-details{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)}
+.risk-det-cell{padding:10px 14px;border-right:1px solid var(--border)}
+.risk-det-cell:last-child{border-right:none}
+.risk-det-label{font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.7px}
+.risk-det-val{font-size:13px;font-weight:600;color:var(--text);font-family:var(--mono)}
+.risk-det-val.danger{color:var(--danger)}
+.risk-det-val.warn{color:var(--warn)}
+.risk-rec{background:#FFF8EC;border-top:1px solid #FDE68A;padding:10px 14px;font-size:12px;color:#92400E;display:flex;align-items:center;gap:8px}
+.risk-rec i{color:#F59E0B;font-size:16px;flex-shrink:0}
+
+.det-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
+.det-row:last-child{border-bottom:none}
+.det-key{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.det-key i{font-size:13px;color:var(--text3)}
+.det-val{font-size:11px;font-weight:600;font-family:var(--mono)}
+.det-val.danger{color:var(--danger)}
+.det-val.warn{color:var(--warn)}
+.det-val.success{color:var(--success)}
+.det-val.info{color:var(--bank)}
+.trigger-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;font-family:var(--mono)}
+.trig-pri{background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.25)}
+.trig-sec{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.25)}
+
+.tl-wrap{position:relative;padding-left:22px}
+.tl-wrap::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--border)}
+.tl-item{position:relative;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tl-item:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-19px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;flex-shrink:0}
+.tl-dot.done{background:var(--success);box-shadow:0 0 0 2px rgba(34,197,94,0.2)}
+.tl-dot.active{background:var(--bank);box-shadow:0 0 0 3px rgba(0,91,172,0.2);animation:pulse 1.5s ease-in-out infinite}
+.tl-dot.pend{background:var(--border)}
+.tl-time{font-family:var(--mono);font-size:10px;color:var(--text3);width:58px;flex-shrink:0}
+.tl-text{font-size:12px;color:var(--text2)}
+.tl-text.done{color:var(--text)}
+.tl-text.active{color:var(--bank);font-weight:600}
+
+.chunk-table{width:100%;border-collapse:collapse;font-size:12px}
+.chunk-table th{font-size:10px;color:var(--text3);letter-spacing:.7px;text-transform:uppercase;padding:7px 8px;border-bottom:1px solid var(--border);text-align:left;font-weight:600;background:#F8FAFC}
+.chunk-table td{padding:7px 8px;border-bottom:1px solid #F0F4F8;vertical-align:middle}
+.chunk-table tr:hover td{background:#F8FAFC}
+.score-wrap{display:flex;align-items:center;gap:6px}
+.score-bar-bg{flex:1;height:4px;border-radius:2px;background:var(--border)}
+.score-bar-fill{height:100%;border-radius:2px;transition:width .6s}
+.verdict-tag{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.v-fraud{background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.2)}
+.v-clean{background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.2)}
+.v-susp{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.2)}
+
+.report-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.report-hdr{background:linear-gradient(135deg,var(--bank),#003d7a);padding:14px 20px}
+.report-hdr-title{color:#fff;font-size:13px;font-weight:700;letter-spacing:.5px;margin-bottom:2px}
+.report-hdr-sub{color:rgba(255,255,255,0.6);font-size:10px;letter-spacing:.5px}
+.report-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0}
+.report-section{padding:14px 16px;border-right:1px solid var(--border)}
+.report-section:last-child{border-right:none}
+.report-section-title{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.rpt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.rpt-key{font-size:10px;color:var(--text3)}
+.rpt-val{font-size:10px;font-weight:600;color:var(--text);font-family:var(--mono)}
+.rpt-val.danger{color:var(--danger)}
+.rpt-rec-box{background:#FEF9EC;border:1px solid #FDE68A;border-radius:5px;padding:8px 10px;font-size:11px;color:#92400E;line-height:1.4;margin-bottom:8px}
+.rpt-rec-label{font-size:9px;font-weight:700;color:#B45309;margin-bottom:3px;letter-spacing:.5px;text-transform:uppercase}
+.pdf-btn{width:100%;padding:7px;background:var(--bank);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s;letter-spacing:.3px}
+.pdf-btn:hover{background:#004A8E}
+.report-footer{padding:8px 16px;background:#F8FAFC;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono)}
+
+.fusion-section{margin-bottom:14px}
+.fusion-layout{display:grid;grid-template-columns:1fr 200px;gap:14px;align-items:start}
+.fusion-svg-wrap{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;position:relative}
+.fusion-svg-title{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.fusion-svg-title i{font-size:14px;color:var(--bank)}
+
+.xai-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.xai-row{margin-bottom:10px}
+.xai-lbl{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px}
+.xai-lbl span:first-child{color:var(--text2)}
+.xai-lbl span:last-child{color:var(--bank);font-weight:600;font-family:var(--mono)}
+.xai-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.xai-fill{height:100%;border-radius:3px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.xai-bio{background:linear-gradient(90deg,var(--bank),#38BDF8)}
+.xai-dl{background:linear-gradient(90deg,var(--teal),#0EA5E9)}
+.xai-fus{background:linear-gradient(90deg,var(--bank),var(--teal))}
+.xai-factors{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.xai-factors-title{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600}
+.xai-factor-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
+.xai-factor-row span:first-child{color:var(--text2)}
+.xai-audit{margin-top:8px;padding:6px 10px;background:#EAF2FB;border-radius:4px;font-size:10px;color:var(--bank);display:flex;align-items:center;gap:5px;border:1px solid rgba(0,91,172,0.15)}
+
+@keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes shimmer{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+</style>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+<div class="header">
+  <div class="logo-wrap">
+    <div class="uco-shield">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M10 1L2 4v6c0 5 3.4 9.5 8 11 4.6-1.5 8-6 8-11V4L10 1z" fill="rgba(255,255,255,0.9)" stroke="rgba(255,255,255,0.5)" stroke-width=".8"/><path d="M10 1L2 4v6c0 5 3.4 9.5 8 11 4.6-1.5 8-6 8-11V4L10 1z" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width=".4"/></svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-name">VoiceGuard™</div>
+      <div class="logo-sub">Audio Forensics Platform</div>
+    </div>
+  </div>
+  <div class="header-mid">
+    <span class="tagline">Detect <span class="sep">·</span> Verify <span class="sep">·</span> Protect</span>
+  </div>
+  <div class="header-right">
+    <div class="hdr-case" id="hdr-case">CASE: VG-——</div>
+    <div class="status-chip chip-ready" id="hdr-chip"><span class="chip-dot"></span><span id="hdr-chip-label">READY</span></div>
+    <div class="hdr-notif"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
+    <div class="hdr-avatar">FK</div>
+    <div class="hdr-time" id="hdr-clock">--:--:--</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="switchPage('page-dashboard', this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-item" onclick="triggerUpload()"><i class="ti ti-plus-circle"></i>New Investigation</div>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">
+      <div class="nav-label">Intelligence</div>
+      <div class="nav-item" id="nav-reports" onclick="switchPage('page-reports', this)"><i class="ti ti-file-text"></i>Reports</div>
+      <div class="nav-item" id="nav-intel" onclick="switchPage('page-intel', this)"><i class="ti ti-brain"></i>Detection Intel</div>
+    </div>
+    <div style="margin:20px 16px 0;padding:10px;background:#F4F8FC;border-radius:6px;border:1px solid var(--border)">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:600">Model Version</div>
+      <div style="font-size:11px;font-weight:600;color:var(--bank)">Fusion v2.0</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:1px">Build 20260621</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div id="page-dashboard" class="page-section" style="display:block">
+    <!-- HERO -->
+    <div class="hero-card">
+      <div class="hero-top">
+        <div>
+          <div class="hero-title">Current Investigation</div>
+          <div class="hero-status" id="hero-status">Awaiting Audio Input</div>
+          <div class="hero-sub" id="hero-sub">Upload a recording or start live capture to begin forensic analysis</div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-score" id="hero-score">—</div>
+          <div class="hero-score-label">Risk Score</div>
+        </div>
+      </div>
+      <div class="hero-body">
+        <div class="hero-stat"><div class="hero-stat-label">Case ID</div><div class="hero-stat-val" id="h-caseid" style="font-size:12px">VG-——</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Classification</div><div class="hero-stat-val" id="h-class">—</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Confidence</div><div class="hero-stat-val" id="h-conf">—</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Duration</div><div class="hero-stat-val" id="h-dur">—</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Proc. Time</div><div class="hero-stat-val" id="h-proc">—</div></div>
+      </div>
+      <div class="hero-rec" id="hero-rec"><i class="ti ti-info-circle"></i><span id="hero-rec-text">No active analysis — submit audio to receive a forensic recommendation.</span></div>
+    </div>
+
+    <!-- AUDIO INTAKE -->
+    <div class="section-hdr">
+      <div class="section-title"><i class="ti ti-microphone"></i>Audio Intake</div>
+      <span class="section-badge">WAV · MP3 · FLAC · OGG · M4A</span>
+    </div>
+    <div class="grid3" style="grid-template-columns:1.2fr 1.2fr 1fr;margin-bottom:14px">
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-upload"></i>UPLOAD RECORDING</div>
+        <div class="upload-zone" id="drop-zone" onclick="triggerUpload()">
+          <div class="uz-icon"><i class="ti ti-waveform"></i></div>
+          <div class="uz-title">Drop audio file or click to upload</div>
+          <div class="uz-sub">Supported: WAV · MP3 · FLAC · OGG · M4A · Max 50 MB</div>
+          <button class="upload-btn"><i class="ti ti-upload" style="font-size:12px"></i> Upload Audio</button>
+        </div>
+        <input type="file" id="file-input" accept="audio/*" style="display:none" onchange="handleFile(this)">
+        <div class="action-btns">
+          <button class="btn-outline btn-record" id="mic-btn" onclick="startMic()"><i class="ti ti-record-mail" style="font-size:13px"></i> Live Record</button>
+          <button class="btn-outline btn-demo" onclick="runDemo()"><i class="ti ti-player-play" style="font-size:13px"></i> Sample Analysis</button>
+        </div>
+        <button class="upload-btn" id="start-btn" onclick="startStagedAnalysis()" style="margin-top:10px;background:#15803D;display:none;align-items:center;justify-content:center;gap:6px"><i class="ti ti-player-play" style="font-size:14px"></i> START FORENSIC ANALYSIS</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-info-circle"></i>FILE METADATA</div>
+        <table class="meta-table">
+          <tr><td>File Name</td><td class="meta-val-pending" id="meta-name">—</td></tr>
+          <tr><td>Format</td><td class="meta-val-pending" id="meta-fmt">—</td></tr>
+          <tr><td>Sample Rate</td><td class="meta-val-pending" id="meta-sr">—</td></tr>
+          <tr><td>Channels</td><td class="meta-val-pending" id="meta-ch">—</td></tr>
+          <tr><td>Duration</td><td class="meta-val-pending" id="meta-dur">—</td></tr>
+          <tr><td>File Size</td><td class="meta-val-pending" id="meta-size">—</td></tr>
+        </table>
+        <div style="margin-top:12px">
+          <div class="card-title" style="margin-bottom:8px"><i class="ti ti-cpu"></i>INFERENCE METRICS</div>
+          <div class="infer-grid">
+            <div class="infer-cell"><div class="infer-key">Processing Time</div><div class="infer-val pend" id="inf-time">—</div><div class="infer-unit" id="inf-time-u">awaiting</div></div>
+            <div class="infer-cell"><div class="infer-key">Confidence</div><div class="infer-val pend" id="inf-conf">—</div><div class="infer-unit" id="inf-conf-u">awaiting</div></div>
+            <div class="infer-cell"><div class="infer-key">Duration</div><div class="infer-val pend" id="inf-dur">—</div><div class="infer-unit" id="inf-dur-u">awaiting</div></div>
+            <div class="infer-cell"><div class="infer-key">Chunks</div><div class="infer-val pend" id="inf-ch">—</div><div class="infer-unit" id="inf-ch-u">awaiting</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-server"></i>SYSTEM STATUS</div>
+        <div class="sys-divider">Infrastructure</div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-cloud"></i>API Gateway</div><div class="pill pill-on" id="s-api">ONLINE</div></div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-broadcast"></i>Stream Engine</div><div class="pill pill-active" id="s-stream">ACTIVE</div></div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-database"></i>Database</div><div class="pill pill-conn" id="s-db">CONNECTED</div></div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-shield"></i>Threat Feed</div><div class="pill pill-conn" id="s-threat">CONNECTED</div></div>
+        <div class="sys-divider" style="margin-top:6px">Fusion Model v2.0</div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-brain"></i>Model Loaded</div><div class="pill pill-on" id="s-mdl">LOADED</div></div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-cpu"></i>Inference Engine</div><div class="pill pill-active" id="s-inf">READY</div></div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-plug"></i>Backend</div><div class="pill pill-conn" id="s-back">CONNECTED</div></div>
+        <div class="sys-row"><div class="sys-label"><i class="ti ti-activity"></i>Current Job</div><div class="pill pill-idle" id="s-job">IDLE</div></div>
+      </div>
+    </div>
+    </div> <!-- end page-dashboard -->
+
+    <div id="page-intel" class="page-section" style="display:none">
+    <!-- AUDIO FORENSICS -->
+    <div class="section-hdr">
+      <div class="section-title"><i class="ti ti-chart-area"></i>Audio Forensics</div>
+      <span class="section-badge">Waveform &amp; Spectrogram Analysis</span>
+    </div>
+    <div class="grid2" style="grid-template-columns:1fr 1.6fr;margin-bottom:14px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-waveform"></i>AUDIO WAVEFORM<span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400" id="wv-stat">NO SIGNAL</span></div>
+        <canvas class="wform" id="wave-canvas"></canvas>
+        <div class="playbar">
+          <button class="play-btn" onclick="togglePlay()"><i class="ti ti-player-play" id="play-icon"></i></button>
+          <div class="play-info">Dur: <span id="wv-dur">—</span> · Sr: <span id="wv-sr">—</span> · Ch: <span id="wv-ch">—</span></div>
+        </div>
+        <div class="prog"><div class="prog-fill" id="prog-fill"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-grid-dots"></i>FREQUENCY SPECTROGRAM<span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400" id="spec-stat">NO SIGNAL</span></div>
+        <canvas class="spec" id="spec-canvas"></canvas>
+        <div class="spec-axes"><span>0s</span><span>Time →</span><span id="spec-dur-label">—</span></div>
+        <div class="spec-legend">
+          <span style="color:var(--text3)">Low</span>
+          <div class="spec-leg-bar"></div>
+          <span style="color:var(--text3)">High</span>
+          <span style="color:var(--text3);margin-left:6px">Intensity</span>
+        </div>
+        <div class="spec-desc"><i class="ti ti-info-circle" style="font-size:13px;color:var(--bank);margin-right:4px;vertical-align:-2px"></i>VoiceGuard analyzes spectrogram patterns to identify synthetic speech artifacts and abnormal voice characteristics including irregular harmonic structures, phase discontinuities, and TTS fingerprints.</div>
+      </div>
+    </div>
+
+    <!-- FUSION ENGINE -->
+    <div class="section-hdr">
+      <div class="section-title"><i class="ti ti-topology-star-3"></i>Fusion Intelligence Engine</div>
+      <span class="section-badge">Biological · Deep Learning · Fusion Core</span>
+    </div>
+    <div class="fusion-section">
+      <div class="fusion-layout">
+        <div class="fusion-svg-wrap">
+          <div class="fusion-svg-title"><i class="ti ti-topology-star-3"></i>BIOMETRIC FUSION MATRIX</div>
+          <svg id="fusion-svg" width="100%" viewBox="0 0 540 340" style="display:block">
+            <defs>
+              <marker id="farrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+            <!-- Bio circle -->
+            <circle cx="110" cy="170" r="70" fill="#EFF8FF" stroke="#38BDF8" stroke-width="1.5"/>
+            <text x="110" y="150" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#005BAC">Biological</text>
+            <text x="110" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">349 Features</text>
+            <text x="110" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#38BDF8" id="bio-score-text">—</text>
+
+            <!-- DL circle -->
+            <circle cx="430" cy="170" r="70" fill="#ECFDF5" stroke="#14B8A6" stroke-width="1.5"/>
+            <text x="430" y="150" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill="#0F766E">Deep Learning</text>
+            <text x="430" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">2048 Features</text>
+            <text x="430" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#14B8A6" id="dl-score-text">—</text>
+
+            <!-- Center Fusion circle -->
+            <circle cx="270" cy="170" r="78" fill="#F0F7FF" stroke="#005BAC" stroke-width="2"/>
+            <circle cx="270" cy="170" r="74" fill="none" stroke="#005BAC" stroke-width=".5" stroke-dasharray="4 3" opacity=".4"/>
+            <text x="270" y="148" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#005BAC">FUSION CORE</text>
+            <text x="270" y="163" text-anchor="middle" font-family="Inter" font-size="10" fill="#6B7280">2,397 Features</text>
+            <text x="270" y="180" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#005BAC" id="fus-score-text">—</text>
+            <text x="270" y="198" text-anchor="middle" font-family="Inter" font-size="9" fill="#6B7280">Fraud Probability</text>
+            <text x="270" y="213" text-anchor="middle" font-family="Inter" font-size="10" font-weight="600" fill="#6B7280" id="fus-risk-text">—</text>
+            <!-- Flow lines -->
+            <path d="M178 170 L190 170" stroke="#38BDF8" stroke-width="1.5" fill="none" marker-end="url(#farrow)" stroke-dasharray="4 3" opacity=".7"/>
+            <path d="M350 170 L362 170" stroke="#14B8A6" stroke-width="1.5" fill="none" marker-end="none" stroke-dasharray="4 3" opacity=".7"/>
+            <path d="M352 170 L350 170" stroke="#14B8A6" stroke-width="1.5" fill="none" marker-end="url(#farrow)" opacity=".7"/>
+            <!-- Axis labels -->
+            <text x="110" y="30" text-anchor="middle" font-family="Inter" font-size="10" fill="#9CA3AF" letter-spacing="1">BIOLOGICAL ENGINE</text>
+            <text x="270" y="30" text-anchor="middle" font-family="Inter" font-size="10" fill="#9CA3AF" letter-spacing="1">FUSION CORE</text>
+            <text x="430" y="30" text-anchor="middle" font-family="Inter" font-size="10" fill="#9CA3AF" letter-spacing="1">DEEP LEARNING ENGINE</text>
+            <!-- Particle dots for animation -->
+            <circle class="fpart" cx="178" cy="170" r="4" fill="#38BDF8" opacity=".9" id="fp1"/>
+            <circle class="fpart" cx="350" cy="170" r="4" fill="#14B8A6" opacity=".9" id="fp2"/>
+          </svg>
+        </div>
+        <div class="xai-card">
+          <div class="card-title" style="margin-bottom:10px"><i class="ti ti-chart-infographic"></i>AI EXPLAINABILITY</div>
+          <div class="xai-row">
+            <div class="xai-lbl"><span>Biological Engine</span><span id="xai-bio-pct">40%</span></div>
+            <div class="xai-bg"><div class="xai-fill xai-bio" id="xai-bio" style="width:40%"></div></div>
+          </div>
+          <div class="xai-row">
+            <div class="xai-lbl"><span>Deep Learning Engine</span><span id="xai-dl-pct">60%</span></div>
+            <div class="xai-bg"><div class="xai-fill xai-dl" id="xai-dl" style="width:60%"></div></div>
+          </div>
+          <div class="xai-row">
+            <div class="xai-lbl"><span>Fusion Output</span><span id="xai-fus-pct">—</span></div>
+            <div class="xai-bg"><div class="xai-fill xai-fus" id="xai-fus" style="width:0%"></div></div>
+          </div>
+          <div class="xai-factors">
+            <div class="xai-factors-title">Top Decision Factors</div>
+            <div class="xai-factor-row"><span>Prosody anomaly</span><span style="color:var(--danger);font-family:var(--mono)">+0.34</span></div>
+            <div class="xai-factor-row"><span>Spectral flatness</span><span style="color:var(--danger);font-family:var(--mono)">+0.28</span></div>
+            <div class="xai-factor-row"><span>F0 micro-variation</span><span style="color:var(--warn);font-family:var(--mono)">+0.19</span></div>
+            <div class="xai-factor-row"><span>Breath naturalness</span><span style="color:var(--success);font-family:var(--mono)">-0.11</span></div>
+          </div>
+          <div class="xai-audit"><i class="ti ti-shield-check" style="font-size:13px"></i>Full audit trail enabled</div>
+        </div>
+      </div>
+    </div>
+    </div> <!-- end page-intel -->
+
+    <div id="page-reports" class="page-section" style="display:none">
+    <!-- RISK + DETECTION -->
+    <div class="section-hdr">
+      <div class="section-title"><i class="ti ti-shield-exclamation"></i>Threat Intelligence &amp; Risk Assessment</div>
+      <span class="section-badge">Real-Time Classification</span>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-top">
+        <div>
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600">Risk Assessment</div>
+          <div class="risk-badge-big risk-badge-lo" id="risk-badge" style="margin-bottom:10px">AWAITING ANALYSIS</div>
+          <div style="font-size:12px;color:var(--text2);max-width:320px;line-height:1.5" id="risk-finding">Submit an audio recording to receive forensic risk classification and fraud probability score.</div>
+        </div>
+        <div style="text-align:center;margin-right:20px">
+          <div class="risk-score-num lo" id="risk-num">—</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Fraud Probability</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600">Detection Summary</div>
+          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-bug"></i>Threat Type</div><div class="det-val danger" id="ti-type">—</div></div>
+          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-radar"></i>Sophistication</div><div class="det-val warn" id="ti-soph">—</div></div>
+          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-repeat"></i>Replay Indicators</div><div class="det-val info" id="ti-replay">—</div></div>
+          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-robot"></i>Synthetic Confidence</div><div class="det-val danger" id="ti-synth">—</div></div>
+          <div class="det-row" style="border-bottom:none"><div class="det-key"><i class="ti ti-tag"></i>Primary Trigger</div><div class="det-val" id="ti-trig">—</div></div>
+        </div>
+      </div>
+      <div class="risk-details">
+        <div class="risk-det-cell"><div class="risk-det-label">Evidence Strength</div><div class="risk-det-val" id="rd-evid">—</div></div>
+        <div class="risk-det-cell"><div class="risk-det-label">Voice Stability Score</div><div class="risk-det-val" id="rd-vstab">—</div></div>
+        <div class="risk-det-cell"><div class="risk-det-label">Spectral Artifact Score</div><div class="risk-det-val danger" id="rd-spec">—</div></div>
+        <div class="risk-det-cell"><div class="risk-det-label">Model Confidence</div><div class="risk-det-val" id="rd-conf">—</div></div>
+      </div>
+      <div class="risk-rec"><i class="ti ti-alert-circle"></i><span id="rd-rec">Run analysis to generate recommendation.</span></div>
+    </div>
+
+    <!-- TIMELINE + CHUNK TABLE -->
+    <div class="grid2" style="grid-template-columns:280px 1fr;margin-bottom:14px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-list-check"></i>INVESTIGATION TIMELINE</div>
+        <div class="tl-wrap" id="timeline">
+          <div class="tl-item"><div class="tl-dot pend" id="tl-0"></div><div class="tl-time" id="tt-0">—</div><div class="tl-text" id="tx-0">Audio Received</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-1"></div><div class="tl-time" id="tt-1">—</div><div class="tl-text" id="tx-1">Audio Standardization</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-2"></div><div class="tl-time" id="tt-2">—</div><div class="tl-text" id="tx-2">Voice Activity Detection</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-3"></div><div class="tl-time" id="tt-3">—</div><div class="tl-text" id="tx-3">Spectrogram Generation</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-4"></div><div class="tl-time" id="tt-4">—</div><div class="tl-text" id="tx-4">Biological Feature Extraction</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-5"></div><div class="tl-time" id="tt-5">—</div><div class="tl-text" id="tx-5">Deep Feature Extraction</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-6"></div><div class="tl-time" id="tt-6">—</div><div class="tl-text" id="tx-6">Fusion Analysis</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-7"></div><div class="tl-time" id="tt-7">—</div><div class="tl-text" id="tx-7">Risk Classification</div></div>
+          <div class="tl-item"><div class="tl-dot pend" id="tl-8"></div><div class="tl-time" id="tt-8">—</div><div class="tl-text" id="tx-8">Report Generation</div></div>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+          <div class="card-title" style="margin-bottom:0"><i class="ti ti-table"></i>CHUNK ANALYSIS REPORT</div>
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="tbl-status">AWAITING INPUT</div>
+        </div>
+        <div style="overflow-y:auto;max-height:290px">
+          <table class="chunk-table">
+            <thead><tr><th style="width:12%">Chunk</th><th style="width:32%">Fraud Score</th><th style="width:16%">Confidence</th><th style="width:18%">Verdict</th><th style="width:22%">Segment</th></tr></thead>
+            <tbody id="chunk-tbody"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No analysis data — upload audio to begin</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT -->
+    <div class="section-hdr">
+      <div class="section-title"><i class="ti ti-file-certificate"></i>Forensic Investigation Report</div>
+      <span class="section-badge">Enterprise Grade · Restricted</span>
+    </div>
+    <div class="report-card">
+      <div class="report-hdr">
+        <div class="report-hdr-title">VoiceGuard™ — FORENSIC INVESTIGATION REPORT</div>
+        <div class="report-hdr-sub">FRAUD INTELLIGENCE DIVISION · RESTRICTED · RBI CIRCULAR No. RBI/2023-24/73 COMPLIANT</div>
+      </div>
+      <div class="report-grid">
+        <div class="report-section">
+          <div class="report-section-title">Case Information</div>
+          <div class="rpt-row"><span class="rpt-key">Case ID</span><span class="rpt-val" id="rpt-id">VG-——</span></div>
+          <div class="rpt-row"><span class="rpt-key">Timestamp</span><span class="rpt-val" id="rpt-ts">—</span></div>
+          <div class="rpt-row"><span class="rpt-key">Model Version</span><span class="rpt-val">Fusion v2.0</span></div>
+          <div class="rpt-row"><span class="rpt-key">Analyst Engine</span><span class="rpt-val" style="font-size:9px">Fusion Matrix Arch.</span></div>
+        </div>
+        <div class="report-section">
+          <div class="report-section-title">Detection Results</div>
+          <div class="rpt-row"><span class="rpt-key">Risk Score</span><span class="rpt-val danger" id="rpt-risk">—</span></div>
+          <div class="rpt-row"><span class="rpt-key">Threat Type</span><span class="rpt-val" id="rpt-type">—</span></div>
+          <div class="rpt-row"><span class="rpt-key">Synthetic Confidence</span><span class="rpt-val" id="rpt-synth">—</span></div>
+          <div class="rpt-row"><span class="rpt-key">Fusion Confidence</span><span class="rpt-val danger" id="rpt-fus">—</span></div>
+        </div>
+        <div class="report-section">
+          <div class="report-section-title">Trigger Analysis</div>
+          <div style="margin-bottom:6px"><div class="rpt-key" style="margin-bottom:4px">Primary Trigger</div><div id="rpt-pri"><span class="trigger-tag trig-pri">—</span></div></div>
+          <div><div class="rpt-key" style="margin-bottom:4px">Secondary Trigger</div><div id="rpt-sec"><span class="trigger-tag trig-sec">—</span></div></div>
+        </div>
+        <div class="report-section">
+          <div class="report-section-title">Recommendation</div>
+          <div class="rpt-rec-box"><div class="rpt-rec-label">Action Required</div><span id="rpt-rec">Run analysis to generate recommendation.</span></div>
+          <button class="pdf-btn" onclick="downloadReport()"><i class="ti ti-file-download" style="font-size:14px"></i>Export PDF Report</button>
+        </div>
+      </div>
+      <div class="report-footer">
+        <span>CLASSIFICATION: <span id="rpt-class">AWAITING ANALYSIS</span></span>
+        <span>RBI/2023-24/73 Compliant · CERT-In Reportable · NPCI Framework Aligned</span>
+      </div>
+    </div>
+
+    <div class="section-hdr" id="active-learning-label" style="display:none;">
+      <div class="section-title"><i class="ti ti-brain"></i>Active Learning Feedback</div>
+      <span class="section-badge">Model Retraining</span>
+    </div>
+    <div class="report-card" id="active-learning-block" style="display:none;margin-bottom:14px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-thumb-up"></i> TEACH THE MODEL</div>
+        <button onclick="retrainModel()" style="background:none;border:1px solid var(--bank);color:var(--bank);border-radius:4px;font-size:10px;padding:4px 10px;cursor:pointer;font-weight:600"><i class="ti ti-refresh"></i> Retrain Meta-Classifier</button>
+      </div>
+      <div style="font-size:11px;color:var(--text);margin-bottom:8px">Was the model's prediction correct?</div>
+      <div style="display:flex;gap:10px;margin-bottom:8px">
+        <button onclick="submitFeedback(true)" style="flex:1;background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.3);padding:8px;border-radius:4px;font-weight:600;cursor:pointer"><i class="ti ti-check"></i> Yes, Correct</button>
+        <button onclick="submitFeedback(false)" style="flex:1;background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.3);padding:8px;border-radius:4px;font-weight:600;cursor:pointer"><i class="ti ti-x"></i> No, Wrong</button>
+      </div>
+      <div id="feedback-wrong-block" style="display:none;padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:8px">What is the TRUE category of this audio?</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:6px">
+            <button onclick="submitTrueLabel('ElevenLabs')" style="flex:1;background:none;color:#DC2626;border:1px solid #DC2626;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🔴 ElevenLabs</button>
+            <button onclick="submitTrueLabel('Resemble')" style="flex:1;background:none;color:#D97706;border:1px solid #D97706;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🔴 Resemble</button>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="submitTrueLabel('Generic')" style="flex:1;background:none;color:#9333EA;border:1px solid #9333EA;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🔴 Other Fake</button>
+            <button onclick="submitTrueLabel('Real')" style="flex:1;background:none;color:#15803D;border:1px solid #15803D;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🟢 Real Voice</button>
+          </div>
+        </div>
+      </div>
+      <div id="feedback-status" style="margin-top:10px;font-size:10px;color:#15803D;font-family:var(--mono);display:none;font-weight:600"></div>
+    </div>
+    </div> <!-- end page-reports -->
+
+    <div style="padding:14px 0;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)">
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;background:var(--bank);border-radius:4px;display:flex;align-items:center;justify-content:center"><svg width="16" height="18" viewBox="0 0 16 18" fill="none"><path d="M8 0L0 3v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V3L8 0z" fill="rgba(255,255,255,0.9)"/></svg></div><div><div style="color:var(--text);font-weight:600;font-size:12px">VoiceGuard™ Enterprise</div><div>Version 2.0 · Build 20260621 · Enterprise-Grade Deployment Certified</div></div></div>
+      <div style="text-align:right">Biological Feature Engine · Wav2Vec2 Phonetic Intelligence · Fusion Matrix Architecture</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BACKEND_URL = window.VoiceGuard_BACKEND_URL || 'http://localhost:8000';
+const SESSION_ID = 'VG-'+Date.now().toString(36).toUpperCase().slice(-6);
+document.getElementById('hdr-case').textContent = 'CASE: '+SESSION_ID;
+document.getElementById('h-caseid').textContent = SESSION_ID;
+document.getElementById('rpt-id').textContent = SESSION_ID;
+
+function updateClock(){const n=new Date();document.getElementById('hdr-clock').textContent=n.toLocaleTimeString('en-IN',{hour12:false});}
+updateClock();setInterval(updateClock,1000);
+
+function setHdrChip(type){
+  const el=document.getElementById('hdr-chip');
+  const lb=document.getElementById('hdr-chip-label');
+  const map={ready:{cls:'chip-ready',txt:'READY'},analyzing:{cls:'chip-analyzing',txt:'ANALYZING'},complete:{cls:'chip-complete',txt:'REPORT AVAILABLE'},risk:{cls:'chip-risk',txt:'HIGH RISK'}};
+  const m=map[type]||map.ready;
+  el.className='status-chip '+m.cls;lb.textContent=m.txt;
+}
+
+const waveCanvas=document.getElementById('wave-canvas');
+const wCtx=waveCanvas.getContext('2d');
+let waveData=[];let isPlaying=false;let wavePos=0;
+function resizeWave(){waveCanvas.width=waveCanvas.offsetWidth*devicePixelRatio;waveCanvas.height=waveCanvas.offsetHeight*devicePixelRatio;wCtx.scale(devicePixelRatio,devicePixelRatio);}
+resizeWave();
+function drawWave(data,pos){
+  const w=waveCanvas.offsetWidth,h=waveCanvas.offsetHeight;
+  wCtx.clearRect(0,0,w,h);
+  if(!data||!data.length){
+    wCtx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--border')||'#D6E3F5';
+    wCtx.lineWidth=1;wCtx.beginPath();wCtx.moveTo(0,h/2);wCtx.lineTo(w,h/2);wCtx.stroke();return;
+  }
+  const step=w/data.length;
+  wCtx.strokeStyle='rgba(0,91,172,0.2)';wCtx.lineWidth=1;
+  wCtx.beginPath();for(let i=0;i<data.length;i++){const x=i*step,y=h/2-data[i]*h*.44;i===0?wCtx.moveTo(x,y):wCtx.lineTo(x,y);}wCtx.stroke();
+  const cx=(pos||0)*w;
+  wCtx.strokeStyle='rgba(0,91,172,0.8)';wCtx.lineWidth=1.5;
+  wCtx.beginPath();for(let i=0;i<data.length;i++){const x=i*step;if(x>cx)break;const y=h/2-data[i]*h*.44;i===0?wCtx.moveTo(x,y):wCtx.lineTo(x,y);}wCtx.stroke();
+  wCtx.strokeStyle='rgba(0,91,172,0.5)';wCtx.lineWidth=1.5;
+  wCtx.beginPath();wCtx.moveTo(cx,4);wCtx.lineTo(cx,h-4);wCtx.stroke();
+}
+drawWave(null,0);
+
+const specCanvas=document.getElementById('spec-canvas');
+const sCtx=specCanvas.getContext('2d');
+function resizeSpec(){specCanvas.width=specCanvas.offsetWidth*devicePixelRatio;specCanvas.height=specCanvas.offsetHeight*devicePixelRatio;sCtx.scale(devicePixelRatio,devicePixelRatio);}
+resizeSpec();
+function drawSpectrogram(audioData,sampleRate,numFrames){
+  const w=specCanvas.offsetWidth,h=specCanvas.offsetHeight;
+  sCtx.clearRect(0,0,w,h);
+  if(!audioData){
+    sCtx.fillStyle='#F0F9FF';sCtx.fillRect(0,0,w,h);
+    sCtx.font='12px Inter';sCtx.fillStyle='#9CA3AF';sCtx.textAlign='center';
+    sCtx.fillText('Spectrogram will appear after audio upload',w/2,h/2);
+    return;
+  }
+  const fftSize=512,hopSize=256,frames=numFrames||Math.floor((audioData.length-fftSize)/hopSize)+1;
+  const freqBins=fftSize/2;
+  const palette=[[10,39,68],[0,91,172],[20,184,166],[245,158,11],[255,255,255]];
+  function getColor(v){
+    const idx=v*(palette.length-1);const lo=Math.floor(idx),hi=Math.min(lo+1,palette.length-1);const t=idx-lo;
+    return palette[lo].map((c,i)=>Math.round(c+(palette[hi][i]-c)*t));
+  }
+  const frameW=w/frames,binH=h/Math.min(freqBins,128);
+  const displayBins=Math.min(freqBins,128);
+  for(let f=0;f<frames;f++){
+    const offset=f*hopSize;
+    for(let b=0;b<displayBins;b++){
+      const freqIdx=Math.floor(b*freqBins/displayBins);
+      let mag=0;
+      for(let k=0;k<8&&offset+freqIdx+k<audioData.length;k++){
+        const v=Math.abs(audioData[offset+Math.floor(freqIdx+k*freqBins/displayBins)%audioData.length]||0);
+        mag=Math.max(mag,v);
+      }
+      const norm=Math.min(1,Math.pow(mag*2.5,0.5));
+      const rgb=getColor(norm);
+      sCtx.fillStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+      sCtx.fillRect(f*frameW,(displayBins-1-b)*binH,frameW+1,binH+1);
+    }
+  }
+  sCtx.strokeStyle='rgba(0,91,172,0.3)';sCtx.lineWidth=.5;
+  [0.25,0.5,0.75].forEach(p=>{sCtx.beginPath();sCtx.moveTo(p*w,0);sCtx.lineTo(p*w,h);sCtx.stroke();});
+  [0.33,0.66].forEach(p=>{sCtx.beginPath();sCtx.moveTo(0,p*h);sCtx.lineTo(w,p*h);sCtx.stroke();});
+  document.getElementById('spec-stat').textContent='SIGNAL ACTIVE';
+  document.getElementById('spec-stat').style.color='var(--success)';
+}
+drawSpectrogram(null);
+
+let currentAudio=null;
+function togglePlay(){
+  const icon=document.getElementById('play-icon');
+  if(!currentAudio || !waveData.length) return;
+  if(currentAudio.paused) {
+    currentAudio.play();
+    isPlaying=true;
+    icon.className='ti ti-player-pause';
+  } else {
+    currentAudio.pause();
+    isPlaying=false;
+    icon.className='ti ti-player-play';
+  }
+}
+
+let fusPhase=0;
+function animFusion(){
+  fusPhase+=0.02;
+  const p1=document.getElementById('fp1'),p2=document.getElementById('fp2');
+  if(p1){const t=(Math.sin(fusPhase)+1)/2;p1.setAttribute('cx',178+t*(192-178));p1.setAttribute('cy',170);}
+  if(p2){const t=(Math.sin(fusPhase+1)+1)/2;p2.setAttribute('cx',350+(1-t)*(362-350));p2.setAttribute('cy',170);}
+  requestAnimationFrame(animFusion);
+}
+animFusion();
+
+function triggerUpload(){document.getElementById('file-input').click();}
+function formatSize(b){if(!b)return'—';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+function setMetaField(id,val){const el=document.getElementById(id);el.textContent=val;el.classList.remove('meta-val-pending');}
+function clearMeta(){['meta-name','meta-fmt','meta-sr','meta-ch','meta-dur','meta-size'].forEach(id=>{const el=document.getElementById(id);el.textContent='—';el.classList.add('meta-val-pending');});}
+function setInf(id,val,unit){const el=document.getElementById(id);el.textContent=val;el.classList.remove('pend');if(unit)document.getElementById(id+'-u').textContent=unit;}
+function clearInf(){['inf-time','inf-conf','inf-dur','inf-ch'].forEach(id=>{const el=document.getElementById(id);el.textContent='—';el.classList.add('pend');});['inf-time-u','inf-conf-u','inf-dur-u','inf-ch-u'].forEach(id=>{document.getElementById(id).textContent='awaiting';});}
+
+let LAST_ANALYSIS=null;
+let storedAudioBuffer=null;
+
+async function apiGet(p){const r=await fetch(BACKEND_URL+p);if(!r.ok)throw new Error(r.status);return r.json();}
+async function apiPost(p,file){const fd=new FormData();fd.append('file',file);const r=await fetch(BACKEND_URL+p,{method:'POST',body:fd});if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}return r.json();}
+
+let STAGED_FILE=null;
+
+function handleFile(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  STAGED_FILE = file;
+  
+  if(currentAudio) { currentAudio.pause(); currentAudio.src=""; }
+  currentAudio = new Audio(URL.createObjectURL(file));
+  currentAudio.addEventListener('ended', () => {
+    isPlaying=false; document.getElementById('play-icon').className='ti ti-player-play';
+    wavePos=0; document.getElementById('prog-fill').style.width='0%';
+    drawWave(waveData, 0);
+  });
+  currentAudio.addEventListener('timeupdate', () => {
+    if(currentAudio.duration) {
+      wavePos = currentAudio.currentTime / currentAudio.duration;
+      document.getElementById('prog-fill').style.width=(wavePos*100)+'%';
+      drawWave(waveData,wavePos);
+    }
+  });
+
+  clearMeta();clearInf();
+  document.getElementById('wv-stat').textContent='STAGED - READY';
+  document.getElementById('wv-stat').style.color='var(--success)';
+  setHdrChip('ready');
+  document.getElementById('start-btn').style.display='flex';
+  
+  const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  const reader=new FileReader();
+  reader.onload=e=>{
+    audioCtx.decodeAudioData(e.target.result.slice(0),buf=>{
+      storedAudioBuffer=buf;
+      const ch=buf.getChannelData(0);const pts=300;const step=Math.floor(ch.length/pts)||1;
+      const wd=[];for(let i=0;i<pts;i++){let mx=0;for(let j=0;j<step;j++){const v=Math.abs(ch[i*step+j]);if(v>mx)mx=v;}wd.push(mx*2-1);}
+      waveData=wd;drawWave(waveData,0);
+      drawSpectrogram(ch,buf.sampleRate,Math.min(150,Math.floor(ch.length/256)));
+      document.getElementById('wv-dur').textContent=buf.duration.toFixed(1)+'s';
+      document.getElementById('wv-sr').textContent=buf.sampleRate+'Hz';
+      document.getElementById('wv-ch').textContent=buf.numberOfChannels;
+      document.getElementById('spec-dur-label').textContent=buf.duration.toFixed(1)+'s';
+    },()=>{document.getElementById('wv-stat').textContent='DECODE ERR';});
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function startStagedAnalysis() {
+  if(STAGED_FILE) {
+    document.getElementById('start-btn').style.display='none';
+    runAnalysis(STAGED_FILE);
+  }
+}
+
+const STEPS=['Audio Received','Audio Standardization','Voice Activity Detection','Spectrogram Generation','Biological Feature Extraction','Deep Feature Extraction','Fusion Analysis','Risk Classification','Report Generation'];
+function advTl(step){
+  for(let i=0;i<STEPS.length;i++){
+    const dot=document.getElementById('tl-'+i),tx=document.getElementById('tx-'+i);
+    if(!dot)continue;
+    if(i<step){dot.className='tl-dot done';tx.className='tl-text done';}
+    else if(i===step){dot.className='tl-dot active';tx.className='tl-text active';document.getElementById('tt-'+i).textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});}
+    else{dot.className='tl-dot pend';}
+  }
+}
+function resetTl(){for(let i=0;i<STEPS.length;i++){const d=document.getElementById('tl-'+i);if(d)d.className='tl-dot pend';document.getElementById('tt-'+i).textContent='—';document.getElementById('tx-'+i).className='tl-text';}}
+
+function resetResults(){
+  if(document.getElementById('active-learning-block')) {
+    document.getElementById('active-learning-block').style.display='none';
+    document.getElementById('active-learning-label').style.display='none';
+    document.getElementById('feedback-wrong-block').style.display='none';
+    document.getElementById('feedback-status').style.display='none';
+  }
+  resetTl();
+  document.getElementById('chunk-tbody').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">Analyzing...</td></tr>';
+  document.getElementById('tbl-status').textContent='PROCESSING';document.getElementById('tbl-status').style.color='var(--warn)';
+  document.getElementById('s-job').className='pill pill-proc';document.getElementById('s-job').textContent='PROCESSING';
+  document.getElementById('hero-status').textContent='Analysis in Progress';
+  document.getElementById('hero-sub').textContent='VoiceGuard is processing the audio...';
+  document.getElementById('hero-score').textContent='—';
+  document.getElementById('h-class').textContent='—';document.getElementById('h-conf').textContent='—';
+  document.getElementById('h-dur').textContent='—';document.getElementById('h-proc').textContent='—';
+  document.getElementById('risk-num').textContent='—';
+  document.getElementById('risk-badge').textContent='ANALYZING...';
+  document.getElementById('risk-badge').className='risk-badge-big risk-badge-lo';
+  document.getElementById('risk-finding').textContent='Fusion engine is processing...';
+  ['ti-type','ti-soph','ti-replay','ti-synth','ti-trig'].forEach(id=>{document.getElementById(id).textContent='—';});
+  ['rd-evid','rd-vstab','rd-spec','rd-conf'].forEach(id=>{document.getElementById(id).textContent='—';});
+  document.getElementById('fus-score-text').textContent='—';
+  document.getElementById('bio-score-text').textContent='—';
+  document.getElementById('dl-score-text').textContent='—';
+  document.getElementById('fus-risk-text').textContent='—';
+  clearInf();
+}
+
+async function runAnalysis(file){
+  resetResults();
+  const t0=performance.now();
+  let step=0;advTl(0);
+  const iv=setInterval(()=>{step=Math.min(step+1,STEPS.length-2);advTl(step);},450);
+  try{
+    const r=await apiPost('/analyze',file);
+    clearInterval(iv);
+    advTl(STEPS.length-1);
+    setTimeout(()=>{
+      for(let i=0;i<STEPS.length;i++){const d=document.getElementById('tl-'+i);if(d){d.className='tl-dot done';document.getElementById('tx-'+i).className='tl-text done';}}
+      showResults(r,Math.round(performance.now()-t0));
+    },300);
+  }catch(err){
+    clearInterval(iv);setHdrChip('ready');
+    document.getElementById('s-job').className='pill pill-idle';document.getElementById('s-job').textContent='ERROR';
+    document.getElementById('tbl-status').textContent='ERROR';document.getElementById('tbl-status').style.color='var(--danger)';
+    document.getElementById('chunk-tbody').innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:24px;font-size:12px">Analysis failed: ${(err.message||'Unknown error').replace(/</g,'&lt;')}<br><span style="color:var(--text3);font-size:11px">Is the VoiceGuard backend running at ${BACKEND_URL}?</span></td></tr>`;
+    document.getElementById('hero-status').textContent='Analysis Failed';document.getElementById('hero-sub').textContent='Backend connection error. Check that the VoiceGuard server is running.';
+  }
+}
+
+function showResults(result,clientMs){
+  LAST_ANALYSIS=result;
+  const meta=result.metadata;
+  setMetaField('meta-name',meta.filename);setMetaField('meta-fmt',meta.format);
+  setMetaField('meta-sr',meta.sample_rate+'Hz');setMetaField('meta-ch',meta.channels);
+  setMetaField('meta-dur',meta.duration+'s');setMetaField('meta-size',formatSize(meta.file_size_bytes));
+  document.getElementById('wv-dur').textContent=meta.duration+'s';
+  document.getElementById('wv-sr').textContent=meta.sample_rate;
+  document.getElementById('wv-ch').textContent=meta.channels;
+  document.getElementById('spec-dur-label').textContent=meta.duration+'s';
+  const fs=result.fraud_score,fc=result.confidence,ver=result.verdict;
+  const isHigh=ver==='FRAUD',isMed=ver==='SUSPICIOUS';
+  document.getElementById('hero-score').textContent=fs+'%';
+  document.getElementById('hero-score').className='hero-score'+(isHigh?' risk-score':'');
+  document.getElementById('hero-status').textContent=result.verdict_label||ver;
+  document.getElementById('hero-sub').textContent='Case '+result.case_id+' · '+new Date(result.timestamp).toLocaleString('en-IN',{hour12:false});
+  document.getElementById('h-caseid').textContent=result.case_id;
+  document.getElementById('h-class').textContent=ver;
+  document.getElementById('h-class').style.color=isHigh?'var(--danger)':isMed?'var(--warn)':'var(--success)';
+  document.getElementById('h-conf').textContent=fc+'%';
+  document.getElementById('h-dur').textContent=result.performance.audio_duration_sec.toFixed(1)+'s';
+  document.getElementById('h-proc').textContent=result.performance.inference_time_ms+'ms';
+  document.getElementById('hero-rec-text').textContent=result.recommendation;
+  setInf('inf-time',result.performance.inference_time_ms,'ms');
+  setInf('inf-conf',fc+'%','fusion confidence');
+  setInf('inf-dur',result.performance.audio_duration_sec.toFixed(2),'seconds');
+  setInf('inf-ch',result.performance.chunks_processed,'1-second windows');
+  const rb=document.getElementById('risk-badge');
+  const rnum=document.getElementById('risk-num');
+  rnum.textContent=fs+'%';
+  rnum.className='risk-score-num'+(isHigh?' hi':isMed?' med':' lo');
+  rb.className='risk-badge-big'+(isHigh?' risk-badge-hi':isMed?' risk-badge-med':' risk-badge-lo');
+  rb.textContent=(isHigh?'HIGH RISK':isMed?'MEDIUM RISK':'LOW RISK')+' · '+result.risk_level;
+  document.getElementById('risk-finding').textContent=result.verdict_label;
+  document.getElementById('ti-type').textContent=result.threat_intel.threat_type;
+  document.getElementById('ti-soph').textContent=result.threat_intel.sophistication;
+  document.getElementById('ti-replay').textContent=result.threat_intel.replay_indicators;
+  document.getElementById('ti-synth').textContent=result.threat_intel.synthetic_confidence+'%';
+  document.getElementById('ti-trig').innerHTML='<span class="trigger-tag trig-pri">'+result.primary_trigger+'</span>';
+  document.getElementById('rd-evid').textContent=isHigh?'STRONG':isMed?'MODERATE':'LOW';
+  document.getElementById('rd-vstab').textContent=Math.round(100-fs)+'%';
+  document.getElementById('rd-spec').textContent=Math.round(fs*0.9)+'%';
+  document.getElementById('rd-conf').textContent=fc+'%';
+  document.getElementById('rd-rec').textContent=result.recommendation;
+  document.getElementById('hdr-case').textContent='CASE: '+result.case_id;
+  setHdrChip(isHigh?'risk':'complete');
+  document.getElementById('s-job').className='pill pill-on';document.getElementById('s-job').textContent='COMPLETE';
+  document.getElementById('fus-score-text').textContent=fs+'%';
+  document.getElementById('fus-risk-text').textContent=result.risk_level;
+  document.getElementById('fus-risk-text').setAttribute('fill',isHigh?'#EF4444':isMed?'#F59E0B':'#22C55E');
+  if(result.chunk_results&&result.chunk_results.length){
+    const avgBio=result.chunk_results.reduce((s,c)=>s+c.bio_score,0)/result.chunk_results.length;
+    const avgDl=result.chunk_results.reduce((s,c)=>s+c.deep_score,0)/result.chunk_results.length;
+    document.getElementById('bio-score-text').textContent='Score: '+avgBio.toFixed(1)+'%';
+    document.getElementById('dl-score-text').textContent='Score: '+avgDl.toFixed(1)+'%';
+    document.getElementById('xai-bio').style.width=Math.min(100,avgBio)+'%';
+    document.getElementById('xai-bio-pct').textContent=Math.round(avgBio)+'%';
+    document.getElementById('xai-dl').style.width=Math.min(100,avgDl)+'%';
+    document.getElementById('xai-dl-pct').textContent=Math.round(avgDl)+'%';
+    document.getElementById('xai-fus').style.width=Math.min(100,fs)+'%';
+    document.getElementById('xai-fus-pct').textContent=fs+'%';
+  }
+  const tbody=document.getElementById('chunk-tbody');
+  tbody.innerHTML='';
+  if(!result.chunk_results||!result.chunk_results.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No chunks processed</td></tr>';
+  }else{
+    result.chunk_results.forEach(c=>{
+      const cv=c.verdict;
+      const color=cv==='FRAUD'?'#EF4444':cv==='SUSPICIOUS'?'#F59E0B':'#22C55E';
+      const vcls=cv==='FRAUD'?'v-fraud':cv==='SUSPICIOUS'?'v-susp':'v-clean';
+      tbody.innerHTML+=`<tr>
+        <td style="font-weight:600;color:var(--text)">#${String(c.index).padStart(2,'0')}</td>
+        <td><div class="score-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${Math.min(100,Math.max(0,c.score))}%;background:${color}"></div></div><span style="color:${color};min-width:36px;text-align:right;font-family:var(--mono)">${c.score.toFixed(1)}%</span></div></td>
+        <td style="color:var(--bank);font-family:var(--mono)">${c.confidence.toFixed(1)}%</td>
+        <td><span class="verdict-tag ${vcls}">${cv}</span></td>
+        <td style="color:var(--text2);font-family:var(--mono);font-size:11px">${c.start}s–${c.end}s</td>
+      </tr>`;
+    });
+  }
+  document.getElementById('tbl-status').textContent='COMPLETE';document.getElementById('tbl-status').style.color='var(--success)';
+  document.getElementById('rpt-id').textContent=result.case_id;
+  document.getElementById('rpt-ts').textContent=new Date(result.timestamp).toLocaleString('en-IN',{hour12:false});
+  document.getElementById('rpt-risk').textContent=fs+'%';
+  document.getElementById('rpt-type').textContent=result.threat_intel.threat_type;
+  document.getElementById('rpt-synth').textContent=result.threat_intel.synthetic_confidence+'%';
+  document.getElementById('rpt-fus').textContent=fc+'%';
+  document.getElementById('rpt-pri').innerHTML='<span class="trigger-tag trig-pri">'+result.primary_trigger+'</span>';
+  document.getElementById('rpt-sec').innerHTML='<span class="trigger-tag trig-sec">'+result.secondary_trigger+'</span>';
+  document.getElementById('rpt-rec').textContent=result.recommendation;
+  document.getElementById('rpt-class').textContent='RESTRICTED · Session: '+result.case_id+(result.using_real_models?'':' · PLACEHOLDER SCORING');
+
+  document.getElementById('active-learning-block').style.display='block';
+  document.getElementById('active-learning-label').style.display='flex';
+  document.getElementById('feedback-wrong-block').style.display='none';
+  document.getElementById('feedback-status').style.display='none';
+}
+
+let mediaRec=null,micChunks=[],micStream=null,micRec=false;
+function startMic(){
+  if(micRec){stopMic();return;}
+  navigator.mediaDevices.getUserMedia({
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false
+    }
+  }).then(stream=>{
+    micStream=stream;micChunks=[];micRec=true;setHdrChip('analyzing');
+    const btn=document.getElementById('mic-btn');
+    btn.innerHTML='<i class="ti ti-square" style="font-size:13px"></i> Stop Recording';btn.style.color='var(--danger)';
+    clearMeta();clearInf();setMetaField('meta-name','MIC_CAPTURE');setMetaField('meta-fmt','PCM/WebM · Live');
+    const mr=new MediaRecorder(stream);mediaRec=mr;
+    mr.ondataavailable=e=>micChunks.push(e.data);
+    mr.onstop=()=>{
+      const blob=new Blob(micChunks,{type:'audio/webm'});
+      const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        audioCtx.decodeAudioData(ev.target.result,buf=>{
+          storedAudioBuffer=buf;
+          const ch=buf.getChannelData(0);const pts=300;const step=Math.floor(ch.length/pts)||1;
+          const wd=[];for(let i=0;i<pts;i++){let mx=0;for(let j=0;j<step;j++){const v=Math.abs(ch[i*step+j]||0);if(v>mx)mx=v;}wd.push(mx*2-1);}
+          waveData=wd;drawWave(waveData,0);
+          drawSpectrogram(ch,buf.sampleRate,Math.min(150,Math.floor(ch.length/256)));
+          document.getElementById('wv-stat').textContent='SIGNAL OK';
+          document.getElementById('wv-stat').style.color='var(--success)';
+          
+          // Convert the decoded AudioBuffer directly to a WAV Blob so librosa doesn't need ffmpeg!
+          const wavBlob = audioBufferToWav(buf);
+          const f = new File([wavBlob], 'MIC_'+Date.now()+'.wav', {type:'audio/wav'});
+          runAnalysis(f);
+        },()=>{document.getElementById('wv-stat').textContent='DECODE ERR';});
+      };reader.readAsArrayBuffer(blob);
+    };
+    mr.start(100);
+  }).catch(()=>{setHdrChip('ready');});
+}
+function stopMic(){
+  if(mediaRec&&micRec){mediaRec.stop();micStream.getTracks().forEach(t=>t.stop());}
+  micRec=false;
+  const btn=document.getElementById('mic-btn');
+  btn.innerHTML='<i class="ti ti-record-mail" style="font-size:13px"></i> Live Record';btn.style.color='';
+}
+
+function audioBufferToWav(buffer) {
+  const sr = buffer.sampleRate;
+  const n = buffer.length;
+  const buf = new ArrayBuffer(44 + n * 2);
+  const view = new DataView(buf);
+  const ws = (o, s) => { for(let i=0; i<s.length; i++) view.setUint8(o+i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); view.setUint32(4, 36 + n * 2, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, sr, true); view.setUint32(28, sr * 2, true); view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true); ws(36, 'data'); view.setUint32(40, n * 2, true);
+  const ch = buffer.getChannelData(0);
+  for(let i=0; i<n; i++) {
+    const s = Math.max(-1, Math.min(1, ch[i]));
+    view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return new Blob([buf], {type: 'audio/wav'});
+}
+
+function genDemoWav(){
+  const sr=16000,dur=6.2,n=Math.floor(sr*dur);
+  const buf=new ArrayBuffer(44+n*2);const view=new DataView(buf);
+  function ws(o,s){for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i));}
+  ws(0,'RIFF');view.setUint32(4,36+n*2,true);ws(8,'WAVE');ws(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sr,true);view.setUint32(28,sr*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);ws(36,'data');view.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){const t=i/sr,env=Math.sin(Math.PI*i/n),val=(Math.sin(2*Math.PI*180*t)*.3+Math.sin(2*Math.PI*420*t)*.15)*env;const s=Math.max(-1,Math.min(1,val));view.setInt16(44+i*2,s*32767,true);}
+  return new Blob([buf],{type:'audio/wav'});
+}
+function runDemo(){
+  const pts=300,arr=[];
+  for(let i=0;i<pts;i++){const t=i/pts,env=Math.sin(t*Math.PI);arr.push((Math.sin(t*80)*.3+Math.sin(t*200)*.15)*env);}
+  waveData=arr;drawWave(waveData,0);
+  document.getElementById('wv-stat').textContent='DEMO SIGNAL';document.getElementById('wv-stat').style.color='var(--warn)';
+  clearMeta();clearInf();
+  const demoRaw=new Float32Array(16000*6);
+  for(let i=0;i<demoRaw.length;i++){const t=i/16000;demoRaw[i]=(Math.sin(t*2*Math.PI*180)*.3+Math.sin(t*2*Math.PI*420)*.15)*Math.sin(Math.PI*i/demoRaw.length);}
+  drawSpectrogram(demoRaw,16000,120);
+  document.getElementById('spec-dur-label').textContent='6.2s';
+  const blob=genDemoWav();
+  const f=new File([blob],'DEMO_SYNTHETIC_TONE_001.wav',{type:'audio/wav'});
+  runAnalysis(f);
+}
+
+async function downloadReport(){
+  if(!LAST_ANALYSIS){alert('Run an analysis first to generate a report.');return;}
+  try{
+    const r=await fetch(BACKEND_URL+'/generate-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({case_id:LAST_ANALYSIS.case_id})});
+    if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}
+    const blob=await r.blob();const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='VoiceGuard_Report_'+LAST_ANALYSIS.case_id+'.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  }catch(err){alert('Report export failed: '+(err.message||'Unknown error')+'\n\nIs the backend running at '+BACKEND_URL+'?');}
+}
+
+async function loadSystemStatus(){
+  try{const s=await apiGet('/model-status');document.getElementById('s-mdl').className='pill pill-on';document.getElementById('s-mdl').textContent=s.model_loaded?'LOADED':'PLACEHOLDER';document.getElementById('s-inf').textContent=s.inference_ready?'READY':'NOT READY';document.getElementById('s-back').className='pill pill-conn';}catch(e){document.getElementById('s-back').className='pill pill-idle';document.getElementById('s-back').textContent='OFFLINE';}
+  try{const h=await apiGet('/health');document.getElementById('s-api').textContent=h.backend_api==='CONNECTED'?'ONLINE':'OFFLINE';document.getElementById('s-db').textContent=h.database==='CONNECTED'?'CONNECTED':'OFFLINE';}catch(e){document.getElementById('s-api').className='pill pill-idle';document.getElementById('s-api').textContent='OFFLINE';}
+}
+loadSystemStatus();setInterval(loadSystemStatus,15000);
+
+window.addEventListener('resize',()=>{resizeWave();resizeSpec();drawWave(waveData,wavePos);});
+
+function submitFeedback(isCorrect){
+  if(isCorrect){
+    if(LAST_ANALYSIS.verdict === 'FRAUD') {
+      const type = LAST_ANALYSIS.threat_intel.threat_type;
+      if (type === 'ElevenLabs Clone') submitTrueLabel('ElevenLabs');
+      else if (type === 'Resemble AI Clone') submitTrueLabel('Resemble');
+      else submitTrueLabel('Generic');
+    } else {
+      submitTrueLabel('Real');
+    }
+  } else {
+    document.getElementById('feedback-wrong-block').style.display='block';
+  }
+}
+async function submitTrueLabel(trueLabel){
+  try{
+    const form = new FormData();
+    form.append('is_correct', 'true');
+    form.append('true_label', trueLabel);
+    const res = await fetch(BACKEND_URL + '/feedback', {method:'POST', body:form});
+    const j = await res.json();
+    const st = document.getElementById('feedback-status');
+    st.textContent = j.message; st.style.display='block'; st.style.color='#15803D';
+    document.getElementById('feedback-wrong-block').style.display='none';
+  }catch(e){
+    const st = document.getElementById('feedback-status');
+    st.textContent = "Error saving feedback."; st.style.display='block'; st.style.color='#DC2626';
+  }
+}
+async function retrainModel(){
+  const st = document.getElementById('feedback-status');
+  st.textContent = "Retraining in background... please wait."; st.style.display='block'; st.style.color='#D97706';
+  try{
+    const res = await fetch(BACKEND_URL + '/retrain', {method:'POST'});
+    const j = await res.json();
+    st.textContent = j.message; st.style.color='#15803D';
+  }catch(e){
+    const st = document.getElementById('feedback-status');
+    st.textContent = "Retrain failed."; st.style.color='#DC2626';
+  }
+}
+
+function switchPage(pageId, navItem) {
+  const pages = ['page-dashboard', 'page-intel', 'page-reports'];
+  pages.forEach(p => {
+    const el = document.getElementById(p);
+    if(el) el.style.display = (p === pageId) ? 'block' : 'none';
+  });
+  
+  if(navItem) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    navItem.classList.add('active');
+  }
+
+  // Fix canvas rendering bug when switching from hidden display
+  if(pageId === 'page-intel') {
+    // Small timeout to ensure DOM has updated display block before reading offsetWidth
+    setTimeout(() => {
+      resizeWave();
+      resizeSpec();
+      drawWave(waveData, wavePos);
+      if (storedAudioBuffer) {
+        const ch = storedAudioBuffer.getChannelData(0);
+        drawSpectrogram(ch, storedAudioBuffer.sampleRate, Math.min(150, Math.floor(ch.length / 256)));
+      } else {
+        drawSpectrogram(null, 0, 0);
+      }
+    }, 50);
+  }
+}
+</script>

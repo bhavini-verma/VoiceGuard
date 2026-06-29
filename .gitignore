@@ -24,3 +24,7 @@ features/*.csv
 DEMONSTRATION/
 aria2/
 
+# Local models and temp files
+models/indicwav2vec-hindi/
+scratch/
+test_real.wav

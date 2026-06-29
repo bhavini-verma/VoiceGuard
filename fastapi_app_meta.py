@@ -49,6 +49,7 @@ class ModelState:
         self.meta_cfg = None
         self.bio_feature_cols = []
         self.deep_feature_cols = []
+        self.contrastive_head = None
         self.is_loaded = False
 
 model_state = ModelState()
@@ -101,6 +102,16 @@ def load_models():
             model_state.deep_feature_cols = model_state.xgb_deep.get_booster().feature_names
     except Exception as e:
         print(f"XGB Deep load failed: {e}")
+        
+    # Load Contrastive Projection Head
+    try:
+        from contrastive_head import ContrastiveProjectionHead
+        model_state.contrastive_head = ContrastiveProjectionHead().to(model_state.device)
+        model_state.contrastive_head.load_state_dict(torch.load(os.path.join(base_dir, 'models', 'contrastive_head.pt'), map_location=model_state.device))
+        model_state.contrastive_head.eval()
+        print("Contrastive projection head loaded successfully!")
+    except Exception as e:
+        print(f"Contrastive projection head load failed: {e}")
 
     # 3. Load Calibrated Wrappers
     try:
@@ -272,9 +283,32 @@ async def analyze_audio(file: UploadFile = File(...)):
                     df_deep_input[c] = 0.0
             df_deep_input = df_deep_input[model_state.deep_feature_cols]
 
-        # 3. Base Stream Predictions (raw probabilities)
-        p_bio = float(model_state.xgb_bio.predict_proba(df_bio_input)[:, 1][0]) if model_state.xgb_bio is not None else 0.5
-        p_deep = float(model_state.xgb_deep.predict_proba(df_deep_input)[:, 1][0]) if model_state.xgb_deep is not None else 0.5
+        # 3. Base Stream Predictions (raw multiclass probabilities)
+        if model_state.xgb_bio is not None:
+            p_bio_classes = model_state.xgb_bio.predict_proba(df_bio_input)[0]
+            p_bio = float(1.0 - p_bio_classes[0])
+        else:
+            p_bio_classes = np.array([0.5, 0.16, 0.16, 0.18])
+            p_bio = 0.5
+
+        if model_state.xgb_deep is not None:
+            if model_state.contrastive_head is not None:
+                deep_cols_2048 = [f'Deep_{k}' for k in range(2048)]
+                for c in deep_cols_2048:
+                    if c not in df_deep_input.columns:
+                        df_deep_input[c] = 0.0
+                X_deep_raw = df_deep_input[deep_cols_2048].values
+                with torch.no_grad():
+                    X_deep_proj = model_state.contrastive_head(torch.tensor(X_deep_raw, dtype=torch.float32).to(model_state.device)).cpu().numpy()
+                proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
+                df_deep_proj = pd.DataFrame(X_deep_proj, columns=proj_cols)
+                p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_proj)[0]
+            else:
+                p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_input)[0]
+            p_deep = float(1.0 - p_deep_classes[0])
+        else:
+            p_deep_classes = np.array([0.5, 0.16, 0.16, 0.18])
+            p_deep = 0.5
         
         # Save temp features for feedback loop
         df_bio_input.to_csv(os.path.join(base_dir, "scratch", "temp_bio.csv"), index=False)
@@ -342,7 +376,16 @@ async def analyze_audio(file: UploadFile = File(...)):
             "using_real_models": True,
             "metadata": {"filename": file.filename, "format": "WAV", "sample_rate": 16000, "channels": 1, "duration": round(duration, 2), "file_size_bytes": file_size},
             "performance": {"model_version": "v2.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
-            "threat_intel": {"threat_type": "TTS Clone" if p_deep > 0.5 else "None", "sophistication": "Advanced", "replay_indicators": "None", "synthetic_confidence": round(p_deep * 100, 1)},
+            "threat_intel": {
+                "threat_type": (
+                    "ElevenLabs Clone" if np.argmax(p_deep_classes[1:]) == 0 else (
+                        "Resemble AI Clone" if np.argmax(p_deep_classes[1:]) == 1 else "Generic TTS Clone"
+                    )
+                ) if verdict != "LEGITIMATE" else "None",
+                "sophistication": "Advanced" if verdict != "LEGITIMATE" else "None",
+                "replay_indicators": "None",
+                "synthetic_confidence": round(float(max(p_deep_classes[1:])) * 100, 1) if verdict != "LEGITIMATE" else 0.0
+            },
             "chunk_results": chunk_results
         }
     finally:
@@ -354,7 +397,16 @@ async def analyze_audio(file: UploadFile = File(...)):
 @app.post("/feedback")
 async def process_feedback(is_correct: str = Form(...), true_label: str = Form(...)):
     is_correct = (is_correct.lower() == 'true')
-    label = 1 if true_label == "Fake (1)" else 0
+    label = 0 if true_label == "Real" else 1
+    
+    if true_label == "ElevenLabs":
+        prefix = "active_learning_elevenlabs"
+    elif true_label == "Resemble":
+        prefix = "active_learning_resemble"
+    elif true_label == "Generic":
+        prefix = "active_learning_generic"
+    else:
+        prefix = "active_learning_real"
     
     bio_temp = os.path.join(base_dir, "scratch", "temp_bio.csv")
     deep_temp = os.path.join(base_dir, "scratch", "temp_deep.csv")
@@ -365,8 +417,8 @@ async def process_feedback(is_correct: str = Form(...), true_label: str = Form(.
         
         df_bio_input['Label'] = label
         df_deep_input['Label'] = label
-        df_bio_input['Filename'] = f"active_learning_{int(time.time())}.wav"
-        df_deep_input['Filename'] = f"active_learning_{int(time.time())}.wav"
+        df_bio_input['Filename'] = f"{prefix}_{int(time.time())}.wav"
+        df_deep_input['Filename'] = f"{prefix}_{int(time.time())}.wav"
         
         hard_val_bio = os.path.join(base_dir, 'features', 'hard_val_bio.csv')
         hard_val_deep = os.path.join(base_dir, 'features', 'hard_val_deep.csv')
@@ -434,3 +486,4 @@ if __name__ == "__main__":
     chrome_thread.start()
     
     uvicorn.run("fastapi_app_meta:app", host="127.0.0.1", port=8000, reload=True)
+    # Trigger model reload: 2026-06-29T20:59
