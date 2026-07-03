@@ -1,6 +1,6 @@
 {
-    "threshold_high": 0.8776686983280378,
-    "threshold_mid": 0.8776686983280378,
+    "threshold_high": 0.9924828361756516,
+    "threshold_mid": 0.9924828361756516,
     "feature_names": [
         "bio_score",
         "deep_score",

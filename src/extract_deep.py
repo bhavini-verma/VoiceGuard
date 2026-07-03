@@ -68,6 +68,22 @@ def get_audio_files(data_dir):
             elif 'real_replays' in path_parts:
                 category = 'real_replays'
                 label = 2  # Replays are REPLAY
+            elif '1_genuine' in path_parts:
+                # Use the subfolder name as category
+                idx = path_parts.index('1_genuine')
+                if idx + 1 < len(path_parts):
+                    category = path_parts[idx + 1]
+                else:
+                    category = '1_genuine'
+                label = 0
+            elif '2_synthetic' in path_parts:
+                # Use the subfolder name as category
+                idx = path_parts.index('2_synthetic')
+                if idx + 1 < len(path_parts):
+                    category = path_parts[idx + 1]
+                else:
+                    category = '2_synthetic'
+                label = 1
             elif 'real' in path_parts:
                 category = 'real'
                 label = 0
@@ -95,8 +111,10 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base")
-    model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base", use_safetensors=True).to(device)
+    model_local_path = os.path.join(base_dir, 'models', 'indicwav2vec-hindi')
+    from transformers import Wav2Vec2FeatureExtractor
+    processor = Wav2Vec2FeatureExtractor.from_pretrained(model_local_path, local_files_only=True)
+    model = Wav2Vec2Model.from_pretrained(model_local_path, use_safetensors=True, output_hidden_states=True, local_files_only=True).to(device)
     model.eval()
     
     audio_files = get_audio_files(data_dir)
@@ -144,8 +162,6 @@ def main():
                 if duration < 1.0 or np.max(np.abs(y)) < 1e-4:
                     continue
                 
-                # Simulate phone codec degradation
-                y = simulate_phone_codec(y, sr=16000)
                 batch_audio.append(y)
                 batch_meta.append({'Filename': os.path.basename(file_path), 'Label': label})
             except Exception as e:
@@ -162,14 +178,17 @@ def main():
             with torch.no_grad():
                 outputs = model(**inputs)
                 
-            hidden_states = outputs.last_hidden_state
-            pooled_features = torch.mean(hidden_states, dim=1).cpu().numpy()
+            hidden_states = outputs.hidden_states[12]
+            pooled_mean = torch.mean(hidden_states, dim=1).cpu().numpy()
+            pooled_std = torch.std(hidden_states, dim=1).cpu().numpy()
             
             batch_results = []
             for j in range(len(batch_meta)):
                 feats = batch_meta[j]
-                for k in range(pooled_features.shape[1]):
-                    feats[f'Deep_{k}'] = float(pooled_features[j, k])
+                for k in range(1024):
+                    feats[f'Deep_{k}'] = float(pooled_mean[j, k])
+                for k in range(1024):
+                    feats[f'Deep_{1024 + k}'] = float(pooled_std[j, k])
                 batch_results.append(feats)
                 
             # Append to CSV

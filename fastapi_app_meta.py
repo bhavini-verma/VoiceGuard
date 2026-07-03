@@ -24,6 +24,43 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(base_dir, 'src'))
 from extract_bio import extract_bio_features, simulate_phone_codec
 from transformers import Wav2Vec2FeatureExtractor, AutoModel
+from sklearn.base import BaseEstimator, ClassifierMixin
+
+class BinaryWrapper(BaseEstimator, ClassifierMixin):
+    def __init__(self, multiclass_xgb, contrastive_head=None):
+        self.multiclass_xgb = multiclass_xgb
+        self.contrastive_head = contrastive_head
+        self.classes_ = np.array([0, 1])
+        if contrastive_head is not None:
+            self.feature_names_in_ = [f'Proj_Deep_{i}' for i in range(128)]
+            self.n_features_in_ = 128
+        else:
+            self.feature_names_in_ = getattr(multiclass_xgb, 'feature_names_in_', None)
+            self.n_features_in_ = getattr(multiclass_xgb, 'n_features_in_', None)
+
+    def fit(self, X, y=None):
+        return self
+
+    def predict_proba(self, X):
+        if self.contrastive_head is not None:
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.contrastive_head.eval()
+            with torch.no_grad():
+                X_tensor = torch.tensor(X, dtype=torch.float32).to(device)
+                X_proj = self.contrastive_head(X_tensor).cpu().numpy()
+            proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
+            X_df = pd.DataFrame(X_proj, columns=proj_cols)
+            p_raw = self.multiclass_xgb.predict_proba(X_df)
+        else:
+            p_raw = self.multiclass_xgb.predict_proba(X)
+            
+        p_real = p_raw[:, 0]
+        p_fake = 1.0 - p_real
+        return np.column_stack([p_real, p_fake])
+
+    def predict(self, X):
+        p_proba = self.predict_proba(X)
+        return (p_proba[:, 1] >= 0.5).astype(int)
 
 app = FastAPI(title="FraudRadar AI - Fixed Weight Fusion (Retrained)")
 
@@ -252,12 +289,13 @@ async def analyze_audio(file: UploadFile = File(...)):
         df_bio_input = pd.DataFrame(bio_data)
         
         # 2. Deep extraction
-        y_sim = simulate_phone_codec(y, sr=16000)
         max_audio_samples = 10 * 16000
-        if len(y_sim) > max_audio_samples:
-            y_sim = y_sim[:max_audio_samples]
+        if len(y) > max_audio_samples:
+            y_clean = y[:max_audio_samples]
+        else:
+            y_clean = y
 
-        inputs = model_state.processor([y_sim], sampling_rate=16000, return_tensors="pt", padding=True)
+        inputs = model_state.processor([y_clean], sampling_rate=16000, return_tensors="pt", padding=True)
         inputs = {k: v.to(model_state.device) for k, v in inputs.items()}
 
         with torch.no_grad():
@@ -276,13 +314,6 @@ async def analyze_audio(file: UploadFile = File(...)):
         for k in range(1024): deep_feats_dict[f'Deep_{1024 + k}'] = [float(pooled_std[k])]
         df_deep_input = pd.DataFrame(deep_feats_dict)
 
-        if model_state.deep_feature_cols:
-            # Add any missing columns with 0.0 (though they shouldn't be missing)
-            for c in model_state.deep_feature_cols:
-                if c not in df_deep_input.columns:
-                    df_deep_input[c] = 0.0
-            df_deep_input = df_deep_input[model_state.deep_feature_cols]
-
         # 3. Base Stream Predictions (raw multiclass probabilities)
         if model_state.xgb_bio is not None:
             p_bio_classes = model_state.xgb_bio.predict_proba(df_bio_input)[0]
@@ -293,18 +324,21 @@ async def analyze_audio(file: UploadFile = File(...)):
 
         if model_state.xgb_deep is not None:
             if model_state.contrastive_head is not None:
-                deep_cols_2048 = [f'Deep_{k}' for k in range(2048)]
-                for c in deep_cols_2048:
-                    if c not in df_deep_input.columns:
-                        df_deep_input[c] = 0.0
-                X_deep_raw = df_deep_input[deep_cols_2048].values
+                raw_cols = [f'Deep_{k}' for k in range(2048)]
+                X_deep_raw = df_deep_input[raw_cols].values.astype(np.float32)
                 with torch.no_grad():
                     X_deep_proj = model_state.contrastive_head(torch.tensor(X_deep_raw, dtype=torch.float32).to(model_state.device)).cpu().numpy()
                 proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
                 df_deep_proj = pd.DataFrame(X_deep_proj, columns=proj_cols)
                 p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_proj)[0]
             else:
-                p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_input)[0]
+                # Fallback: align raw features
+                deep_cols = model_state.deep_feature_cols if model_state.deep_feature_cols else [f'Deep_{k}' for k in range(2048)]
+                for c in deep_cols:
+                    if c not in df_deep_input.columns:
+                        df_deep_input[c] = 0.0
+                df_deep_input_aligned = df_deep_input[deep_cols]
+                p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_input_aligned)[0]
             p_deep = float(1.0 - p_deep_classes[0])
         else:
             p_deep_classes = np.array([0.5, 0.16, 0.16, 0.18])

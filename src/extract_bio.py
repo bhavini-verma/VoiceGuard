@@ -263,6 +263,22 @@ def get_audio_files(data_dir):
             elif 'real_replays' in path_parts:
                 category = 'real_replays'
                 label = 2  # Replays are REPLAY
+            elif '1_genuine' in path_parts:
+                # Use the subfolder name as category
+                idx = path_parts.index('1_genuine')
+                if idx + 1 < len(path_parts):
+                    category = path_parts[idx + 1]
+                else:
+                    category = '1_genuine'
+                label = 0
+            elif '2_synthetic' in path_parts:
+                # Use the subfolder name as category
+                idx = path_parts.index('2_synthetic')
+                if idx + 1 < len(path_parts):
+                    category = path_parts[idx + 1]
+                else:
+                    category = '2_synthetic'
+                label = 1
             elif 'real' in path_parts:
                 category = 'real'
                 label = 0
