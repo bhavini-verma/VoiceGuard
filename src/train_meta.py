@@ -140,18 +140,27 @@ def main():
     contrastive_head.load_state_dict(torch.load(os.path.join(base_dir, 'models', 'contrastive_head.pt'), map_location=device))
     contrastive_head.eval()
     
-    deep_cols = [f'Deep_{i}' for i in range(2048)]
+    # MCT deep features: 4096D per row (clean 2048D + degraded 2048D)
+    deep_cols = [f'Deep_{i}' for i in range(4096)]
 
     print("Loading features CSVs...")
     features_dir = os.path.join(base_dir, 'features')
     df_bio = pd.read_csv(os.path.join(features_dir, 'bio_features.csv')).dropna()
-    df_deep = pd.read_csv(os.path.join(features_dir, 'deep_features.csv')).dropna()
-    
     df_bio = df_bio[df_bio['Label'].isin([0, 1])]
+    
+    # Load MCT deep features (4096D: clean + lowpass-degraded concatenated per row)
+    df_deep = pd.read_csv(os.path.join(features_dir, 'deep_features.csv')).dropna()
     df_deep = df_deep[df_deep['Label'].isin([0, 1])]
+    deep_col_count = len([c for c in df_deep.columns if c.startswith('Deep_')])
+    assert deep_col_count == 4096, \
+        f"CRITICAL: deep_features.csv has {deep_col_count} Deep_* columns, expected 4096."
+    print(f"Deep feature schema: {deep_col_count}D per row (MCT) - PASS")
 
     df_hard_bio = pd.read_csv(os.path.join(features_dir, 'hard_val_bio.csv')).dropna()
     df_hard_deep = pd.read_csv(os.path.join(features_dir, 'hard_val_deep.csv')).dropna()
+    hard_col_count = len([c for c in df_hard_deep.columns if c.startswith('Deep_')])
+    assert hard_col_count == 4096, \
+        f"CRITICAL: hard_val_deep.csv has {hard_col_count} Deep_* columns, expected 4096. Re-run extract_hard_val_mct.py."
     
     df_hard_bio = df_hard_bio[df_hard_bio['Label'].isin([0, 1])]
     df_hard_deep = df_hard_deep[df_hard_deep['Label'].isin([0, 1])]

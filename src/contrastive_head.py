@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 
 class ContrastiveProjectionHead(nn.Module):
-    def __init__(self, input_dim=2048, hidden_dim=512, output_dim=128):
+    def __init__(self, input_dim=4096, hidden_dim=512, output_dim=128):
         super(ContrastiveProjectionHead, self).__init__()
         self.fc = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),

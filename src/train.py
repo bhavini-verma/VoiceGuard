@@ -60,14 +60,20 @@ def get_multiclass_label(filename, binary_label):
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     bio_path = os.path.join(base_dir, 'features', 'bio_features.csv')
+    # MCT deep features: 4096D per row (2048D clean + 2048D lowpass-degraded concatenated)
     deep_path = os.path.join(base_dir, 'features', 'deep_features.csv')
 
     print("Loading features...")
     df_bio = pd.read_csv(bio_path).dropna()
-    df_deep = pd.read_csv(deep_path).dropna()
-    
     df_bio = df_bio[df_bio['Label'].isin([0, 1])]
+
+    print("Loading MCT deep features (4096D: clean + degraded)...")
+    df_deep = pd.read_csv(deep_path).dropna()
     df_deep = df_deep[df_deep['Label'].isin([0, 1])]
+    deep_col_count = len([c for c in df_deep.columns if c.startswith('Deep_')])
+    assert deep_col_count == 4096, \
+        f"CRITICAL: deep_features.csv has {deep_col_count} Deep_* columns, expected 4096. Re-run extract_deep.py."
+    print(f"Deep feature schema verified: {deep_col_count}D per row (MCT) - PASS")
 
     df = pd.merge(df_deep, df_bio, on=['Filename', 'Label'], suffixes=('_deep', '_bio'))
 
@@ -80,9 +86,11 @@ def main():
         df_hard_bio = df_hard_bio[df_hard_bio['Label'].isin([0.0, 1.0, 0, 1])]
         df_hard_deep = df_hard_deep[df_hard_deep['Label'].astype(str).str.strip().isin(['0.0', '1.0', '0', '1', '0.000000', '1.000000'])]
         df_hard_deep['Label'] = df_hard_deep['Label'].astype(float).astype(int)
+        hard_deep_col_count = len([c for c in df_hard_deep.columns if c.startswith('Deep_')])
+        assert hard_deep_col_count == 4096, \
+            f"CRITICAL: hard_val_deep.csv has {hard_deep_col_count} Deep_* columns, expected 4096. Re-run extract_hard_val_mct.py."
         df_hard = pd.merge(df_hard_deep, df_hard_bio, on=['Filename', 'Label'], suffixes=('_deep', '_bio'))
-        print(f"Loaded {len(df_hard)} hard validation/user feedback samples.")
-        
+        print(f"Loaded {len(df_hard)} hard validation/user feedback samples (4096D verified).")
         df = pd.concat([df, df_hard], ignore_index=True)
         print(f"Total combined features count: {len(df)}")
     

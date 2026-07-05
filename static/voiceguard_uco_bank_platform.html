@@ -8,7 +8,7 @@
 --sans:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;min-height:100vh}
-.header{background:var(--bank);padding:0 24px;display:flex;align-items:center;height:60px;gap:20px;box-shadow:0 2px 8px rgba(0,91,172,0.2)}
+.header{background:var(--bank);padding:0 24px;display:flex;align-items:center;height:60px;gap:20px;box-shadow:0 2px 8px rgba(0,91,172,0.2);position:relative;z-index:900;}
 .logo-wrap{display:flex;align-items:center;gap:12px;border-right:1px solid rgba(255,255,255,0.2);padding-right:20px}
 .uco-shield{width:34px;height:38px;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:4px 4px 10px 10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .uco-shield svg{width:20px;height:20px}
@@ -19,7 +19,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .tagline{font-size:12px;color:rgba(255,255,255,0.6);letter-spacing:.3px}
 .sep{color:rgba(255,255,255,0.25);margin:0 4px}
 .header-right{display:flex;align-items:center;gap:12px}
-.status-chip{display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px}
+.status-chip{display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:transform 0.15s;}
+.status-chip:hover{transform:scale(1.03);}
 .chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .chip-ready{background:rgba(34,197,94,0.2);color:#16A34A;border:1px solid rgba(34,197,94,0.3)}
 .chip-ready .chip-dot{background:#22C55E}
@@ -73,23 +74,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .section-title i{font-size:15px;color:var(--bank)}
 .section-badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:#EAF2FB;color:var(--bank);border:1px solid rgba(0,91,172,0.15)}
 
-.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,91,172,0.03);transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);}
+.card:hover{box-shadow:0 4px 14px rgba(0,91,172,0.07);transform:translateY(-1px);}
 .card-title{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .card-title i{font-size:14px;color:var(--bank)}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
 
-.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;background:#FAFCFF;transition:all .2s}
+.upload-zone{border:2px dashed #B0CBEF;border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;background:#FAFCFF;transition:all .2s ease-in-out}
 .upload-zone:hover{border-color:var(--bank2);background:#EAF2FB}
-.uz-icon{color:var(--bank);font-size:30px;margin-bottom:8px;opacity:.7}
+.uz-icon{color:var(--bank);font-size:30px;margin-bottom:8px;opacity:.7;transition:transform 0.2s}
+.upload-zone:hover .uz-icon{transform:scale(1.1);}
 .uz-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
 .uz-sub{font-size:11px;color:var(--text3)}
-.upload-btn{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:7px 18px;background:var(--bank);color:#fff;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:background .2s}
-.upload-btn:hover{background:#004A8E}
+.upload-btn{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:7px 18px;background:var(--bank);color:#fff;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.upload-btn:hover{background:#004A8E;box-shadow:0 2px 6px rgba(0,91,172,0.15);transform:translateY(-1px);}
+.upload-btn:active{transform:translateY(0);}
 .action-btns{display:flex;gap:8px;margin-top:10px}
 .btn-outline{flex:1;padding:8px;border:1px solid var(--border);border-radius:5px;background:#fff;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
-.btn-outline:hover{border-color:var(--bank);color:var(--bank);background:#F0F7FF}
+.btn-outline:hover{border-color:var(--bank);color:var(--bank);background:#F0F7FF;transform:translateY(-1px);}
+.btn-outline:active{transform:translateY(0);}
 .btn-record{color:var(--danger);border-color:rgba(239,68,68,0.35)}
 .btn-record:hover{background:rgba(239,68,68,0.05);border-color:var(--danger)}
 .btn-demo{color:#D97706;border-color:rgba(245,158,11,0.4)}
@@ -116,7 +121,8 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
 .spec-desc{margin-top:8px;padding:8px 10px;background:#EAF2FB;border-radius:5px;font-size:11px;color:var(--text2);line-height:1.5;border-left:3px solid var(--bank)}
 
 .infer-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.infer-cell{background:#F4F8FC;border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center}
+.infer-cell{background:#FAFCFF;border:1px solid var(--border);border-left:3px solid var(--bank2);border-radius:6px;padding:10px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,0.015);transition:all 0.15s;}
+.infer-cell:hover{border-left-color:var(--teal);background:#F0F9FF;transform:translateX(1px);}
 .infer-key{font-size:9px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
 .infer-val{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--bank);line-height:1}
 .infer-val.pend{color:var(--text3);font-size:14px;font-weight:400}
@@ -194,7 +200,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
 .v-clean{background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.2)}
 .v-susp{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.2)}
 
-.report-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.report-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;display:none}
 .report-hdr{background:linear-gradient(135deg,var(--bank),#003d7a);padding:14px 20px}
 .report-hdr-title{color:#fff;font-size:13px;font-weight:700;letter-spacing:.5px;margin-bottom:2px}
 .report-hdr-sub{color:rgba(255,255,255,0.6);font-size:10px;letter-spacing:.5px}
@@ -202,10 +208,12 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
 .report-section{padding:14px 16px;border-right:1px solid var(--border)}
 .report-section:last-child{border-right:none}
 .report-section-title{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-weight:600}
-.rpt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.rpt-key{font-size:10px;color:var(--text3)}
-.rpt-val{font-size:10px;font-weight:600;color:var(--text);font-family:var(--mono)}
+.rpt-row{display:flex;flex-direction:column;align-items:flex-start;margin-bottom:8px}
+.rpt-key{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
+.rpt-val{font-size:11px;font-weight:600;color:var(--text);font-family:var(--mono);line-height:1.2;word-break:break-all}
 .rpt-val.danger{color:var(--danger)}
+.rpt-val.warn{color:var(--warn)}
+.rpt-val.success{color:var(--success)}
 .rpt-rec-box{background:#FEF9EC;border:1px solid #FDE68A;border-radius:5px;padding:8px 10px;font-size:11px;color:#92400E;line-height:1.4;margin-bottom:8px}
 .rpt-rec-label{font-size:9px;font-weight:700;color:#B45309;margin-bottom:3px;letter-spacing:.5px;text-transform:uppercase}
 .pdf-btn{width:100%;padding:7px;background:var(--bank);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s;letter-spacing:.3px}
@@ -237,6 +245,311 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
 @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes shimmer{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+
+.intake-tab {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: var(--text2);
+  transition: all 0.15s ease-in-out;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+}
+.intake-tab:hover {
+  background: #F0F7FF;
+  color: var(--bank);
+}
+.intake-tab.active {
+  background: rgba(0, 91, 172, 0.08);
+  color: var(--bank);
+  border-color: rgba(0, 91, 172, 0.2);
+}
+
+@media print {
+  body { background: #fff; color: #000; font-size: 12px; }
+  .header, .sidebar, .content > *:not(.report-card), .action-btns, .section-hdr, .pdf-btn, .nav-section, .nav-divider {
+    display: none !important;
+  }
+  .layout { display: block; min-height: auto; }
+  .content { padding: 0; margin: 0; }
+  .report-card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    page-break-inside: avoid;
+    display: block !important;
+  }
+  .report-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  .report-section {
+    border-right: 1px solid #ccc !important;
+    padding: 10px !important;
+  }
+  .report-section:nth-child(2n) {
+    border-right: none !important;
+  }
+}
+
+/* ==================== NEW WORKFLOW FEATURES STYLES ==================== */
+/* AI CHAT ASSISTANT */
+.chat-panel{display:flex;flex-direction:column;height:100%}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;max-height:320px;min-height:200px}
+.chat-bubble{padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.5;max-width:90%;word-break:break-word}
+.bubble-user{background:var(--bank);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.bubble-ai{background:#F4F8FC;color:var(--text);align-self:flex-start;border:1px solid var(--border);border-bottom-left-radius:3px}
+.bubble-ai b{color:var(--bank)}
+.chat-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border)}
+.chat-input{flex:1;border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:12px;font-family:var(--sans);color:var(--text);background:#fff;outline:none}
+.chat-input:focus{border-color:var(--bank)}
+.chat-send{padding:7px 12px;background:var(--bank);color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;transition:background .2s}
+.chat-send:hover{background:#004A8E}
+.chat-quick{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;border-bottom:1px solid var(--border)}
+.cq-btn{padding:3px 9px;border:1px solid rgba(0,91,172,0.25);border-radius:20px;font-size:10px;color:var(--bank);background:#F0F7FF;cursor:pointer;transition:all .15s}
+.cq-btn:hover{background:var(--bank);color:#fff}
+.chat-typing{display:none;padding:8px 12px;font-size:11px;color:var(--text3);font-style:italic}
+
+/* SIMILAR CASES */
+.case-card{background:#F4F8FC;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.case-card:last-child{margin-bottom:0}
+.case-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.case-id{font-size:10px;font-family:var(--mono);color:var(--bank);font-weight:600}
+.case-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px}
+.case-badge.blocked{background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.2)}
+.case-badge.escalated{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.2)}
+.case-badge.cleared{background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.2)}
+.case-row{display:flex;gap:12px;font-size:11px;color:var(--text2)}
+.case-row span{display:flex;align-items:center;gap:3px}
+.case-row i{font-size:12px;color:var(--text3)}
+.case-sim{font-size:10px;color:var(--text3);margin-top:4px}
+.case-sim-bar{height:3px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden}
+.case-sim-fill{height:100%;background:linear-gradient(90deg,var(--bank),var(--teal));border-radius:2px}
+
+/* FRAUD STATISTICS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-cell{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.stat-num{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1}
+.stat-num.danger{color:var(--danger)}
+.stat-num.warn{color:var(--warn)}
+.stat-num.success{color:var(--success)}
+.stat-num.info{color:var(--bank)}
+.stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px}
+.stat-delta{font-size:10px;margin-top:2px;font-weight:600}
+.stat-delta.up{color:var(--danger)}
+.stat-delta.dn{color:var(--success)}
+
+/* TREND ANALYSIS */
+.trend-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.trend-row:last-child{border-bottom:none}
+.trend-key{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.trend-key i{font-size:13px;color:var(--text3)}
+.trend-val{font-size:11px;font-weight:600;color:var(--text);font-family:var(--mono)}
+.trend-val.accent{color:var(--bank)}
+.trend-val.danger{color:var(--danger)}
+.trend-val.warn{color:var(--warn)}
+
+/* AUDIT LOG */
+.audit-table{width:100%;border-collapse:collapse;font-size:11px}
+.audit-table th{font-size:9px;color:var(--text3);letter-spacing:.7px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);text-align:left;font-weight:600;background:#F8FAFC}
+.audit-table td{padding:6px 8px;border-bottom:1px solid #F0F4F8;vertical-align:middle}
+.audit-table tr:hover td{background:#F8FAFC}
+.audit-action{padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;font-family:var(--mono)}
+.a-analysis{background:rgba(0,91,172,0.08);color:var(--bank);border:1px solid rgba(0,91,172,0.15)}
+.a-report{background:rgba(20,184,166,0.08);color:#0F766E;border:1px solid rgba(20,184,166,0.2)}
+.a-feedback{background:rgba(245,158,11,0.08);color:#D97706;border:1px solid rgba(245,158,11,0.2)}
+.a-export{background:rgba(34,197,94,0.08);color:#15803D;border:1px solid rgba(34,197,94,0.2)}
+
+/* AGENT NOTES */
+.notes-area{width:100%;border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-size:12px;font-family:var(--sans);color:var(--text);background:#fff;resize:vertical;min-height:80px;outline:none;line-height:1.5}
+.notes-area:focus{border-color:var(--bank)}
+.notes-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#EAF2FB;color:var(--bank);border:1px solid rgba(0,91,172,0.15);margin:2px;cursor:pointer}
+.notes-tag:hover{background:#D4E9F7}
+.notes-saved{font-size:10px;color:var(--success);display:none;margin-top:4px}
+.inv-notes-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600;background:#EAF2FB;color:var(--bank);border:1px solid rgba(0,91,172,0.15);margin:2px;cursor:pointer;transition:all .15s}
+.inv-notes-tag:hover{background:var(--bank);color:#fff}
+
+/* KNOWLEDGE / SOP */
+.kb-item{padding:10px 12px;border-radius:6px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:all .15s;background:#fff}
+.kb-item:hover{border-color:var(--bank);background:#F0F7FF}
+.kb-item-hdr{display:flex;align-items:center;justify-content:space-between}
+.kb-q{font-size:12px;font-weight:600;color:var(--text);margin-bottom:0}
+.kb-ans{font-size:11px;color:var(--text2);line-height:1.5;margin-top:6px;display:none;padding-top:6px;border-top:1px solid var(--border)}
+.kb-item.open .kb-ans{display:block}
+.kb-item.open{border-color:var(--bank);background:#F0F7FF}
+.sop-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.sop-step:last-child{border-bottom:none}
+.sop-num{width:22px;height:22px;border-radius:50%;background:var(--bank);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sop-text{font-size:12px;color:var(--text2);line-height:1.5}
+.sop-text b{color:var(--text)}
+
+/* ATTACK TYPE BADGE */
+.attack-type-banner{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:6px;margin-bottom:10px;border:1px solid}
+.atb-ai{background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.25);color:#991B1B}
+.atb-replay{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.25);color:#92400E}
+.atb-deepfake{background:rgba(139,92,246,0.06);border-color:rgba(139,92,246,0.25);color:#5B21B6}
+.atb-human{background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.25);color:#14532D}
+.atb-unknown{background:#F4F8FC;border-color:var(--border);color:var(--text3)}
+.atb-icon{font-size:22px}
+.atb-title{font-size:13px;font-weight:700}
+.atb-sub{font-size:11px;opacity:.8}
+
+/* CONFIDENCE METER */
+.conf-meter{margin-bottom:10px}
+.conf-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.conf-label{font-size:11px;color:var(--text2);width:140px;flex-shrink:0}
+.conf-bg{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.conf-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.conf-fill.ai{background:linear-gradient(90deg,#EF4444,#F97316)}
+.conf-fill.replay{background:linear-gradient(90deg,#F59E0B,#EF4444)}
+.conf-fill.overall{background:linear-gradient(90deg,var(--bank),var(--teal))}
+.conf-pct{font-size:11px;font-weight:700;font-family:var(--mono);width:34px;text-align:right}
+
+/* EXPORT BUTTONS */
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.export-btn{display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.export-btn:hover{border-color:var(--bank);color:var(--bank);background:#F0F7FF}
+.export-btn i{font-size:15px}
+
+/* ===== AI INVESTIGATOR PAGE ===== */
+/* Investigation Summary */
+.inv-summary-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-top:1px solid var(--border)}
+.inv-sum-cell{padding:12px 14px;border-right:1px solid var(--border);text-align:center}
+.inv-sum-cell:last-child{border-right:none}
+.inv-sum-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:600}
+.inv-sum-val{font-size:13px;font-weight:700;color:var(--text);font-family:var(--mono)}
+.inv-sum-val.danger{color:var(--danger)}
+.inv-sum-val.success{color:var(--success)}
+.inv-sum-val.warn{color:var(--warn)}
+.inv-sum-val.info{color:var(--bank)}
+
+/* AI Summary block */
+.ai-summary-block{background:#F8FAFF;border:1px solid rgba(0,91,172,0.15);border-radius:8px;padding:16px;margin-bottom:0}
+.ai-sum-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(0,91,172,0.1)}
+.ai-sum-icon{width:32px;height:32px;background:var(--bank);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-sum-icon i{color:#fff;font-size:16px}
+.ai-sum-title{font-size:13px;font-weight:700;color:var(--bank)}
+.ai-sum-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.ai-sum-status{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--success)}
+.ai-sum-status-dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.ai-finding-section{margin-bottom:10px}
+.ai-finding-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.ai-finding-label i{font-size:12px;color:var(--bank)}
+.ai-finding-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid rgba(0,91,172,0.07);font-size:12px;color:var(--text2);line-height:1.4}
+.ai-finding-item:last-child{border-bottom:none}
+.ai-finding-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.ai-finding-dot.danger{background:var(--danger)}
+.ai-finding-dot.warn{background:var(--warn)}
+.ai-finding-dot.info{background:var(--bank)}
+.ai-rec-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid rgba(0,91,172,0.07);font-size:12px;color:var(--text);line-height:1.4;font-weight:500}
+.ai-rec-item:last-child{border-bottom:none}
+.ai-rec-item i{font-size:13px;color:var(--bank);flex-shrink:0}
+
+/* Investigator Chat */
+.inv-chat-panel{display:flex;flex-direction:column;height:420px}
+.inv-chat-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#F8FAFF;flex-shrink:0}
+.inv-chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.inv-chat-quick{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-shrink:0}
+.inv-chat-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);flex-shrink:0}
+
+/* Evidence Panel */
+.evid-item{margin-bottom:10px}
+.evid-item:last-child{margin-bottom:0}
+.evid-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.evid-name{font-size:11px;color:var(--text2)}
+.evid-pct{font-size:11px;font-weight:700;font-family:var(--mono)}
+.evid-pct.danger{color:var(--danger)}
+.evid-pct.warn{color:var(--warn)}
+.evid-pct.success{color:var(--success)}
+.evid-pct.info{color:var(--bank)}
+.evid-bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.evid-bar-fill{height:100%;border-radius:3px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.evid-fill-danger{background:linear-gradient(90deg,#EF4444,#F97316)}
+.evid-fill-warn{background:linear-gradient(90deg,#F59E0B,#EF4444)}
+.evid-fill-success{background:linear-gradient(90deg,#22C55E,#14B8A6)}
+.evid-fill-info{background:linear-gradient(90deg,var(--bank),var(--teal))}
+
+/* Recommended Actions */
+.action-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.action-row:last-child{border-bottom:none}
+.action-check{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;transition:all .15s}
+.action-check.checked{background:var(--success);border-color:var(--success)}
+.action-check.checked::after{content:'\2713';color:#fff;font-size:10px;font-weight:700}
+.action-row:hover .action-check:not(.checked){border-color:var(--bank);background:#EAF2FB}
+.action-label{flex:1;font-size:12px;color:var(--text);line-height:1.3}
+.priority-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.3px;flex-shrink:0}
+.pri-critical{background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.3)}
+.pri-high{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.3)}
+.pri-medium{background:rgba(0,91,172,0.1);color:var(--bank);border:1px solid rgba(0,91,172,0.25)}
+.pri-low{background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.3)}
+
+/* Similar Fraud Cases Table */
+.sim-table{width:100%;border-collapse:collapse;font-size:11px}
+.sim-table th{font-size:9px;color:var(--text3);letter-spacing:.7px;text-transform:uppercase;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:600;background:#F8FAFC}
+.sim-table td{padding:7px 10px;border-bottom:1px solid #F0F4F8;vertical-align:middle}
+.sim-table tr:hover td{background:#F8FAFC}
+.sim-tag{padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700}
+.sim-blocked{background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.2)}
+.sim-escalated{background:rgba(245,158,11,0.1);color:#D97706;border:1px solid rgba(245,158,11,0.2)}
+.sim-resolved{background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.2)}
+.sim-pct-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:3px}
+.sim-pct-fill{height:100%;background:linear-gradient(90deg,var(--bank),var(--teal));border-radius:2px}
+
+/* Investigation Timeline */
+.inv-tl-wrap{position:relative;padding-left:22px}
+.inv-tl-wrap::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--border)}
+.inv-tl-item{position:relative;display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.inv-tl-item:last-child{margin-bottom:0}
+.inv-tl-dot{position:absolute;left:-19px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;flex-shrink:0;margin-top:2px}
+.inv-tl-dot.done{background:var(--success);box-shadow:0 0 0 2px rgba(34,197,94,0.2)}
+.inv-tl-dot.active{background:var(--bank);box-shadow:0 0 0 3px rgba(0,91,172,0.2);animation:pulse 1.5s ease-in-out infinite}
+.inv-tl-dot.pend{background:var(--border)}
+.inv-tl-step{font-size:12px;font-weight:600;color:var(--text)}
+.inv-tl-step.done{color:var(--text)}
+.inv-tl-step.active{color:var(--bank)}
+.inv-tl-step.pend{color:var(--text3)}
+.inv-tl-detail{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* Feature Importance */
+.feat-item{margin-bottom:9px}
+.feat-item:last-child{margin-bottom:0}
+.feat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.feat-name{font-size:11px;color:var(--text2)}
+.feat-pct{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--bank)}
+.feat-bar-bg{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.feat-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--bank),var(--teal));transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+
+/* Report Generator Buttons */
+.rpt-gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rpt-gen-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.rpt-gen-btn:hover{border-color:var(--bank);color:var(--bank);background:#F0F7FF}
+.rpt-gen-btn.primary{background:var(--bank);color:#fff;border-color:var(--bank)}
+.rpt-gen-btn.primary:hover{background:#004A8E}
+.rpt-gen-btn i{font-size:15px}
+
+/* Quick Tools Grid */
+.inv-tools-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.inv-tool-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;transition:all .15s;text-align:center}
+.inv-tool-btn:hover{border-color:var(--bank);background:#F0F7FF}
+.inv-tool-btn i{font-size:20px;color:var(--bank)}
+.inv-tool-btn span{font-size:10px;color:var(--text2);font-weight:500;line-height:1.3}
+
+/* AI Suggestions Card */
+.ai-sugg-card{background:linear-gradient(135deg,#EFF6FF 0%,#F0F9FF 100%);border:1px solid rgba(0,91,172,0.2);border-radius:8px;padding:14px}
+.ai-sugg-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-sugg-icon{width:26px;height:26px;background:var(--bank);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.ai-sugg-icon i{color:#fff;font-size:13px}
+.ai-sugg-title{font-size:11px;font-weight:700;color:var(--bank)}
+.ai-sugg-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(0,91,172,0.1);font-size:11px;color:var(--text2);line-height:1.4}
+.ai-sugg-item:last-child{border-bottom:none}
+.ai-sugg-item i{font-size:13px;color:var(--bank);flex-shrink:0;margin-top:1px}
+
 </style>
 
 
@@ -259,10 +572,72 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
   </div>
   <div class="header-right">
     <div class="hdr-case" id="hdr-case">CASE: VG-——</div>
-    <div class="status-chip chip-ready" id="hdr-chip"><span class="chip-dot"></span><span id="hdr-chip-label">READY</span></div>
-    <div class="hdr-notif"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
-    <div class="hdr-avatar">FK</div>
+    <div class="status-chip chip-ready" id="hdr-chip" title="Click to view system diagnostics"><span class="chip-dot"></span><span id="hdr-chip-label">READY</span></div>
+    <div class="hdr-notif" title="View alerts and system logs"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
+    <div class="hdr-avatar" title="View analyst profile">FK</div>
     <div class="hdr-time" id="hdr-clock">--:--:--</div>
+  </div>
+  
+  <!-- Popover Dropdowns inside Header -->
+  <!-- 1. System Diagnostics Dropdown -->
+  <div id="diagnostics-dropdown" style="display:none; position:absolute; top:55px; right:120px; width:280px; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 10px 25px rgba(0,91,172,0.15); z-index:1000; padding:12px; color:var(--text); text-align:left;">
+    <div style="font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+      <span>Forensics Diagnostics</span>
+      <span style="color:var(--success); font-family:var(--mono); font-size:10px; font-weight:700;">ONLINE</span>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; color:var(--text2);">
+      <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(0,0,0,0.03);">
+        <span>Backend API Node</span><span style="font-family:var(--mono);">http://127.0.0.1:8000</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(0,0,0,0.03);">
+        <span>Feature Pipelines</span><span style="font-family:var(--mono);">345D Bio + 4096D MCT</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(0,0,0,0.03);">
+        <span>Inference Latency</span><span style="font-family:var(--mono); color:var(--success);">~210ms (CUDA GPU)</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:3px 0;">
+        <span>VRAM Footprint</span><span style="font-family:var(--mono);">~2.01 GB (Calibrated)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. System Alerts Dropdown -->
+  <div id="notif-dropdown" style="display:none; position:absolute; top:55px; right:70px; width:300px; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 10px 25px rgba(0,91,172,0.15); z-index:1000; padding:12px; color:var(--text); text-align:left;">
+    <div style="font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+      <span>Forensics Log Feed</span>
+      <span class="pill pill-on" style="font-size:9px; padding:1px 6px;">4 ACTIVE</span>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; font-size:11px; color:var(--text2);">
+      <div style="padding:6px; background:#F8FAFC; border-radius:4px; border-left:3px solid var(--success);">
+        <div style="font-weight:600; color:var(--text);">✓ GPU Pipeline Online</div>
+        <div style="font-size:10px; color:var(--text3); margin-top:2px;">Wav2Vec2 dual-pass runs on CUDA. VRAM is optimal.</div>
+      </div>
+      <div style="padding:6px; background:#F8FAFC; border-radius:4px; border-left:3px solid var(--bank);">
+        <div style="font-weight:600; color:var(--text);">✓ Decision Fusion Calibrated</div>
+        <div style="font-size:10px; color:var(--text3); margin-top:2px;">Weights set to 61.8% Biological and 38.2% Deep.</div>
+      </div>
+      <div style="padding:6px; background:#F8FAFC; border-radius:4px; border-left:3px solid var(--warn);">
+        <div style="font-weight:600; color:var(--text);">✓ Phone Codec Filters Active</div>
+        <div style="font-size:10px; color:var(--text3); margin-top:2px;">Butterworth 4th-order lowpass handles telephony bypass.</div>
+      </div>
+      <div style="padding:6px; background:#F8FAFC; border-radius:4px; border-left:3px solid var(--success);">
+        <div style="font-weight:600; color:var(--text);">✓ Active Learning Engine</div>
+        <div style="font-size:10px; color:var(--text3); margin-top:2px;">Feedback loop database is connected and logs corrections.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Analyst Profile Dropdown -->
+  <div id="profile-dropdown" style="display:none; position:absolute; top:55px; right:20px; width:240px; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 10px 25px rgba(0,91,172,0.15); z-index:1000; padding:14px; text-align:center; color:var(--text);">
+    <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,#E0F2FE,#BAE6FD); border:2px solid var(--bank); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--bank); margin:0 auto 8px;">FK</div>
+    <div style="font-weight:700; font-size:12px; color:var(--text);">Forensic Analyst (FK)</div>
+    <div style="font-size:10px; color:var(--text3); margin-top:2px;">Risk Intelligence &amp; Fraud Division</div>
+    <div style="font-size:10px; color:var(--text2); font-weight:600; margin-top:4px;">UCO BANK CO-HEADQUARTERS</div>
+    <div style="margin-top:10px; border-top:1px solid var(--border); padding-top:8px; font-size:10px; display:flex; flex-direction:column; gap:4px; text-align:left; font-family:var(--mono);">
+      <div style="display:flex; justify-content:space-between;"><span>Role:</span><span>Super Admin</span></div>
+      <div style="display:flex; justify-content:space-between;"><span>Session ID:</span><span style="color:var(--success);">ACTIVE</span></div>
+      <div style="display:flex; justify-content:space-between;"><span>Node:</span><span>Node-08_Kolkata</span></div>
+    </div>
   </div>
 </div>
 
@@ -271,13 +646,20 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
     <div class="nav-section">
       <div class="nav-label">Workspace</div>
       <div class="nav-item active" id="nav-dashboard" onclick="switchPage('page-dashboard', this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
-      <div class="nav-item" onclick="triggerUpload()"><i class="ti ti-plus-circle"></i>New Investigation</div>
     </div>
     <div class="nav-divider"></div>
     <div class="nav-section">
       <div class="nav-label">Intelligence</div>
-      <div class="nav-item" id="nav-reports" onclick="switchPage('page-reports', this)"><i class="ti ti-file-text"></i>Reports</div>
+
       <div class="nav-item" id="nav-intel" onclick="switchPage('page-intel', this)"><i class="ti ti-brain"></i>Detection Intel</div>
+      <div class="nav-item" id="nav-stats" onclick="switchPage('page-stats', this)"><i class="ti ti-chart-bar"></i>Fraud Statistics</div>
+      <div class="nav-item" id="nav-kb" onclick="switchPage('page-kb', this)"><i class="ti ti-book"></i>Knowledge Base</div>
+      <div class="nav-item" id="nav-audit" onclick="switchPage('page-audit', this)"><i class="ti ti-clipboard-list"></i>Audit Logs<span class="nav-badge" id="audit-count">0</span></div>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">
+      <div class="nav-label">AI Tools</div>
+      <div class="nav-item" id="nav-investigator" onclick="switchPage('page-investigator', this)"><i class="ti ti-shield-search"></i>🛡 Investigation Console<span style="margin-left:auto;padding:1px 6px;border-radius:10px;background:rgba(239,68,68,0.12);color:#DC2626;font-size:9px;font-weight:700;letter-spacing:.3px">LIVE</span></div>
     </div>
     <div style="margin:20px 16px 0;padding:10px;background:#F4F8FC;border-radius:6px;border:1px solid var(--border)">
       <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:600">Model Version</div>
@@ -319,20 +701,67 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
     </div>
     <div class="grid3" style="grid-template-columns:1.2fr 1.2fr 1fr;margin-bottom:14px">
 
-      <div class="card">
-        <div class="card-title"><i class="ti ti-upload"></i>UPLOAD RECORDING</div>
-        <div class="upload-zone" id="drop-zone" onclick="triggerUpload()">
-          <div class="uz-icon"><i class="ti ti-waveform"></i></div>
-          <div class="uz-title">Drop audio file or click to upload</div>
-          <div class="uz-sub">Supported: WAV · MP3 · FLAC · OGG · M4A · Max 50 MB</div>
-          <button class="upload-btn"><i class="ti ti-upload" style="font-size:12px"></i> Upload Audio</button>
+      <div class="card" style="display: flex; flex-direction: column; min-height: 290px; justify-content: space-between;">
+        <div class="intake-tabs" style="display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;">
+          <div class="intake-tab active" id="tab-file" onclick="switchIntakeTab('file')" style="flex: 1; justify-content: center;">
+            <i class="ti ti-file-upload" style="margin-right: 6px; font-size: 13px;"></i>File Upload
+          </div>
+          <div class="intake-tab" id="tab-record" onclick="switchIntakeTab('record')" style="flex: 1; justify-content: center;">
+            <i class="ti ti-microphone" style="margin-right: 6px; font-size: 13px;"></i>Live Mic
+          </div>
         </div>
+        
+        <!-- Tab Content Area -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+          <!-- 1. FILE UPLOAD VIEW -->
+          <div id="view-file" style="display: block; width: 100%;">
+            <div class="upload-zone" id="drop-zone" onclick="triggerUpload()" style="position:relative; overflow:hidden; min-height:130px; display:flex; align-items:center; justify-content:center;">
+              <div id="upload-default-state" style="display:block; width:100%;">
+                <div class="uz-icon"><i class="ti ti-cloud-upload"></i></div>
+                <div class="uz-title">Select audio file or drag it here</div>
+                <div class="uz-sub">WAV, MP3, FLAC, OGG, M4A up to 50MB</div>
+                <button class="upload-btn" style="margin-top: 10px; padding: 5px 12px; font-size: 11px;"><i class="ti ti-upload" style="font-size:11px"></i> Browse Files</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 2. LIVE MIC VIEW -->
+          <div id="view-record" style="display: none; width: 100%;">
+            <div class="upload-zone" style="position:relative; overflow:hidden; min-height:130px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:2px dashed rgba(239,68,68,0.3); background: #FFFDFD; cursor: default;">
+              <div id="record-default-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                <div class="uz-icon" style="color: var(--danger);"><i class="ti ti-microphone"></i></div>
+                <div class="uz-title">Live Microphone Stream</div>
+                <div class="uz-sub">Record live speaker audio to verify authenticity</div>
+                <button class="btn-outline btn-record" id="mic-btn" onclick="startMic()" style="margin-top: 8px; padding: 5px 12px; font-size: 11px;"><i class="ti ti-record-mail" style="font-size:11px"></i> Live Record</button>
+              </div>
+              <div id="upload-recording-state" style="display:none; flex-direction:column; align-items:center; justify-content:center; width:100%;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--danger); font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:6px; justify-content:center;">
+                  <span style="width:8px; height:8px; background:var(--danger); border-radius:50%; animation:blink .8s infinite;"></span>
+                  Live Recording Active
+                </div>
+                <canvas id="mic-visualizer" style="width:100%; height:50px; display:block; max-width:260px; margin:0 auto;"></canvas>
+                <div style="font-size:20px; font-weight:700; font-family:var(--mono); color:var(--text); margin-top:4px;" id="mic-timer">00:00</div>
+                <button class="upload-btn btn-record" onclick="stopMic()" style="margin-top: 8px; background: var(--danger); color: white; padding: 5px 12px; font-size: 11px;"><i class="ti ti-square" style="font-size:11px"></i> Stop Recording</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Loaded Audio Panel (Global) -->
+          <div id="upload-loaded-state" style="display:none; flex-direction:column; align-items:center; justify-content:center; width:100%; min-height:130px; border: 1px solid var(--border); border-radius: 8px; background: #FAFCFF; padding: 12px; text-align: center;">
+            <div class="uz-icon" style="color:var(--bank); margin-bottom: 4px;"><i class="ti ti-music"></i></div>
+            <div class="uz-title" id="loaded-file-name" style="word-break: break-all; padding: 0 10px; font-size: 12px; font-weight:600; color:var(--text);">active_audio.wav</div>
+            <div class="uz-sub" id="loaded-file-info" style="font-size: 10px;">PCM/WAV · 0.0s</div>
+            <div style="margin-top: 8px; display: flex; gap: 8px; justify-content: center;">
+              <span class="pill pill-on" style="background:rgba(0,91,172,0.1); color:var(--bank); border:1px solid rgba(0,91,172,0.25); font-size: 9px; padding: 1px 6px;">AUDIO FILE LOADED</span>
+            </div>
+          </div>
+        </div>
+        
         <input type="file" id="file-input" accept="audio/*" style="display:none" onchange="handleFile(this)">
-        <div class="action-btns">
-          <button class="btn-outline btn-record" id="mic-btn" onclick="startMic()"><i class="ti ti-record-mail" style="font-size:13px"></i> Live Record</button>
-          <button class="btn-outline btn-demo" onclick="runDemo()"><i class="ti ti-player-play" style="font-size:13px"></i> Sample Analysis</button>
+        <div style="margin-top: 10px; display: flex; gap: 8px; width: 100%;">
+          <button class="upload-btn" id="start-btn" onclick="startStagedAnalysis()" style="flex: 1; margin-top:0; background:#15803D; display:none; align-items:center; justify-content:center; gap:6px; padding: 8px 12px; font-size: 11px;"><i class="ti ti-player-play" style="font-size:12px"></i> START FORENSIC ANALYSIS</button>
+          <button class="btn-outline" id="clear-btn" onclick="clearCurrentAudio()" style="flex: 0.3; margin-top:0; display:none; color:var(--text2); border-color:var(--border); padding: 8px;"><i class="ti ti-trash" style="font-size:12px"></i> Clear</button>
         </div>
-        <button class="upload-btn" id="start-btn" onclick="startStagedAnalysis()" style="margin-top:10px;background:#15803D;display:none;align-items:center;justify-content:center;gap:6px"><i class="ti ti-player-play" style="font-size:14px"></i> START FORENSIC ANALYSIS</button>
       </div>
 
       <div class="card">
@@ -356,18 +785,19 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title"><i class="ti ti-server"></i>SYSTEM STATUS</div>
-        <div class="sys-divider">Infrastructure</div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-cloud"></i>API Gateway</div><div class="pill pill-on" id="s-api">ONLINE</div></div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-broadcast"></i>Stream Engine</div><div class="pill pill-active" id="s-stream">ACTIVE</div></div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-database"></i>Database</div><div class="pill pill-conn" id="s-db">CONNECTED</div></div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-shield"></i>Threat Feed</div><div class="pill pill-conn" id="s-threat">CONNECTED</div></div>
-        <div class="sys-divider" style="margin-top:6px">Fusion Model v2.0</div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-brain"></i>Model Loaded</div><div class="pill pill-on" id="s-mdl">LOADED</div></div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-cpu"></i>Inference Engine</div><div class="pill pill-active" id="s-inf">READY</div></div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-plug"></i>Backend</div><div class="pill pill-conn" id="s-back">CONNECTED</div></div>
-        <div class="sys-row"><div class="sys-label"><i class="ti ti-activity"></i>Current Job</div><div class="pill pill-idle" id="s-job">IDLE</div></div>
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 290px;">
+        <div class="card-title" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px;"><i class="ti ti-list-check"></i>ANALYSIS PIPELINE TIMELINE</div>
+        <div class="tl-wrap" id="timeline" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px;">
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-0"></div><div class="tl-text" id="tx-0">Audio Received</div></div><div class="tl-time" id="tt-0">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-1"></div><div class="tl-text" id="tx-1">Audio Standardization</div></div><div class="tl-time" id="tt-1">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-2"></div><div class="tl-text" id="tx-2">Voice Activity Detection</div></div><div class="tl-time" id="tt-2">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-3"></div><div class="tl-text" id="tx-3">Spectrogram Generation</div></div><div class="tl-time" id="tt-3">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-4"></div><div class="tl-text" id="tx-4">Biological Feature Extraction</div></div><div class="tl-time" id="tt-4">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-5"></div><div class="tl-text" id="tx-5">Deep Feature Extraction</div></div><div class="tl-time" id="tt-5">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-6"></div><div class="tl-text" id="tx-6">Fusion Analysis</div></div><div class="tl-time" id="tt-6">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-7"></div><div class="tl-text" id="tx-7">Risk Classification</div></div><div class="tl-time" id="tt-7">—</div></div>
+          <div class="tl-item" style="display: flex; align-items: center; justify-content: space-between;"><div style="display:flex; align-items:center; gap:6px;"><div class="tl-dot pend" id="tl-8"></div><div class="tl-text" id="tx-8">Report Generation</div></div><div class="tl-time" id="tt-8">—</div></div>
+        </div>
       </div>
     </div>
     </div> <!-- end page-dashboard -->
@@ -378,27 +808,52 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
       <div class="section-title"><i class="ti ti-chart-area"></i>Audio Forensics</div>
       <span class="section-badge">Waveform &amp; Spectrogram Analysis</span>
     </div>
-    <div class="grid2" style="grid-template-columns:1fr 1.6fr;margin-bottom:14px">
-      <div class="card">
-        <div class="card-title"><i class="ti ti-waveform"></i>AUDIO WAVEFORM<span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400" id="wv-stat">NO SIGNAL</span></div>
-        <canvas class="wform" id="wave-canvas"></canvas>
+    <div class="grid2" style="grid-template-columns:1fr 1.6fr;margin-bottom:14px;">
+      <!-- Waveform Card -->
+      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div class="card-title" style="margin-bottom: 8px;"><i class="ti ti-waveform"></i>AUDIO WAVEFORM (AMPLITUDE)<span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400" id="wv-stat">NO SIGNAL</span></div>
+        <div style="display: flex; gap: 6px; align-items: stretch; height: 90px; margin-bottom: 6px;">
+          <!-- Amplitude Y-axis -->
+          <div style="display: flex; flex-direction: column; justify-content: space-between; font-size: 8px; color: var(--text3); font-family: var(--mono); padding: 2px 0; text-align: right; width: 22px; font-weight: 600;">
+            <span>+1.0</span>
+            <span>0.0</span>
+            <span>-1.0</span>
+          </div>
+          <!-- Waveform Canvas -->
+          <div style="flex: 1; position: relative;">
+            <canvas class="wform" id="wave-canvas" style="height: 100%;"></canvas>
+          </div>
+        </div>
         <div class="playbar">
           <button class="play-btn" onclick="togglePlay()"><i class="ti ti-player-play" id="play-icon"></i></button>
           <div class="play-info">Dur: <span id="wv-dur">—</span> · Sr: <span id="wv-sr">—</span> · Ch: <span id="wv-ch">—</span></div>
         </div>
         <div class="prog"><div class="prog-fill" id="prog-fill"></div></div>
+        <div style="margin-top: 6px; font-size: 11px; padding: 6px 10px; border-left: 3px solid var(--bank2); background: #F8FAFC;" id="wave-analysis-text"><i class="ti ti-info-circle" style="font-size:13px;color:var(--bank2);margin-right:4px;vertical-align:-2px"></i>The waveform plots voice amplitude level changes over time. Natural speech displays random transients and smooth decay segments, while cloned voice segments often showcase artificially flat speech segments or abrupt thresholds.</div>
       </div>
-      <div class="card">
-        <div class="card-title"><i class="ti ti-chart-grid-dots"></i>FREQUENCY SPECTROGRAM<span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400" id="spec-stat">NO SIGNAL</span></div>
-        <canvas class="spec" id="spec-canvas"></canvas>
-        <div class="spec-axes"><span>0s</span><span>Time →</span><span id="spec-dur-label">—</span></div>
-        <div class="spec-legend">
-          <span style="color:var(--text3)">Low</span>
-          <div class="spec-leg-bar"></div>
-          <span style="color:var(--text3)">High</span>
-          <span style="color:var(--text3);margin-left:6px">Intensity</span>
+      
+      <!-- Spectrogram Card -->
+      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div class="card-title" style="margin-bottom: 8px;"><i class="ti ti-chart-grid-dots"></i>FREQUENCY SPECTROGRAM (SPECTRAL DENSITY)<span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:400" id="spec-stat">NO SIGNAL</span></div>
+        <div style="display: flex; gap: 6px; align-items: stretch; height: 130px; margin-bottom: 4px;">
+          <!-- Frequency Y-axis -->
+          <div style="display: flex; flex-direction: column; justify-content: space-between; font-size: 8px; color: var(--text3); font-family: var(--mono); padding: 4px 0; text-align: right; width: 22px; font-weight: 600;">
+            <span>8 kHz</span>
+            <span>4 kHz</span>
+            <span>0 Hz</span>
+          </div>
+          <!-- Spectrogram Canvas -->
+          <div style="flex: 1; position: relative;">
+            <canvas class="spec" id="spec-canvas" style="height: 100%;"></canvas>
+          </div>
         </div>
-        <div class="spec-desc"><i class="ti ti-info-circle" style="font-size:13px;color:var(--bank);margin-right:4px;vertical-align:-2px"></i>VoiceGuard analyzes spectrogram patterns to identify synthetic speech artifacts and abnormal voice characteristics including irregular harmonic structures, phase discontinuities, and TTS fingerprints.</div>
+        <div class="spec-axes" style="padding-left: 28px;"><span>0s</span><span>Time (Seconds) →</span><span id="spec-dur-label">—</span></div>
+        <div class="spec-legend" style="margin-top: 4px;">
+          <span style="color:var(--text3)">Low Density</span>
+          <div class="spec-leg-bar"></div>
+          <span style="color:var(--text3)">High Density</span>
+        </div>
+        <div class="spec-desc" id="spec-analysis-text" style="margin-top: 6px; font-size: 11px; padding: 6px 10px; border-left: 3px solid var(--bank); background: #F4F8FC;"><i class="ti ti-info-circle" style="font-size:13px;color:var(--bank);margin-right:4px;vertical-align:-2px"></i>VoiceGuard spectrogram analysis monitors spectral frequency distribution. In voice clones, high frequencies (4kHz - 8kHz) reveal phase anomalies, unnatural silence, or harmonic grid alignments typical of synthetic speech generators.</div>
       </div>
     </div>
 
@@ -407,214 +862,532 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
       <div class="section-title"><i class="ti ti-topology-star-3"></i>Fusion Intelligence Engine</div>
       <span class="section-badge">Biological · Deep Learning · Fusion Core</span>
     </div>
-    <div class="fusion-section">
-      <div class="fusion-layout">
-        <div class="fusion-svg-wrap">
-          <div class="fusion-svg-title"><i class="ti ti-topology-star-3"></i>BIOMETRIC FUSION MATRIX</div>
-          <svg id="fusion-svg" width="100%" viewBox="0 0 540 340" style="display:block">
+    <div class="fusion-section" style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <!-- Polished Graphical Biometric Fusion Matrix -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 18px; min-height: 290px;">
+        <div class="card-title" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; font-size: 11px;">
+          <i class="ti ti-topology-star-3"></i>Biometric Fusion &amp; Decision Core
+        </div>
+        <div style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center;">
+          <svg id="fusion-svg" width="100%" height="210" viewBox="0 0 540 210" style="display:block;">
             <defs>
-              <marker id="farrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.06)"/>
+              </filter>
+              <linearGradient id="bioGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F0F9FF"/>
+                <stop offset="100%" stop-color="#E0F2FE"/>
+              </linearGradient>
+              <linearGradient id="dlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F0FDFA"/>
+                <stop offset="100%" stop-color="#CCFBF1"/>
+              </linearGradient>
+              <linearGradient id="fuseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#005BAC"/>
+                <stop offset="100%" stop-color="#003D7A"/>
+              </linearGradient>
+              <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 1L8 5L0 9z" fill="#005BAC"/>
               </marker>
             </defs>
-            <!-- Bio circle -->
-            <circle cx="110" cy="170" r="70" fill="#EFF8FF" stroke="#38BDF8" stroke-width="1.5"/>
-            <text x="110" y="150" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#005BAC">Biological</text>
-            <text x="110" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">349 Features</text>
-            <text x="110" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#38BDF8" id="bio-score-text">—</text>
 
-            <!-- DL circle -->
-            <circle cx="430" cy="170" r="70" fill="#ECFDF5" stroke="#14B8A6" stroke-width="1.5"/>
-            <text x="430" y="150" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill="#0F766E">Deep Learning</text>
-            <text x="430" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">2048 Features</text>
-            <text x="430" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#14B8A6" id="dl-score-text">—</text>
+            <!-- Bio Stream Node -->
+            <g transform="translate(100, 105)" filter="url(#shadow)">
+              <circle cx="0" cy="0" r="62" fill="url(#bioGrad)" stroke="#38BDF8" stroke-width="2"/>
+              <text x="0" y="-22" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#0369A1">BIOLOGICAL</text>
+              <text x="0" y="-6" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">345 Features</text>
+              <rect x="-35" y="8" width="70" height="20" rx="4" fill="rgba(3,105,161,0.08)"/>
+              <text x="0" y="21" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="#0369A1" id="bio-matrix-score">—</text>
+            </g>
 
-            <!-- Center Fusion circle -->
-            <circle cx="270" cy="170" r="78" fill="#F0F7FF" stroke="#005BAC" stroke-width="2"/>
-            <circle cx="270" cy="170" r="74" fill="none" stroke="#005BAC" stroke-width=".5" stroke-dasharray="4 3" opacity=".4"/>
-            <text x="270" y="148" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#005BAC">FUSION CORE</text>
-            <text x="270" y="163" text-anchor="middle" font-family="Inter" font-size="10" fill="#6B7280">2,397 Features</text>
-            <text x="270" y="180" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#005BAC" id="fus-score-text">—</text>
-            <text x="270" y="198" text-anchor="middle" font-family="Inter" font-size="9" fill="#6B7280">Fraud Probability</text>
-            <text x="270" y="213" text-anchor="middle" font-family="Inter" font-size="10" font-weight="600" fill="#6B7280" id="fus-risk-text">—</text>
-            <!-- Flow lines -->
-            <path d="M178 170 L190 170" stroke="#38BDF8" stroke-width="1.5" fill="none" marker-end="url(#farrow)" stroke-dasharray="4 3" opacity=".7"/>
-            <path d="M350 170 L362 170" stroke="#14B8A6" stroke-width="1.5" fill="none" marker-end="none" stroke-dasharray="4 3" opacity=".7"/>
-            <path d="M352 170 L350 170" stroke="#14B8A6" stroke-width="1.5" fill="none" marker-end="url(#farrow)" opacity=".7"/>
-            <!-- Axis labels -->
-            <text x="110" y="30" text-anchor="middle" font-family="Inter" font-size="10" fill="#9CA3AF" letter-spacing="1">BIOLOGICAL ENGINE</text>
-            <text x="270" y="30" text-anchor="middle" font-family="Inter" font-size="10" fill="#9CA3AF" letter-spacing="1">FUSION CORE</text>
-            <text x="430" y="30" text-anchor="middle" font-family="Inter" font-size="10" fill="#9CA3AF" letter-spacing="1">DEEP LEARNING ENGINE</text>
-            <!-- Particle dots for animation -->
-            <circle class="fpart" cx="178" cy="170" r="4" fill="#38BDF8" opacity=".9" id="fp1"/>
-            <circle class="fpart" cx="350" cy="170" r="4" fill="#14B8A6" opacity=".9" id="fp2"/>
+            <!-- Deep Learning Node -->
+            <g transform="translate(440, 105)" filter="url(#shadow)">
+              <circle cx="0" cy="0" r="62" fill="url(#dlGrad)" stroke="#14B8A6" stroke-width="2"/>
+              <text x="0" y="-22" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#0F766E">DEEP MCT</text>
+              <text x="0" y="-6" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">4096 Features</text>
+              <rect x="-35" y="8" width="70" height="20" rx="4" fill="rgba(15,118,110,0.08)"/>
+              <text x="0" y="21" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="#0F766E" id="dl-matrix-score">—</text>
+            </g>
+
+            <!-- Connecting Flow Lines -->
+            <path d="M172 105 L200 105" stroke="#005BAC" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <path d="M368 105 L340 105" stroke="#005BAC" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+            <!-- Center Fusion Core Node -->
+            <g transform="translate(270, 105)" filter="url(#shadow)">
+              <circle cx="0" cy="0" r="68" fill="url(#fuseGrad)" stroke="#FFFFFF" stroke-width="2.5"/>
+              <circle cx="0" cy="0" r="64" fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.5"/>
+              <text x="0" y="-24" text-anchor="middle" font-family="Inter" font-size="10" font-weight="800" fill="#E0F2FE" letter-spacing="1">FUSION CORE</text>
+              <text x="0" y="-8" text-anchor="middle" font-family="Inter" font-size="9" fill="#BAE6FD">Fraud Prob.</text>
+              <text x="0" y="20" text-anchor="middle" font-family="JetBrains Mono" font-size="22" font-weight="700" fill="#FFFFFF" id="fus-matrix-score">—</text>
+              <text x="0" y="38" text-anchor="middle" font-family="Inter" font-size="8" font-weight="600" fill="#BAE6FD">61.8% Bio | 38.2% Deep</text>
+            </g>
           </svg>
         </div>
-        <div class="xai-card">
-          <div class="card-title" style="margin-bottom:10px"><i class="ti ti-chart-infographic"></i>AI EXPLAINABILITY</div>
+      </div>
+      
+      <!-- AI Explainability -->
+      <div class="xai-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 18px; min-height: 290px;">
+        <div class="card-title" style="margin-bottom:10px; font-size: 11px;"><i class="ti ti-chart-infographic"></i>AI EXPLAINABILITY (XAI)</div>
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-around;">
           <div class="xai-row">
-            <div class="xai-lbl"><span>Biological Engine</span><span id="xai-bio-pct">40%</span></div>
-            <div class="xai-bg"><div class="xai-fill xai-bio" id="xai-bio" style="width:40%"></div></div>
+            <div class="xai-lbl"><span>Biometric Weight Impact</span><span id="xai-bio-pct">61.8%</span></div>
+            <div class="xai-bg"><div class="xai-fill xai-bio" id="xai-bio" style="width:61.8%"></div></div>
           </div>
           <div class="xai-row">
-            <div class="xai-lbl"><span>Deep Learning Engine</span><span id="xai-dl-pct">60%</span></div>
-            <div class="xai-bg"><div class="xai-fill xai-dl" id="xai-dl" style="width:60%"></div></div>
+            <div class="xai-lbl"><span>Deep MCT Weight Impact</span><span id="xai-dl-pct">38.2%</span></div>
+            <div class="xai-bg"><div class="xai-fill xai-dl" id="xai-dl" style="width:38.2%"></div></div>
           </div>
           <div class="xai-row">
-            <div class="xai-lbl"><span>Fusion Output</span><span id="xai-fus-pct">—</span></div>
+            <div class="xai-lbl"><span>Fused Calibrated Score</span><span id="xai-fus-pct">—</span></div>
             <div class="xai-bg"><div class="xai-fill xai-fus" id="xai-fus" style="width:0%"></div></div>
           </div>
-          <div class="xai-factors">
-            <div class="xai-factors-title">Top Decision Factors</div>
-            <div class="xai-factor-row"><span>Prosody anomaly</span><span style="color:var(--danger);font-family:var(--mono)">+0.34</span></div>
-            <div class="xai-factor-row"><span>Spectral flatness</span><span style="color:var(--danger);font-family:var(--mono)">+0.28</span></div>
-            <div class="xai-factor-row"><span>F0 micro-variation</span><span style="color:var(--warn);font-family:var(--mono)">+0.19</span></div>
-            <div class="xai-factor-row"><span>Breath naturalness</span><span style="color:var(--success);font-family:var(--mono)">-0.11</span></div>
+        </div>
+        <div class="xai-factors" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);">
+          <div class="xai-factors-title" style="font-size: 9px; margin-bottom: 4px;">Forensic Anomaly Contribution</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 10px;">
+            <div class="xai-factor-row"><span>Prosody:</span><span style="color:var(--danger); font-family:var(--mono);">+0.34</span></div>
+            <div class="xai-factor-row"><span>Jitter:</span><span style="color:var(--danger); font-family:var(--mono);">+0.28</span></div>
+            <div class="xai-factor-row"><span>Pitch Stability:</span><span style="color:var(--warn); font-family:var(--mono);">+0.19</span></div>
+            <div class="xai-factor-row"><span>Spectral:</span><span style="color:var(--success); font-family:var(--mono);">-0.11</span></div>
           </div>
-          <div class="xai-audit"><i class="ti ti-shield-check" style="font-size:13px"></i>Full audit trail enabled</div>
         </div>
       </div>
     </div>
     </div> <!-- end page-intel -->
 
-    <div id="page-reports" class="page-section" style="display:none">
-    <!-- RISK + DETECTION -->
-    <div class="section-hdr">
-      <div class="section-title"><i class="ti ti-shield-exclamation"></i>Threat Intelligence &amp; Risk Assessment</div>
-      <span class="section-badge">Real-Time Classification</span>
-    </div>
-
-    <div class="risk-card">
-      <div class="risk-top">
-        <div>
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600">Risk Assessment</div>
-          <div class="risk-badge-big risk-badge-lo" id="risk-badge" style="margin-bottom:10px">AWAITING ANALYSIS</div>
-          <div style="font-size:12px;color:var(--text2);max-width:320px;line-height:1.5" id="risk-finding">Submit an audio recording to receive forensic risk classification and fraud probability score.</div>
+    <!-- stand-alone printable PDF template (hidden on screen, visible during window.print) -->
+    <!-- stand-alone printable PDF template (hidden on screen, visible during window.print) -->
+    <div class="report-card" id="printable-report-card" style="padding: 24px; font-family: var(--font)">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--bank); padding-bottom:12px; margin-bottom:18px">
+        <div style="display:flex; align-items:center; gap:10px">
+          <div style="width:32px; height:32px; background:var(--bank); border-radius:4px; display:flex; align-items:center; justify-content:center"><i class="ti ti-shield-check" style="color:#fff; font-size:20px"></i></div>
+          <div>
+            <div style="font-size:14px; font-weight:800; color:var(--bank); letter-spacing:0.5px">UCO BANK · VOICEGUARD PLATFORM</div>
+            <div style="font-size:9px; color:var(--text3); font-weight:600">OFFICIAL FORENSIC INCIDENT REPORT</div>
+          </div>
         </div>
-        <div style="text-align:center;margin-right:20px">
-          <div class="risk-score-num lo" id="risk-num">—</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">Fraud Probability</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600">Detection Summary</div>
-          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-bug"></i>Threat Type</div><div class="det-val danger" id="ti-type">—</div></div>
-          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-radar"></i>Sophistication</div><div class="det-val warn" id="ti-soph">—</div></div>
-          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-repeat"></i>Replay Indicators</div><div class="det-val info" id="ti-replay">—</div></div>
-          <div class="det-row" style="border-color:var(--border)"><div class="det-key"><i class="ti ti-robot"></i>Synthetic Confidence</div><div class="det-val danger" id="ti-synth">—</div></div>
-          <div class="det-row" style="border-bottom:none"><div class="det-key"><i class="ti ti-tag"></i>Primary Trigger</div><div class="det-val" id="ti-trig">—</div></div>
+        <div style="text-align:right">
+          <div style="font-size:10px; font-weight:700; color:var(--text)" id="rpt-case-id-header">VG-——</div>
+          <div style="font-size:8px; color:var(--text3)">RBI/2023-24/73 COMPLIANT</div>
         </div>
       </div>
-      <div class="risk-details">
-        <div class="risk-det-cell"><div class="risk-det-label">Evidence Strength</div><div class="risk-det-val" id="rd-evid">—</div></div>
-        <div class="risk-det-cell"><div class="risk-det-label">Voice Stability Score</div><div class="risk-det-val" id="rd-vstab">—</div></div>
-        <div class="risk-det-cell"><div class="risk-det-label">Spectral Artifact Score</div><div class="risk-det-val danger" id="rd-spec">—</div></div>
-        <div class="risk-det-cell"><div class="risk-det-label">Model Confidence</div><div class="risk-det-val" id="rd-conf">—</div></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px">
+        <div style="border:1px solid var(--border); border-radius:6px; padding:12px">
+          <div style="font-size:10px; font-weight:700; color:var(--bank); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px">1. Incident Overview</div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Case Reference ID</span><span class="rpt-val" id="rpt-id" style="font-weight:700; font-family:var(--mono)">VG-——</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Incident Timestamp</span><span class="rpt-val" id="rpt-ts">—</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Customer Name</span><span class="rpt-val" style="font-weight:600">Rajesh Kumar</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Branch Location</span><span class="rpt-val" style="font-weight:600">Lucknow Branch</span></div>
+        </div>
+        
+        <div style="border:1px solid var(--border); border-radius:6px; padding:12px">
+          <div style="font-size:10px; font-weight:700; color:var(--bank); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px">2. AI Forensic Analysis</div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Verdict Classification</span><span class="rpt-val danger" id="rpt-type" style="font-weight:700">—</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">AI Voice Clone Risk</span><span class="rpt-val" id="rpt-risk" style="font-weight:600; font-family:var(--mono)">—</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Recorded Playback Risk</span><span class="rpt-val" id="rpt-synth" style="font-weight:600; font-family:var(--mono)">—</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Overall Model Confidence</span><span class="rpt-val" id="rpt-fus" style="font-weight:600; font-family:var(--mono)">—</span></div>
+        </div>
       </div>
-      <div class="risk-rec"><i class="ti ti-alert-circle"></i><span id="rd-rec">Run analysis to generate recommendation.</span></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px">
+        <div style="border:1px solid var(--border); border-radius:6px; padding:12px">
+          <div style="font-size:10px; font-weight:700; color:var(--bank); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px">3. Security Checklist Status</div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Transaction Frozen</span><span class="rpt-val" id="rpt-check-pause" style="font-weight:600">Pending</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">SMS OTP Verified</span><span class="rpt-val" id="rpt-check-otp" style="font-weight:600">Pending</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Video KYC Request</span><span class="rpt-val" id="rpt-check-video" style="font-weight:600">Pending</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Fraud Escalation Alert</span><span class="rpt-val" id="rpt-check-escalate" style="font-weight:600">Pending</span></div>
+        </div>
+
+        <div style="border:1px solid var(--border); border-radius:6px; padding:12px">
+          <div style="font-size:10px; font-weight:700; color:var(--bank); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px">4. Audio Signal Triggers</div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Primary Trigger Signal</span><span class="rpt-val" id="rpt-pri" style="font-weight:600">—</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">Secondary Trigger Signal</span><span class="rpt-val" id="rpt-sec" style="font-weight:600">—</span></div>
+          <div class="rpt-row" style="display:flex; justify-content:space-between; font-size:10px; flex-direction:row; align-items:center"><span class="rpt-key" style="color:var(--text2); margin:0">SOP Recommended Action</span><span class="rpt-val" id="rpt-rec" style="font-weight:600; font-family:var(--font)">—</span></div>
+        </div>
+      </div>
+
+      <!-- Officer Notes Box -->
+      <div style="border:1px solid var(--border); border-radius:6px; padding:12px; margin-bottom:18px; min-height:80px">
+        <div style="font-size:10px; font-weight:700; color:var(--bank); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px">5. Branch Officer Decision Notes</div>
+        <div style="font-size:10px; line-height:1.5; color:var(--text); font-family:var(--font)" id="rpt-notes-content">No comments or decision notes submitted by the verifying officer.</div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:8px; color:var(--text3); border-top:1px dashed var(--border); padding-top:10px">
+        <div>INCIDENT CLASSIFICATION: <span id="rpt-class" style="font-weight:700">RESTRICTED</span></div>
+        <div>UCO Bank Enterprise Security Protocol Compliant</div>
+      </div>
     </div>
 
-    <!-- TIMELINE + CHUNK TABLE -->
-    <div class="grid2" style="grid-template-columns:280px 1fr;margin-bottom:14px">
-      <div class="card">
-        <div class="card-title"><i class="ti ti-list-check"></i>INVESTIGATION TIMELINE</div>
-        <div class="tl-wrap" id="timeline">
-          <div class="tl-item"><div class="tl-dot pend" id="tl-0"></div><div class="tl-time" id="tt-0">—</div><div class="tl-text" id="tx-0">Audio Received</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-1"></div><div class="tl-time" id="tt-1">—</div><div class="tl-text" id="tx-1">Audio Standardization</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-2"></div><div class="tl-time" id="tt-2">—</div><div class="tl-text" id="tx-2">Voice Activity Detection</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-3"></div><div class="tl-time" id="tt-3">—</div><div class="tl-text" id="tx-3">Spectrogram Generation</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-4"></div><div class="tl-time" id="tt-4">—</div><div class="tl-text" id="tx-4">Biological Feature Extraction</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-5"></div><div class="tl-time" id="tt-5">—</div><div class="tl-text" id="tx-5">Deep Feature Extraction</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-6"></div><div class="tl-time" id="tt-6">—</div><div class="tl-text" id="tx-6">Fusion Analysis</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-7"></div><div class="tl-time" id="tt-7">—</div><div class="tl-text" id="tx-7">Risk Classification</div></div>
-          <div class="tl-item"><div class="tl-dot pend" id="tl-8"></div><div class="tl-time" id="tt-8">—</div><div class="tl-text" id="tx-8">Report Generation</div></div>
+
+
+
+    <!-- FRAUD STATISTICS PAGE -->
+    <div id="page-stats" class="page-section" style="display:none">
+      <div class="section-hdr">
+        <div class="section-title"><i class="ti ti-chart-bar"></i>Fraud Statistics Dashboard</div>
+        <span class="section-badge" id="stats-date">Today</span>
+      </div>
+      <!-- Summary stats -->
+      <div class="stat-grid">
+        <div class="stat-cell"><div class="stat-num info" id="st-total">1,200</div><div class="stat-lbl">Total Calls</div><div class="stat-delta up" id="st-total-d">+4.2% vs yesterday</div></div>
+        <div class="stat-cell"><div class="stat-num success" id="st-real">1,160</div><div class="stat-lbl">Real Calls</div><div class="stat-delta dn" id="st-real-d">-1.2%</div></div>
+        <div class="stat-cell"><div class="stat-num danger" id="st-ai">25</div><div class="stat-lbl">AI Voice Clones</div><div class="stat-delta up" id="st-ai-d">+12% spike</div></div>
+        <div class="stat-cell"><div class="stat-num warn" id="st-replay">15</div><div class="stat-lbl">Replay Attacks</div><div class="stat-delta up" id="st-replay-d">+8%</div></div>
+      </div>
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-cell"><div class="stat-num danger">40</div><div class="stat-lbl">High Risk Calls</div></div>
+        <div class="stat-cell"><div class="stat-num warn">67</div><div class="stat-lbl">Medium Risk</div></div>
+        <div class="stat-cell"><div class="stat-num">96.8%</div><div class="stat-lbl">Detection Accuracy</div></div>
+      </div>
+
+      <div class="grid2" style="gap:14px">
+        <!-- TREND ANALYSIS -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-trending-up"></i>TREND ANALYSIS</div>
+          <div class="trend-row"><div class="trend-key"><i class="ti ti-language"></i>Most Targeted Language</div><div class="trend-val accent">Hindi</div></div>
+          <div class="trend-row"><div class="trend-key"><i class="ti ti-bug"></i>Most Common Attack</div><div class="trend-val danger">Replay Attack</div></div>
+          <div class="trend-row"><div class="trend-key"><i class="ti ti-clock"></i>Peak Fraud Time</div><div class="trend-val warn">2 PM – 5 PM</div></div>
+          <div class="trend-row"><div class="trend-key"><i class="ti ti-building-bank"></i>Highest Risk Branch</div><div class="trend-val danger">Lucknow</div></div>
+          <div class="trend-row"><div class="trend-key"><i class="ti ti-calendar-week"></i>Highest Risk Day</div><div class="trend-val warn">Monday</div></div>
+          <div class="trend-row"><div class="trend-key"><i class="ti ti-device-mobile"></i>Primary Channel</div><div class="trend-val accent">IVR / Call Center</div></div>
+        </div>
+
+        <!-- ATTACK BREAKDOWN CHART -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-chart-donut"></i>ATTACK TYPE BREAKDOWN</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">AI Voice Clone</span><span style="font-family:var(--mono);color:var(--danger);font-weight:600">25 calls (62.5%)</span></div>
+              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:62.5%;height:100%;background:var(--danger);border-radius:3px"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Replay Attack</span><span style="font-family:var(--mono);color:var(--warn);font-weight:600">15 calls (37.5%)</span></div>
+              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:37.5%;height:100%;background:var(--warn);border-radius:3px"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">Deepfake Speech</span><span style="font-family:var(--mono);color:#7C3AED;font-weight:600">0 calls (0%)</span></div>
+              <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:#7C3AED;border-radius:3px"></div></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border);margin-top:12px;padding-top:10px">
+            <div class="card-title" style="margin-bottom:8px"><i class="ti ti-language"></i>BY LANGUAGE</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11px">
+              <span style="padding:3px 9px;background:#EAF2FB;border-radius:4px;color:var(--bank);font-weight:600">Hindi 38%</span>
+              <span style="padding:3px 9px;background:#F4F8FC;border-radius:4px;color:var(--text2)">Bengali 22%</span>
+              <span style="padding:3px 9px;background:#F4F8FC;border-radius:4px;color:var(--text2)">English 18%</span>
+              <span style="padding:3px 9px;background:#F4F8FC;border-radius:4px;color:var(--text2)">Tamil 12%</span>
+              <span style="padding:3px 9px;background:#F4F8FC;border-radius:4px;color:var(--text2)">Malayalam 6%</span>
+              <span style="padding:3px 9px;background:#F4F8FC;border-radius:4px;color:var(--text2)">Bhojpuri 4%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KNOWLEDGE BASE + SOP PAGE -->
+    <!-- ======== KNOWLEDGE BASE PAGE ======== -->
+    <div id="page-kb" class="page-section" style="display:none">
+      <div class="section-hdr">
+        <div class="section-title"><i class="ti ti-book"></i>Staff Help Center & Security SOP</div>
+        <span class="section-badge">Standard Guidelines</span>
+      </div>
+      <div class="grid2" style="gap:14px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-help-circle"></i>UNDERSTANDING THE VOICE THREATS</div>
+            
+            <div class="kb-item" onclick="toggleKb(this)">
+              <div class="kb-item-hdr"><div class="kb-q">What is an AI Voice Clone?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+              <div class="kb-ans">A fake voice created by computer software using artificial intelligence. Fraudsters feed it a few seconds of a real customer's voice, and it can speak any script to sound exactly like them.</div>
+            </div>
+            
+            <div class="kb-item" onclick="toggleKb(this)">
+              <div class="kb-item-hdr"><div class="kb-q">What is a Replay Attack?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+              <div class="kb-ans">This is when a fraudster records a customer's genuine phone call (e.g. using a hidden microphone or call recorder) and plays it back over the phone to the bank to fool us.</div>
+            </div>
+            
+            <div class="kb-item" onclick="toggleKb(this)">
+              <div class="kb-item-hdr"><div class="kb-q">How does VoiceGuard detect fakes?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+              <div class="kb-ans">It checks the audio for hidden clues that the human ear cannot hear:
+                <br>• <b>AI Speech Checks</b>: Computers make speech that sounds perfect but lacks the tiny, natural tremors and breathing sounds of real human voices.
+                <br>• <b>Replay Checks</b>: Playing a recording back over a phone speaker introduces background hums, speaker echoes, and flat noise patterns.
+              </div>
+            </div>
+            
+            <div class="kb-item" onclick="toggleKb(this)">
+              <div class="kb-item-hdr"><div class="kb-q">What does the Risk Score mean?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+              <div class="kb-ans">It shows how likely the voice is to be fake:
+                <br>• <b>0% – 20% (Safe)</b>: The voice sounds natural and authentic. Proceed normally.
+                <br>• <b>21% – 79% (Caution)</b>: Some anomalies were found. Ask secondary security questions (e.g. last deposit, date of birth) before continuing.
+                <br>• <b>80% – 100% (High Risk)</b>: Extremely likely to be fake. Stop! Do not authorize any transactions.
+              </div>
+            </div>
+
+            <div class="kb-item" onclick="toggleKb(this)">
+              <div class="kb-item-hdr"><div class="kb-q">What should I tell the caller if fraud is suspected?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
+              <div class="kb-ans">Do not alert the caller or sound hostile. Calmly state: <i>"For your security, our system requires a quick secondary verification to complete this request. I am sending an OTP to your registered phone."</i> If they refuse, freeze the transfer and notify your manager.</div>
+            </div>
+
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-file-certificate"></i>OFFICIAL UCO BANK SECURITY STEPS (SOP)</div>
+            <div style="padding:8px 10px;background:#EAF2FB;border-radius:5px;font-size:11px;color:var(--bank);margin-bottom:12px;border-left:3px solid var(--bank)"><i class="ti ti-info-circle" style="font-size:12px;margin-right:4px;vertical-align:-1px"></i>Following RBI Cyber Security Framework for Voice Fraud</div>
+            <div style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Step-by-step action plan:</div>
+            
+            <div class="sop-step"><div class="sop-num">1</div><div class="sop-text"><b>Verify the customer</b> — Send an SMS OTP to their registered number or request a video call.</div></div>
+            <div class="sop-step"><div class="sop-num">2</div><div class="sop-text"><b>Freeze money transfers</b> — Immediately pause any high-value transactions on this account.</div></div>
+            <div class="sop-step"><div class="sop-num">3</div><div class="sop-text"><b>Report the call</b> — Open a support ticket and tag it as "Cyber Fraud Investigation".</div></div>
+            <div class="sop-step"><div class="sop-num">4</div><div class="sop-text"><b>Keep call records</b> — The recording is saved automatically in our system as evidence. Do not clear it.</div></div>
+            <div class="sop-step"><div class="sop-num">5</div><div class="sop-text"><b>Notify the customer</b> — Send an official bank warning message to the customer's email about the attempt.</div></div>
+            <div class="sop-step"><div class="sop-num">6</div><div class="sop-text"><b>Notify Branch Manager</b> — Escalation is mandatory for transactions above ₹1 Lakh.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIT LOGS PAGE -->
+    <div id="page-audit" class="page-section" style="display:none">
+      <div class="section-hdr">
+        <div class="section-title"><i class="ti ti-clipboard-list"></i>Audit Logs</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="section-badge" id="audit-log-count">0 entries</span>
+          <button onclick="clearAuditLogs()" style="padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--text2);font-size:10px;cursor:pointer">Clear Logs</button>
         </div>
       </div>
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
-          <div class="card-title" style="margin-bottom:0"><i class="ti ti-table"></i>CHUNK ANALYSIS REPORT</div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="tbl-status">AWAITING INPUT</div>
-        </div>
-        <div style="overflow-y:auto;max-height:290px">
-          <table class="chunk-table">
-            <thead><tr><th style="width:12%">Chunk</th><th style="width:32%">Fraud Score</th><th style="width:16%">Confidence</th><th style="width:18%">Verdict</th><th style="width:22%">Segment</th></tr></thead>
-            <tbody id="chunk-tbody"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No analysis data — upload audio to begin</td></tr></tbody>
+        <div style="overflow-y:auto;max-height:500px">
+          <table class="audit-table" id="audit-table">
+            <thead><tr><th style="width:16%">Case ID</th><th style="width:14%">Time</th><th style="width:16%">Officer</th><th style="width:20%">Action</th><th style="width:14%">Decision</th><th style="width:20%">Status</th></tr></thead>
+            <tbody id="audit-tbody"><tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No audit entries yet. Run an analysis to begin logging.</td></tr></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- REPORT -->
-    <div class="section-hdr">
-      <div class="section-title"><i class="ti ti-file-certificate"></i>Forensic Investigation Report</div>
-      <span class="section-badge">Enterprise Grade · Restricted</span>
-    </div>
-    <div class="report-card">
-      <div class="report-hdr">
-        <div class="report-hdr-title">VoiceGuard™ — FORENSIC INVESTIGATION REPORT</div>
-        <div class="report-hdr-sub">FRAUD INTELLIGENCE DIVISION · RESTRICTED · RBI CIRCULAR No. RBI/2023-24/73 COMPLIANT</div>
-      </div>
-      <div class="report-grid">
-        <div class="report-section">
-          <div class="report-section-title">Case Information</div>
-          <div class="rpt-row"><span class="rpt-key">Case ID</span><span class="rpt-val" id="rpt-id">VG-——</span></div>
-          <div class="rpt-row"><span class="rpt-key">Timestamp</span><span class="rpt-val" id="rpt-ts">—</span></div>
-          <div class="rpt-row"><span class="rpt-key">Model Version</span><span class="rpt-val">Fusion v2.0</span></div>
-          <div class="rpt-row"><span class="rpt-key">Analyst Engine</span><span class="rpt-val" style="font-size:9px">Fusion Matrix Arch.</span></div>
-        </div>
-        <div class="report-section">
-          <div class="report-section-title">Detection Results</div>
-          <div class="rpt-row"><span class="rpt-key">Risk Score</span><span class="rpt-val danger" id="rpt-risk">—</span></div>
-          <div class="rpt-row"><span class="rpt-key">Threat Type</span><span class="rpt-val" id="rpt-type">—</span></div>
-          <div class="rpt-row"><span class="rpt-key">Synthetic Confidence</span><span class="rpt-val" id="rpt-synth">—</span></div>
-          <div class="rpt-row"><span class="rpt-key">Fusion Confidence</span><span class="rpt-val danger" id="rpt-fus">—</span></div>
-        </div>
-        <div class="report-section">
-          <div class="report-section-title">Trigger Analysis</div>
-          <div style="margin-bottom:6px"><div class="rpt-key" style="margin-bottom:4px">Primary Trigger</div><div id="rpt-pri"><span class="trigger-tag trig-pri">—</span></div></div>
-          <div><div class="rpt-key" style="margin-bottom:4px">Secondary Trigger</div><div id="rpt-sec"><span class="trigger-tag trig-sec">—</span></div></div>
-        </div>
-        <div class="report-section">
-          <div class="report-section-title">Recommendation</div>
-          <div class="rpt-rec-box"><div class="rpt-rec-label">Action Required</div><span id="rpt-rec">Run analysis to generate recommendation.</span></div>
-          <button class="pdf-btn" onclick="downloadReport()"><i class="ti ti-file-download" style="font-size:14px"></i>Export PDF Report</button>
-        </div>
-      </div>
-      <div class="report-footer">
-        <span>CLASSIFICATION: <span id="rpt-class">AWAITING ANALYSIS</span></span>
-        <span>RBI/2023-24/73 Compliant · CERT-In Reportable · NPCI Framework Aligned</span>
-      </div>
-    </div>
+    <!-- ======== AI INVESTIGATOR PAGE ======== -->
+    <!-- ======== AI INVESTIGATOR PAGE ======== -->
+    <div id="page-investigator" class="page-section" style="display:none">
 
-    <div class="section-hdr" id="active-learning-label" style="display:none;">
-      <div class="section-title"><i class="ti ti-brain"></i>Active Learning Feedback</div>
-      <span class="section-badge">Model Retraining</span>
-    </div>
-    <div class="report-card" id="active-learning-block" style="display:none;margin-bottom:14px;padding:16px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-thumb-up"></i> TEACH THE MODEL</div>
-        <button onclick="retrainModel()" style="background:none;border:1px solid var(--bank);color:var(--bank);border-radius:4px;font-size:10px;padding:4px 10px;cursor:pointer;font-weight:600"><i class="ti ti-refresh"></i> Retrain Meta-Classifier</button>
+      <!-- Case Header -->
+      <div class="section-hdr">
+        <div class="section-title"><i class="ti ti-search"></i>Forensic Case Workspace</div>
+        <span class="section-badge" id="inv-case-badge">VG-——</span>
       </div>
-      <div style="font-size:11px;color:var(--text);margin-bottom:8px">Was the model's prediction correct?</div>
-      <div style="display:flex;gap:10px;margin-bottom:8px">
-        <button onclick="submitFeedback(true)" style="flex:1;background:rgba(34,197,94,0.1);color:#15803D;border:1px solid rgba(34,197,94,0.3);padding:8px;border-radius:4px;font-weight:600;cursor:pointer"><i class="ti ti-check"></i> Yes, Correct</button>
-        <button onclick="submitFeedback(false)" style="flex:1;background:rgba(239,68,68,0.1);color:#DC2626;border:1px solid rgba(239,68,68,0.3);padding:8px;border-radius:4px;font-weight:600;cursor:pointer"><i class="ti ti-x"></i> No, Wrong</button>
-      </div>
-      <div id="feedback-wrong-block" style="display:none;padding-top:10px;border-top:1px solid var(--border)">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:8px">What is the TRUE category of this audio?</div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <div style="display:flex;gap:6px">
-            <button onclick="submitTrueLabel('ElevenLabs')" style="flex:1;background:none;color:#DC2626;border:1px solid #DC2626;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🔴 ElevenLabs</button>
-            <button onclick="submitTrueLabel('Resemble')" style="flex:1;background:none;color:#D97706;border:1px solid #D97706;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🔴 Resemble</button>
+
+      <!-- Simple Case Status Banner -->
+      <div class="card" style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:14px">
+        <div style="display:flex; align-items:center; justify-content:space-between">
+          <div style="display:flex; align-items:center; gap:14px">
+            <div>
+              <div style="font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px">Active Case File</div>
+              <div style="font-size:14px; font-weight:700; font-family:var(--mono); color:var(--bank)" id="inv-case-id">VG-——</div>
+            </div>
+            <div style="border-left:1px solid var(--border); height:30px; margin:0 6px"></div>
+            <div>
+              <div style="font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px">Status</div>
+              <div id="inv-status-badge" class="status-chip chip-complete" style="display:inline-flex; padding: 2px 8px; font-size:10px;"><span class="chip-dot"></span><span>Awaiting Analysis</span></div>
+            </div>
+            <div style="border-left:1px solid var(--border); height:30px; margin:0 6px"></div>
+            <div>
+              <div style="font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px">Last Updated</div>
+              <div style="font-size:11px; font-weight:600; color:var(--text)" id="inv-current-time">—</div>
+            </div>
           </div>
-          <div style="display:flex;gap:6px">
-            <button onclick="submitTrueLabel('Generic')" style="flex:1;background:none;color:#9333EA;border:1px solid #9333EA;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🔴 Other Fake</button>
-            <button onclick="submitTrueLabel('Real')" style="flex:1;background:none;color:#15803D;border:1px solid #15803D;padding:6px;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">🟢 Real Voice</button>
+          <div style="text-align:right; display:flex; align-items:center; gap:16px">
+            <div>
+              <div style="font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px">AI Risk Score</div>
+              <div style="font-size:20px; font-weight:700; font-family:var(--mono); line-height:1; color:var(--text)" id="inv-risk-score">—</div>
+            </div>
+            <button onclick="downloadReport()" style="padding:6px 12px; font-size:11px; font-weight:600; border-radius:4px; display:flex; align-items:center; gap:4px; cursor:pointer; background:#fff; border:1px solid var(--bank); color:var(--bank)"><i class="ti ti-printer"></i> Print PDF Report</button>
           </div>
         </div>
       </div>
-      <div id="feedback-status" style="margin-top:10px;font-size:10px;color:#15803D;font-family:var(--mono);display:none;font-weight:600"></div>
+
+      <!-- Frozen Alert Banner -->
+      <div id="inv-paused-banner" style="display:none; align-items:center; gap:10px; padding:10px 14px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px; margin-bottom:14px; color:#DC2626; font-size:11px">
+        <i class="ti ti-alert-triangle" style="font-size:14px"></i>
+        <span><strong>TRANSACTION FROZEN</strong> — Immediate payout lock active on customer account. Core Banking gateway alerted.</span>
+      </div>
+
+      <!-- Video KYC Alert Banner -->
+      <div id="inv-video-banner" style="display:none; align-items:center; gap:10px; padding:10px 14px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:6px; margin-bottom:14px; color:#059669; font-size:11px">
+        <i class="ti ti-video" style="font-size:14px"></i>
+        <span><strong>VIDEO KYC LINK ACTIVE</strong> — Verification link sent to customer phone. Status: Awaiting customer join...</span>
+      </div>
+
+      <!-- AI Alerts Banner ( Lucknow cluster matches ) -->
+      <div class="ai-sugg-card" style="margin-bottom:14px; display:none;" id="inv-ai-sugg-block">
+        <div class="ai-sugg-hdr">
+          <div class="ai-sugg-icon" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i></div>
+          <div class="ai-sugg-title">VoiceGuard AI Warning Alert</div>
+          <div style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono)" id="inv-hero-sub">—</div>
+        </div>
+        <div class="ai-sugg-item" style="padding-top:4px"><i class="ti ti-arrow-right" style="color:var(--danger)"></i><span id="inv-ai-alert-text">No warning matches.</span></div>
+      </div>
+
+      <!-- 2-Column Core Layout -->
+      <div class="grid2" style="grid-template-columns:1.2fr 1fr; gap:14px; margin-bottom:14px">
+
+        <!-- LEFT COLUMN: Checklist & Notes -->
+        <div style="display:flex; flex-direction:column; gap:14px">
+
+          <!-- 1. Recommended Actions Checklist -->
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title"><i class="ti ti-list-check"></i>SECURITY CHECKLIST FOR STAFF</div>
+            <div style="font-size:11px; color:var(--text3); margin-bottom:8px">Interactive Steps: Click on a step to toggle its action.</div>
+            <div id="inv-actions-list">
+              <div class="action-row" id="chk-row-pause" onclick="handleChecklistClick('pause')">
+                <div class="action-check"></div>
+                <div class="action-label"><strong>Pause Transaction Immediately</strong><br>Hold all pending money transfers for this customer.</div>
+                <span class="priority-badge pri-critical">CRITICAL</span>
+              </div>
+              <div class="action-row" id="chk-row-otp" onclick="handleChecklistClick('otp')">
+                <div class="action-check"></div>
+                <div class="action-label"><strong>OTP Verification</strong><br>Send a security code to the customer's registered phone number.</div>
+                <span class="priority-badge pri-critical">CRITICAL</span>
+              </div>
+              
+              <!-- OTP Simulation Popup -->
+              <div id="chk-otp-popup" style="display:none; padding:10px 14px; background:#F8FAFC; border:1px solid var(--border); border-radius:6px; margin: 6px 0 10px">
+                <div style="font-size:10px; color:var(--text2); font-weight:600; margin-bottom:4px">Verify customer identity via OTP:</div>
+                <div style="display:flex; gap:6px">
+                  <input type="text" id="chk-otp-input" placeholder="Enter code (Demo: 123456)" style="flex:1; padding:4px 8px; font-size:11px; border:1px solid var(--border); border-radius:4px">
+                  <button onclick="verifyChecklistOtp()" style="padding:4px 12px; font-size:10px; font-weight:600; background:var(--bank); color:#fff; border:none; border-radius:4px; cursor:pointer">Verify</button>
+                </div>
+                <div id="chk-otp-status" style="font-size:9px; margin-top:4px; font-family:var(--mono)"></div>
+              </div>
+
+              <div class="action-row" id="chk-row-video" onclick="handleChecklistClick('video')">
+                <div class="action-check"></div>
+                <div class="action-label"><strong>Video KYC Request</strong><br>Ask the customer to join a quick live video call to verify their identity.</div>
+                <span class="priority-badge pri-high">HIGH</span>
+              </div>
+              <div class="action-row" id="chk-row-escalate" onclick="handleChecklistClick('escalate')">
+                <div class="action-check"></div>
+                <div class="action-label"><strong>Alert Fraud Department</strong><br>Forward this case details to UCO Bank Cyber Fraud Team.</div>
+                <span class="priority-badge pri-high">HIGH</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Case Notes -->
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title">
+              <span><i class="ti ti-notes"></i>OFFICER DECISION NOTES</span>
+            </div>
+            <div style="margin-bottom:8px; display:flex; flex-wrap:wrap; gap:4px">
+              <span class="inv-notes-tag" style="font-size:10px; padding:3px 6px" onclick="appendInvNote('⚠ HIGH RISK: Flagged voice clone detected.')">High Risk</span>
+              <span class="inv-notes-tag" style="font-size:10px; padding:3px 6px" onclick="appendInvNote('Voice matched registered profile.')">Voice Verified</span>
+              <span class="inv-notes-tag" style="font-size:10px; padding:3px 6px" onclick="appendInvNote('Escalated to Branch Manager.')">Escalated</span>
+              <span class="inv-notes-tag" style="font-size:10px; padding:3px 6px" onclick="appendInvNote('Verified via OTP. False alarm.')">False Positive</span>
+            </div>
+            <textarea class="notes-area" id="inv-notes" placeholder="Write your notes here... (e.g. Identity verified via OTP. Suspicious Lucknow cluster match.)" style="min-height:100px; font-size:11px"></textarea>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px">
+              <div class="notes-saved" id="inv-notes-saved" style="display:none; font-size:10px"><i class="ti ti-check" style="font-size:10px"></i> Notes saved</div>
+              <button onclick="saveInvNotes()" style="padding:5px 12px; background:var(--bank); color:#fff; border:none; border-radius:4px; font-size:11px; cursor:pointer; font-weight:500; margin-left:auto"><i class="ti ti-device-floppy" style="font-size:11px"></i> Save Notes</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Evidence Analysis & Chat -->
+        <div style="display:flex; flex-direction:column; gap:14px">
+
+          <!-- 1. Single Simple Evidence Analysis Card -->
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title"><i class="ti ti-fingerprint"></i>EVIDENCE SCORES (SIMPLE GUIDE)</div>
+            <div id="inv-evidence-panel">
+              <div class="evid-item">
+                <div class="evid-row"><span class="evid-name">AI Voice Clone Risk</span><span class="evid-pct danger" id="ev-ai">—</span></div>
+                <div class="evid-bar-bg"><div class="evid-bar-fill evid-fill-danger" id="evb-ai" style="width:0%"></div></div>
+              </div>
+              <div class="evid-item">
+                <div class="evid-row"><span class="evid-name">Recorded Playback Risk</span><span class="evid-pct danger" id="ev-replay">—</span></div>
+                <div class="evid-bar-bg"><div class="evid-bar-fill evid-fill-danger" id="evb-replay" style="width:0%"></div></div>
+              </div>
+              <div class="evid-item">
+                <div class="evid-row"><span class="evid-name">Voice Clarity & Stability</span><span class="evid-pct success" id="ev-human">—</span></div>
+                <div class="evid-bar-bg"><div class="evid-bar-fill evid-fill-success" id="evb-human" style="width:0%"></div></div>
+              </div>
+              <div class="evid-item">
+                <div class="evid-row"><span class="evid-name">Overall Security Confidence</span><span class="evid-pct info" id="ev-fusion">—</span></div>
+                <div class="evid-bar-bg"><div class="evid-bar-fill" id="evb-fusion" style="width:0%; background:var(--bank)"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. AI Investigator Assistant Chat -->
+          <div class="card" style="padding:0; overflow:hidden; display:flex; flex-direction:column; margin-bottom:0; flex:1">
+            <div style="padding:10px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; background:#F8FAFF">
+              <div style="width:26px; height:26px; background:var(--bank); border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0"><i class="ti ti-robot" style="color:#fff; font-size:13px"></i></div>
+              <div>
+                <div style="font-size:11px; font-weight:700; color:var(--text)">AI Forensics Helper</div>
+                <div style="font-size:9px; color:var(--text3)">Ask questions about this specific case</div>
+              </div>
+            </div>
+            
+            <!-- Quick Suggestions Bar (Restored to original style) -->
+            <div class="inv-chat-quick" style="background:#fff; border-bottom:1px solid var(--border); padding:8px 12px; display:flex; gap:6px; flex-wrap:wrap">
+              <span class="cq-btn" onclick="invChat('Why is this voice fake?')">Why is this fake?</span>
+              <span class="cq-btn" onclick="invChat('Show all evidence for this case.')">Show evidence</span>
+              <span class="cq-btn" onclick="invChat('Explain what a replay attack is.')">Replay attack</span>
+              <span class="cq-btn" onclick="invChat('Generate a full investigation report summary.')">Generate report</span>
+              <span class="cq-btn" onclick="invChat('What should be the next action?')">Next action</span>
+              <span class="cq-btn" onclick="invChat('Summarize this investigation.')">Summarize</span>
+              <span class="cq-btn" onclick="invChat('Show similar fraud cases from this week.')">Similar frauds</span>
+            </div>
+            
+            <div class="chat-msgs" id="inv-chat-msgs" style="max-height:180px; padding:10px; font-size:11px">
+              <div class="chat-bubble bubble-ai"><b>Investigator AI:</b> Awaiting case analysis. Ask me why a call was flagged or what checklist steps are needed.</div>
+            </div>
+            <div class="chat-typing" id="inv-chat-typing" style="font-size:10px; padding:4px 10px; display:none;"><i class="ti ti-dots" style="font-size:10px"></i> Typing...</div>
+            <div class="chat-input-row" style="padding:6px">
+              <input class="chat-input" id="inv-chat-input" placeholder="Ask AI about this voice case..." style="font-size:11px; padding:6px" onkeydown="if(event.key==='Enter')invChat()">
+              <button class="chat-send" onclick="invChat()" style="width:28px; height:28px"><i class="ti ti-send" style="font-size:11px"></i></button>
+            </div>
+          </div>
+
+        </div>
+
+      </div> <!-- end grid2 -->
+
+      <!-- 3. Active Learning Feedback (Full-width card at the bottom) -->
+      <div class="section-hdr" id="active-learning-label" style="display:none; margin-top:14px">
+        <div class="section-title"><i class="ti ti-brain"></i>Active Learning Feedback</div>
+        <span class="section-badge">Model Retraining</span>
+      </div>
+      <div class="report-card" id="active-learning-block" style="display:none; margin-bottom:14px; padding:16px; background:#fff; border:1px solid var(--border); border-radius:8px">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px">
+          <div style="font-size:11px; color:var(--text2); font-weight:600; text-transform:uppercase; letter-spacing:.5px"><i class="ti ti-thumb-up"></i> TEACH THE MODEL</div>
+          <button onclick="retrainModel()" style="background:none; border:1px solid var(--bank); color:var(--bank); border-radius:4px; font-size:10px; padding:4px 10px; cursor:pointer; font-weight:600"><i class="ti ti-refresh"></i> Retrain Meta-Classifier</button>
+        </div>
+        <div style="font-size:11px; color:var(--text); margin-bottom:8px">Was the model's prediction correct?</div>
+        <div style="display:flex; gap:10px; margin-bottom:8px">
+          <button onclick="submitFeedback(true)" style="flex:1; background:rgba(34,197,94,0.1); color:#15803D; border:1px solid rgba(34,197,94,0.3); padding:8px; border-radius:4px; font-weight:600; cursor:pointer"><i class="ti ti-check"></i> Yes, Correct</button>
+          <button onclick="submitFeedback(false)" style="flex:1; background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); padding:8px; border-radius:4px; font-weight:600; cursor:pointer"><i class="ti ti-x"></i> No, Wrong</button>
+        </div>
+        <div id="feedback-wrong-block" style="display:none; padding-top:10px; border-top:1px solid var(--border)">
+          <div style="font-size:10px; color:var(--text3); margin-bottom:8px">What is the TRUE category of this audio?</div>
+          <div style="display:flex; flex-direction:column; gap:6px">
+            <div style="display:flex; gap:6px">
+              <button onclick="submitTrueLabel('ElevenLabs')" style="flex:1; background:none; color:#DC2626; border:1px solid #DC2626; padding:6px; border-radius:4px; font-size:10px; cursor:pointer;font-weight:600">🔴 ElevenLabs</button>
+              <button onclick="submitTrueLabel('Resemble')" style="flex:1; background:none; color:#D97706; border:1px solid #D97706; padding:6px; border-radius:4px; font-size:10px; cursor:pointer;font-weight:600">🔴 Resemble</button>
+            </div>
+            <div style="display:flex; gap:6px">
+              <button onclick="submitTrueLabel('Generic')" style="flex:1; background:none; color:#9333EA; border:1px solid #9333EA; padding:6px; border-radius:4px; font-size:10px; cursor:pointer;font-weight:600">🔴 Other Fake</button>
+              <button onclick="submitTrueLabel('Real')" style="flex:1; background:none; color:#15803D; border:1px solid #15803D; padding:6px; border-radius:4px; font-size:10px; cursor:pointer;font-weight:600">🟢 Real Voice</button>
+            </div>
+          </div>
+        </div>
+        <div id="feedback-status" style="margin-top:10px; font-size:10px; color:#15803D; font-family:var(--mono); display:none; font-weight:600"></div>
+      </div>
+
     </div>
-    </div> <!-- end page-reports -->
+    <!-- ======== END AI INVESTIGATOR PAGE ======== -->
 
     <div style="padding:14px 0;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3)">
       <div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;background:var(--bank);border-radius:4px;display:flex;align-items:center;justify-content:center"><svg width="16" height="18" viewBox="0 0 16 18" fill="none"><path d="M8 0L0 3v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V3L8 0z" fill="rgba(255,255,255,0.9)"/></svg></div><div><div style="color:var(--text);font-weight:600;font-size:12px">VoiceGuard™ Enterprise</div><div>Version 2.0 · Build 20260621 · Enterprise-Grade Deployment Certified</div></div></div>
@@ -734,7 +1507,66 @@ function animFusion(){
 }
 animFusion();
 
-function triggerUpload(){document.getElementById('file-input').click();}
+function switchIntakeTab(tab) {
+  if (STAGED_FILE || LAST_ANALYSIS) return; // Prevent switching when audio is active
+  
+  document.querySelectorAll('.intake-tab').forEach(el => el.classList.remove('active'));
+  const targetTab = document.getElementById('tab-' + tab);
+  if (targetTab) targetTab.classList.add('active');
+  
+  ['file', 'record'].forEach(t => {
+    const el = document.getElementById('view-' + t);
+    if (el) el.style.display = (t === tab) ? 'block' : 'none';
+  });
+}
+
+function setUploadZoneState(state, filename = '', fileinfo = '') {
+  const tabsEl = document.querySelector('.intake-tabs');
+  const fileView = document.getElementById('view-file');
+  const recordView = document.getElementById('view-record');
+  const loadedEl = document.getElementById('upload-loaded-state');
+  
+  if (state === 'default') {
+    if (tabsEl) tabsEl.style.display = 'flex';
+    
+    // Get currently active tab
+    const activeTabEl = document.querySelector('.intake-tab.active');
+    const activeTab = activeTabEl ? activeTabEl.id.replace('tab-', '') : 'file';
+    
+    if (fileView) fileView.style.display = (activeTab === 'file') ? 'block' : 'none';
+    if (recordView) recordView.style.display = (activeTab === 'record') ? 'block' : 'none';
+    
+    // Reset individual elements inside tab contents
+    document.getElementById('upload-default-state').style.display = 'block';
+    document.getElementById('record-default-state').style.display = 'flex';
+    document.getElementById('upload-recording-state').style.display = 'none';
+    
+    if (loadedEl) loadedEl.style.display = 'none';
+  } else if (state === 'recording') {
+    if (tabsEl) tabsEl.style.display = 'none';
+    if (fileView) fileView.style.display = 'none';
+    if (recordView) recordView.style.display = 'block';
+    if (loadedEl) loadedEl.style.display = 'none';
+    
+    document.getElementById('record-default-state').style.display = 'none';
+    document.getElementById('upload-recording-state').style.display = 'flex';
+  } else if (state === 'loaded') {
+    if (tabsEl) tabsEl.style.display = 'none';
+    if (fileView) fileView.style.display = 'none';
+    if (recordView) recordView.style.display = 'none';
+    
+    if (loadedEl) {
+      loadedEl.style.display = 'flex';
+      document.getElementById('loaded-file-name').textContent = filename;
+      document.getElementById('loaded-file-info').textContent = fileinfo;
+    }
+  }
+}
+
+function triggerUpload(){
+  if(micRec || STAGED_FILE || LAST_ANALYSIS) return;
+  document.getElementById('file-input').click();
+}
 function formatSize(b){if(!b)return'—';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
 function setMetaField(id,val){const el=document.getElementById(id);el.textContent=val;el.classList.remove('meta-val-pending');}
 function clearMeta(){['meta-name','meta-fmt','meta-sr','meta-ch','meta-dur','meta-size'].forEach(id=>{const el=document.getElementById(id);el.textContent='—';el.classList.add('meta-val-pending');});}
@@ -761,9 +1593,10 @@ function handleFile(input){
     wavePos=0; document.getElementById('prog-fill').style.width='0%';
     drawWave(waveData, 0);
   });
-  currentAudio.addEventListener('timeupdate', () => {
-    if(currentAudio.duration) {
-      wavePos = currentAudio.currentTime / currentAudio.duration;
+  currentAudio.addEventListener('timeupdate', (e) => {
+    const audio = e.target;
+    if(audio.duration) {
+      wavePos = audio.currentTime / audio.duration;
       document.getElementById('prog-fill').style.width=(wavePos*100)+'%';
       drawWave(waveData,wavePos);
     }
@@ -774,6 +1607,8 @@ function handleFile(input){
   document.getElementById('wv-stat').style.color='var(--success)';
   setHdrChip('ready');
   document.getElementById('start-btn').style.display='flex';
+  document.getElementById('clear-btn').style.display='flex';
+  setUploadZoneState('loaded', file.name, formatSize(file.size) + ' · ' + (file.type || 'audio/wav'));
   
   const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
   const reader=new FileReader();
@@ -815,29 +1650,36 @@ function resetTl(){for(let i=0;i<STEPS.length;i++){const d=document.getElementBy
 function resetResults(){
   if(document.getElementById('active-learning-block')) {
     document.getElementById('active-learning-block').style.display='none';
-    document.getElementById('active-learning-label').style.display='none';
+    const _all=document.getElementById('active-learning-label');if(_all)_all.style.display='none';
     document.getElementById('feedback-wrong-block').style.display='none';
     document.getElementById('feedback-status').style.display='none';
   }
   resetTl();
-  document.getElementById('chunk-tbody').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">Analyzing...</td></tr>';
-  document.getElementById('tbl-status').textContent='PROCESSING';document.getElementById('tbl-status').style.color='var(--warn)';
-  document.getElementById('s-job').className='pill pill-proc';document.getElementById('s-job').textContent='PROCESSING';
+  const _tbody=document.getElementById('chunk-tbody');if(_tbody)_tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">Analyzing...</td></tr>';
+  const _tbl=document.getElementById('tbl-status');if(_tbl){_tbl.textContent='PROCESSING';_tbl.style.color='var(--warn)';}
+  const _sj=document.getElementById('s-job');if(_sj){_sj.className='pill pill-proc';_sj.textContent='PROCESSING';}
   document.getElementById('hero-status').textContent='Analysis in Progress';
   document.getElementById('hero-sub').textContent='VoiceGuard is processing the audio...';
   document.getElementById('hero-score').textContent='—';
   document.getElementById('h-class').textContent='—';document.getElementById('h-conf').textContent='—';
   document.getElementById('h-dur').textContent='—';document.getElementById('h-proc').textContent='—';
-  document.getElementById('risk-num').textContent='—';
-  document.getElementById('risk-badge').textContent='ANALYZING...';
-  document.getElementById('risk-badge').className='risk-badge-big risk-badge-lo';
-  document.getElementById('risk-finding').textContent='Fusion engine is processing...';
-  ['ti-type','ti-soph','ti-replay','ti-synth','ti-trig'].forEach(id=>{document.getElementById(id).textContent='—';});
-  ['rd-evid','rd-vstab','rd-spec','rd-conf'].forEach(id=>{document.getElementById(id).textContent='—';});
-  document.getElementById('fus-score-text').textContent='—';
-  document.getElementById('bio-score-text').textContent='—';
-  document.getElementById('dl-score-text').textContent='—';
-  document.getElementById('fus-risk-text').textContent='—';
+  const riskNum = document.getElementById('risk-num'); if(riskNum) riskNum.textContent='—';
+  const riskBadge = document.getElementById('risk-badge'); if(riskBadge) { riskBadge.textContent='ANALYZING...'; riskBadge.className='risk-badge-big risk-badge-lo'; }
+  const riskFinding = document.getElementById('risk-finding'); if(riskFinding) riskFinding.textContent='Fusion engine is processing...';
+  ['ti-type','ti-soph','ti-replay','ti-synth','ti-trig'].forEach(id=>{ const e = document.getElementById(id); if(e) e.textContent='—'; });
+  ['rd-evid','rd-vstab','rd-spec','rd-conf'].forEach(id=>{ const e = document.getElementById(id); if(e) e.textContent='—'; });
+  const fusScore = document.getElementById('fus-matrix-score'); if(fusScore) fusScore.textContent='—';
+  const bioScore = document.getElementById('bio-matrix-score'); if(bioScore) bioScore.textContent='—';
+  const dlScore = document.getElementById('dl-matrix-score'); if(dlScore) dlScore.textContent='—';
+  
+  const invSBadge = document.getElementById('inv-status-badge');
+  if(invSBadge) {
+    invSBadge.className = 'status-chip chip-complete';
+    invSBadge.querySelector('span:nth-child(2)').textContent = 'Awaiting Analysis';
+  }
+  const pausedBanner = document.getElementById('inv-paused-banner'); if(pausedBanner) pausedBanner.style.display = 'none';
+  const videoBanner = document.getElementById('inv-video-banner'); if(videoBanner) videoBanner.style.display = 'none';
+  document.querySelectorAll('#inv-actions-list .action-check').forEach(el => el.classList.remove('checked'));
   clearInf();
 }
 
@@ -856,9 +1698,9 @@ async function runAnalysis(file){
     },300);
   }catch(err){
     clearInterval(iv);setHdrChip('ready');
-    document.getElementById('s-job').className='pill pill-idle';document.getElementById('s-job').textContent='ERROR';
-    document.getElementById('tbl-status').textContent='ERROR';document.getElementById('tbl-status').style.color='var(--danger)';
-    document.getElementById('chunk-tbody').innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:24px;font-size:12px">Analysis failed: ${(err.message||'Unknown error').replace(/</g,'&lt;')}<br><span style="color:var(--text3);font-size:11px">Is the VoiceGuard backend running at ${BACKEND_URL}?</span></td></tr>`;
+    const _sje=document.getElementById('s-job');if(_sje){_sje.className='pill pill-idle';_sje.textContent='ERROR';}
+    const _tble=document.getElementById('tbl-status');if(_tble){_tble.textContent='ERROR';_tble.style.color='var(--danger)';}
+    const _tbe=document.getElementById('chunk-tbody');if(_tbe)_tbe.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:24px;font-size:12px">Analysis failed: ${(err.message||'Unknown error').replace(/</g,'&lt;')}<br><span style="color:var(--text3);font-size:11px">Is the VoiceGuard backend running at ${BACKEND_URL}?</span></td></tr>`;
     document.getElementById('hero-status').textContent='Analysis Failed';document.getElementById('hero-sub').textContent='Backend connection error. Check that the VoiceGuard server is running.';
   }
 }
@@ -892,32 +1734,59 @@ function showResults(result,clientMs){
   setInf('inf-ch',result.performance.chunks_processed,'1-second windows');
   const rb=document.getElementById('risk-badge');
   const rnum=document.getElementById('risk-num');
-  rnum.textContent=fs+'%';
-  rnum.className='risk-score-num'+(isHigh?' hi':isMed?' med':' lo');
-  rb.className='risk-badge-big'+(isHigh?' risk-badge-hi':isMed?' risk-badge-med':' risk-badge-lo');
-  rb.textContent=(isHigh?'HIGH RISK':isMed?'MEDIUM RISK':'LOW RISK')+' · '+result.risk_level;
-  document.getElementById('risk-finding').textContent=result.verdict_label;
-  document.getElementById('ti-type').textContent=result.threat_intel.threat_type;
-  document.getElementById('ti-soph').textContent=result.threat_intel.sophistication;
-  document.getElementById('ti-replay').textContent=result.threat_intel.replay_indicators;
-  document.getElementById('ti-synth').textContent=result.threat_intel.synthetic_confidence+'%';
-  document.getElementById('ti-trig').innerHTML='<span class="trigger-tag trig-pri">'+result.primary_trigger+'</span>';
-  document.getElementById('rd-evid').textContent=isHigh?'STRONG':isMed?'MODERATE':'LOW';
-  document.getElementById('rd-vstab').textContent=Math.round(100-fs)+'%';
-  document.getElementById('rd-spec').textContent=Math.round(fs*0.9)+'%';
-  document.getElementById('rd-conf').textContent=fc+'%';
-  document.getElementById('rd-rec').textContent=result.recommendation;
+  if(rnum) {
+    rnum.textContent=fs+'%';
+    rnum.className='risk-score-num'+(isHigh?' hi':isMed?' med':' lo');
+  }
+  if(rb) {
+    rb.className='risk-badge-big'+(isHigh?' risk-badge-hi':isMed?' risk-badge-med':' risk-badge-lo');
+    rb.textContent=(isHigh?'HIGH RISK':isMed?'MEDIUM RISK':'LOW RISK')+' · '+result.risk_level;
+  }
+  const riskFinding = document.getElementById('risk-finding'); if(riskFinding) riskFinding.textContent=result.verdict_label;
+  const tiType = document.getElementById('ti-type'); if(tiType) tiType.textContent=result.threat_intel.threat_type;
+  const tiSoph = document.getElementById('ti-soph'); if(tiSoph) tiSoph.textContent=result.threat_intel.sophistication;
+  const tiReplay = document.getElementById('ti-replay'); if(tiReplay) tiReplay.textContent=result.threat_intel.replay_indicators;
+  const tiSynth = document.getElementById('ti-synth'); if(tiSynth) tiSynth.textContent=result.threat_intel.synthetic_confidence+'%';
+  const tiTrig = document.getElementById('ti-trig'); if(tiTrig) tiTrig.innerHTML='<span class="trigger-tag trig-pri">'+result.primary_trigger+'</span>';
+  const rdEvid = document.getElementById('rd-evid'); if(rdEvid) rdEvid.textContent=isHigh?'STRONG':isMed?'MODERATE':'LOW';
+  const rdVstab = document.getElementById('rd-vstab'); if(rdVstab) rdVstab.textContent=Math.round(100-fs)+'%';
+  const rdSpec = document.getElementById('rd-spec'); if(rdSpec) rdSpec.textContent=Math.round(fs*0.9)+'%';
+  const rdConf = document.getElementById('rd-conf'); if(rdConf) rdConf.textContent=fc+'%';
+  const rdRec = document.getElementById('rd-rec'); if(rdRec) rdRec.textContent=result.recommendation;
   document.getElementById('hdr-case').textContent='CASE: '+result.case_id;
   setHdrChip(isHigh?'risk':'complete');
-  document.getElementById('s-job').className='pill pill-on';document.getElementById('s-job').textContent='COMPLETE';
-  document.getElementById('fus-score-text').textContent=fs+'%';
-  document.getElementById('fus-risk-text').textContent=result.risk_level;
-  document.getElementById('fus-risk-text').setAttribute('fill',isHigh?'#EF4444':isMed?'#F59E0B':'#22C55E');
+  const _sjc=document.getElementById('s-job');if(_sjc){_sjc.className='pill pill-on';_sjc.textContent='COMPLETE';}
+  
+  // Dynamic Spectrogram Analysis Text
+  const specTextEl = document.getElementById('spec-analysis-text');
+  if (specTextEl) {
+    if (ver === 'FRAUD') {
+      specTextEl.innerHTML = `<i class="ti ti-alert-triangle" style="font-size:13px;color:var(--danger);margin-right:4px;vertical-align:-2px"></i> <span style="color:var(--danger); font-weight:600;">ANOMALY DETECTED:</span> Synthetic speech cues verified. Spectrogram analysis shows unnatural phase alignment, high frequency formants, and harmonic discontinuities typical of speech synthesis cloning engines (e.g. ElevenLabs).`;
+      specTextEl.style.borderLeftColor = 'var(--danger)';
+    } else if (ver === 'SUSPICIOUS') {
+      specTextEl.innerHTML = `<i class="ti ti-alert-circle" style="font-size:13px;color:var(--warn);margin-right:4px;vertical-align:-2px"></i> <span style="color:var(--warn); font-weight:600;">SUSPICIOUS SPECTRUM:</span> Phase fluctuations and frequency roll-off detected. Stream signature shows potential synthetic overlays or telephony artifacts masking clean deep speech cues. Monitoring recommended.`;
+      specTextEl.style.borderLeftColor = 'var(--warn)';
+    } else {
+      if (meta.sample_rate <= 8000 || fs < 15) {
+        specTextEl.innerHTML = `<i class="ti ti-circle-check" style="font-size:13px;color:var(--success);margin-right:4px;vertical-align:-2px"></i> <span style="color:var(--success); font-weight:600;">LEGITIMATE TELEPHONY:</span> Telephony channel signature verified. Natural speech features are concentrated under 4kHz with high-frequency roll-off matching standard voice codec compression.`;
+        specTextEl.style.borderLeftColor = 'var(--success)';
+      } else {
+        specTextEl.innerHTML = `<i class="ti ti-circle-check" style="font-size:13px;color:var(--success);margin-right:4px;vertical-align:-2px"></i> <span style="color:var(--success); font-weight:600;">LEGITIMATE SPEAKER:</span> Natural high-fidelity voice. Stable harmonic tracks and formant transitions are continuous up to 8kHz with standard variation and natural speech breaths.`;
+        specTextEl.style.borderLeftColor = 'var(--success)';
+      }
+    }
+  }
+
   if(result.chunk_results&&result.chunk_results.length){
     const avgBio=result.chunk_results.reduce((s,c)=>s+c.bio_score,0)/result.chunk_results.length;
     const avgDl=result.chunk_results.reduce((s,c)=>s+c.deep_score,0)/result.chunk_results.length;
-    document.getElementById('bio-score-text').textContent='Score: '+avgBio.toFixed(1)+'%';
-    document.getElementById('dl-score-text').textContent='Score: '+avgDl.toFixed(1)+'%';
+    
+    // Update professional Decision Flow panel fields
+    document.getElementById('bio-matrix-score').textContent=avgBio.toFixed(1)+'%';
+    document.getElementById('dl-matrix-score').textContent=avgDl.toFixed(1)+'%';
+    document.getElementById('fus-matrix-score').textContent=fs+'%';
+    
+    // Update XAI sliders
     document.getElementById('xai-bio').style.width=Math.min(100,avgBio)+'%';
     document.getElementById('xai-bio-pct').textContent=Math.round(avgBio)+'%';
     document.getElementById('xai-dl').style.width=Math.min(100,avgDl)+'%';
@@ -926,24 +1795,26 @@ function showResults(result,clientMs){
     document.getElementById('xai-fus-pct').textContent=fs+'%';
   }
   const tbody=document.getElementById('chunk-tbody');
-  tbody.innerHTML='';
-  if(!result.chunk_results||!result.chunk_results.length){
-    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No chunks processed</td></tr>';
-  }else{
-    result.chunk_results.forEach(c=>{
-      const cv=c.verdict;
-      const color=cv==='FRAUD'?'#EF4444':cv==='SUSPICIOUS'?'#F59E0B':'#22C55E';
-      const vcls=cv==='FRAUD'?'v-fraud':cv==='SUSPICIOUS'?'v-susp':'v-clean';
-      tbody.innerHTML+=`<tr>
-        <td style="font-weight:600;color:var(--text)">#${String(c.index).padStart(2,'0')}</td>
-        <td><div class="score-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${Math.min(100,Math.max(0,c.score))}%;background:${color}"></div></div><span style="color:${color};min-width:36px;text-align:right;font-family:var(--mono)">${c.score.toFixed(1)}%</span></div></td>
-        <td style="color:var(--bank);font-family:var(--mono)">${c.confidence.toFixed(1)}%</td>
-        <td><span class="verdict-tag ${vcls}">${cv}</span></td>
-        <td style="color:var(--text2);font-family:var(--mono);font-size:11px">${c.start}s–${c.end}s</td>
-      </tr>`;
-    });
+  if(tbody){
+    tbody.innerHTML='';
+    if(!result.chunk_results||!result.chunk_results.length){
+      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No chunks processed</td></tr>';
+    }else{
+      result.chunk_results.forEach(c=>{
+        const cv=c.verdict;
+        const color=cv==='FRAUD'?'#EF4444':cv==='SUSPICIOUS'?'#F59E0B':'#22C55E';
+        const vcls=cv==='FRAUD'?'v-fraud':cv==='SUSPICIOUS'?'v-susp':'v-clean';
+        tbody.innerHTML+=`<tr>
+          <td style="font-weight:600;color:var(--text)">#${String(c.index).padStart(2,'0')}</td>
+          <td><div class="score-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${Math.min(100,Math.max(0,c.score))}%;background:${color}"></div></div><span style="color:${color};min-width:36px;text-align:right;font-family:var(--mono)">${c.score.toFixed(1)}%</span></div></td>
+          <td style="color:var(--bank);font-family:var(--mono)">${c.confidence.toFixed(1)}%</td>
+          <td><span class="verdict-tag ${vcls}">${cv}</span></td>
+          <td style="color:var(--text2);font-family:var(--mono);font-size:11px">${c.start}s–${c.end}s</td>
+        </tr>`;
+      });
+    }
   }
-  document.getElementById('tbl-status').textContent='COMPLETE';document.getElementById('tbl-status').style.color='var(--success)';
+  const _tblc=document.getElementById('tbl-status');if(_tblc){_tblc.textContent='COMPLETE';_tblc.style.color='var(--success)';}
   document.getElementById('rpt-id').textContent=result.case_id;
   document.getElementById('rpt-ts').textContent=new Date(result.timestamp).toLocaleString('en-IN',{hour12:false});
   document.getElementById('rpt-risk').textContent=fs+'%';
@@ -956,12 +1827,15 @@ function showResults(result,clientMs){
   document.getElementById('rpt-class').textContent='RESTRICTED · Session: '+result.case_id+(result.using_real_models?'':' · PLACEHOLDER SCORING');
 
   document.getElementById('active-learning-block').style.display='block';
-  document.getElementById('active-learning-label').style.display='flex';
+  const _all2=document.getElementById('active-learning-label');if(_all2)_all2.style.display='flex';
   document.getElementById('feedback-wrong-block').style.display='none';
   document.getElementById('feedback-status').style.display='none';
+  document.getElementById('clear-btn').style.display='flex';
 }
 
 let mediaRec=null,micChunks=[],micStream=null,micRec=false;
+let micAnimId=null,micStartTime=null,micTimerInterval=null;
+
 function startMic(){
   if(micRec){stopMic();return;}
   navigator.mediaDevices.getUserMedia({
@@ -974,7 +1848,17 @@ function startMic(){
     micStream=stream;micChunks=[];micRec=true;setHdrChip('analyzing');
     const btn=document.getElementById('mic-btn');
     btn.innerHTML='<i class="ti ti-square" style="font-size:13px"></i> Stop Recording';btn.style.color='var(--danger)';
+    
+    // Set recording state in the upload zone
+    setUploadZoneState('recording');
+    document.getElementById('clear-btn').style.display = 'none';
+    document.getElementById('start-btn').style.display = 'none';
+
     clearMeta();clearInf();setMetaField('meta-name','MIC_CAPTURE');setMetaField('meta-fmt','PCM/WebM · Live');
+    
+    visualizeMic(stream);
+    startMicTimer();
+
     const mr=new MediaRecorder(stream);mediaRec=mr;
     mr.ondataavailable=e=>micChunks.push(e.data);
     mr.onstop=()=>{
@@ -991,21 +1875,276 @@ function startMic(){
           document.getElementById('wv-stat').textContent='SIGNAL OK';
           document.getElementById('wv-stat').style.color='var(--success)';
           
-          // Convert the decoded AudioBuffer directly to a WAV Blob so librosa doesn't need ffmpeg!
+          // Wire up audio playback for live recording
+          if(currentAudio) { currentAudio.pause(); currentAudio.src=""; }
+          currentAudio = new Audio(URL.createObjectURL(blob));
+          currentAudio.addEventListener('ended', () => {
+            isPlaying=false; document.getElementById('play-icon').className='ti ti-player-play';
+            wavePos=0; document.getElementById('prog-fill').style.width='0%';
+            drawWave(waveData, 0);
+          });
+          currentAudio.addEventListener('timeupdate', (e) => {
+            const audio = e.target;
+            if(audio.duration) {
+              wavePos = audio.currentTime / audio.duration;
+              document.getElementById('prog-fill').style.width=(wavePos*100)+'%';
+              drawWave(waveData,wavePos);
+            }
+          });
+
+          // Convert to Wav File object
           const wavBlob = audioBufferToWav(buf);
           const f = new File([wavBlob], 'MIC_'+Date.now()+'.wav', {type:'audio/wav'});
-          runAnalysis(f);
+          STAGED_FILE = f;
+          
+          setUploadZoneState('loaded', f.name, formatSize(f.size) + ' · PCM/WAV · ' + buf.duration.toFixed(1) + 's');
+          setHdrChip('ready');
+          document.getElementById('clear-btn').style.display='flex';
+          document.getElementById('start-btn').style.display='flex';
         },()=>{document.getElementById('wv-stat').textContent='DECODE ERR';});
       };reader.readAsArrayBuffer(blob);
     };
     mr.start(100);
   }).catch(()=>{setHdrChip('ready');});
 }
+
 function stopMic(){
   if(mediaRec&&micRec){mediaRec.stop();micStream.getTracks().forEach(t=>t.stop());}
   micRec=false;
+  
+  if (micAnimId) {
+    cancelAnimationFrame(micAnimId);
+    micAnimId = null;
+  }
+  stopMicTimer();
+
   const btn=document.getElementById('mic-btn');
   btn.innerHTML='<i class="ti ti-record-mail" style="font-size:13px"></i> Live Record';btn.style.color='';
+}
+
+function visualizeMic(stream) {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaStreamSource(stream);
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  source.connect(analyser);
+
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  const canvas = document.getElementById('mic-visualizer');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = canvas.offsetWidth || 280;
+  canvas.height = canvas.offsetHeight || 60;
+
+  function draw() {
+    if (!micRec) {
+      audioCtx.close();
+      return;
+    }
+    micAnimId = requestAnimationFrame(draw);
+
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.fillStyle = '#FAFCFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Guide center line
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.05)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height/2);
+    ctx.lineTo(canvas.width, canvas.height/2);
+    ctx.stroke();
+
+    // 1. Soft background phase-shifted wave
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+    ctx.beginPath();
+    let x1 = 0;
+    const sliceWidth1 = canvas.width / bufferLength;
+    for (let i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0;
+      const offsetVal = Math.sin(i * 0.15 + Date.now() * 0.01) * 3;
+      const y = (v * canvas.height) / 2 + offsetVal;
+      if (i === 0) ctx.moveTo(x1, y);
+      else ctx.lineTo(x1, y);
+      x1 += sliceWidth1;
+    }
+    ctx.stroke();
+
+    // 2. Main glowing primary wave
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(239, 68, 68, 0.4)';
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, '#EF4444');
+    gradient.addColorStop(0.5, '#F59E0B');
+    gradient.addColorStop(1, '#EF4444');
+    ctx.strokeStyle = gradient;
+    ctx.beginPath();
+
+    let x = 0;
+    const sliceWidth = canvas.width / bufferLength;
+    for (let i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * canvas.height) / 2;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+      x += sliceWidth;
+    }
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+    
+    ctx.shadowBlur = 0; // Reset shadow
+  }
+  draw();
+}
+
+function startMicTimer() {
+  micStartTime = Date.now();
+  const timerEl = document.getElementById('mic-timer');
+  timerEl.textContent = '00:00';
+  micTimerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - micStartTime) / 1000);
+    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const ss = String(elapsed % 60).padStart(2, '0');
+    timerEl.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+
+function stopMicTimer() {
+  if (micTimerInterval) {
+    clearInterval(micTimerInterval);
+    micTimerInterval = null;
+  }
+}
+
+function clearCurrentAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = "";
+    currentAudio = null;
+  }
+  STAGED_FILE = null;
+  LAST_ANALYSIS = null;
+  storedAudioBuffer = null;
+  waveData = [];
+  wavePos = 0;
+  
+  // Reset Timeline & Results
+  setUploadZoneState('default');
+  resetTl();
+  clearMeta();
+  clearInf();
+  setHdrChip('ready');
+  
+  // Reset screen report placeholders
+  const scrAwaiting = document.getElementById('screen-report-awaiting');
+  const scrSummary = document.getElementById('screen-report-summary');
+  if(scrAwaiting) scrAwaiting.style.display = 'block';
+  if(scrSummary) scrSummary.style.display = 'none';
+  
+  // Hide buttons
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('clear-btn').style.display = 'none';
+  
+  // Reset Hero card
+  document.getElementById('hero-status').textContent = 'Awaiting Audio Input';
+  document.getElementById('hero-sub').textContent = 'Upload a recording or start live capture to begin forensic analysis';
+  document.getElementById('hero-score').textContent = '—';
+  document.getElementById('hero-score').className = 'hero-score';
+  document.getElementById('h-caseid').textContent = 'VG-——';
+  document.getElementById('h-class').textContent = '—';
+  document.getElementById('h-class').style.color = '';
+  document.getElementById('h-conf').textContent = '—';
+  document.getElementById('h-dur').textContent = '—';
+  document.getElementById('h-proc').textContent = '—';
+  document.getElementById('hero-rec-text').textContent = 'No active analysis — submit audio to receive a forensic recommendation.';
+  document.getElementById('hdr-case').textContent = 'CASE: VG-——';
+  
+  // Reset risk details
+  const riskNum = document.getElementById('risk-num'); if(riskNum) { riskNum.textContent = '—'; riskNum.className = 'risk-score-num lo'; }
+  const rb = document.getElementById('risk-badge'); if(rb) { rb.className = 'risk-badge-big risk-badge-lo'; rb.textContent = 'AWAITING ANALYSIS'; }
+  const riskFinding = document.getElementById('risk-finding'); if(riskFinding) riskFinding.textContent = 'Submit an audio recording to receive forensic risk classification and fraud probability score.';
+  
+  // Reset threat intel fields
+  ['ti-type','ti-soph','ti-replay','ti-synth','ti-trig'].forEach(id=>{ const e = document.getElementById(id); if(e) e.textContent='—'; });
+  ['rd-evid','rd-vstab','rd-spec','rd-conf'].forEach(id=>{ const e = document.getElementById(id); if(e) e.textContent='—'; });
+  const rdRec = document.getElementById('rd-rec'); if(rdRec) rdRec.textContent = 'Run analysis to generate recommendation.';
+  
+  // Reset fusion engine metrics
+  const fusScore = document.getElementById('fus-matrix-score'); if(fusScore) fusScore.textContent = '—';
+  const bioScore = document.getElementById('bio-matrix-score'); if(bioScore) bioScore.textContent = '—';
+  const dlScore = document.getElementById('dl-matrix-score'); if(dlScore) dlScore.textContent = '—';
+  
+  // Reset XAI sliders
+  document.getElementById('xai-bio').style.width = '40%';
+  document.getElementById('xai-bio-pct').textContent = '40%';
+  document.getElementById('xai-dl').style.width = '60%';
+  document.getElementById('xai-dl-pct').textContent = '60%';
+  document.getElementById('xai-fus').style.width = '0%';
+  document.getElementById('xai-fus-pct').textContent = '—';
+  
+  // Reset spectrogram & waveform canvases
+  drawWave([], 0);
+  drawSpectrogram(null);
+  
+  // Reset playbar & progress
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('wv-dur').textContent = '—';
+  document.getElementById('wv-sr').textContent = '—';
+  document.getElementById('wv-ch').textContent = '—';
+  document.getElementById('spec-dur-label').textContent = '—';
+  
+  // Reset chunk analysis table
+  const tbody = document.getElementById('chunk-tbody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No analysis data — upload audio to begin</td></tr>';
+  const tblStatus = document.getElementById('tbl-status');
+  if (tblStatus) {
+    tblStatus.textContent = 'AWAITING INPUT';
+    tblStatus.style.color = 'var(--text3)';
+  }
+  const sJob = document.getElementById('s-job');
+  if (sJob) {
+    sJob.className = 'pill pill-idle';
+    sJob.textContent = 'IDLE';
+  }
+  
+  // Reset report section
+  document.getElementById('rpt-id').textContent = 'VG-——';
+  document.getElementById('rpt-ts').textContent = '—';
+  document.getElementById('rpt-risk').textContent = '—';
+  document.getElementById('rpt-type').textContent = '—';
+  document.getElementById('rpt-synth').textContent = '—';
+  document.getElementById('rpt-fus').textContent = '—';
+  document.getElementById('rpt-pri').innerHTML = '<span class="trigger-tag trig-pri">—</span>';
+  document.getElementById('rpt-sec').innerHTML = '<span class="trigger-tag trig-sec">—</span>';
+  document.getElementById('rpt-rec').textContent = 'Run analysis to generate recommendation.';
+  document.getElementById('rpt-class').textContent = 'AWAITING ANALYSIS';
+  
+  // Reset feedback & console states
+  if(document.getElementById('active-learning-block')) {
+    document.getElementById('active-learning-block').style.display='none';
+    const _all3=document.getElementById('active-learning-label');if(_all3)_all3.style.display='none';
+    document.getElementById('feedback-wrong-block').style.display='none';
+    document.getElementById('feedback-status').style.display='none';
+  }
+  const invSBadge = document.getElementById('inv-status-badge');
+  if(invSBadge) {
+    invSBadge.className = 'status-chip chip-complete';
+    invSBadge.querySelector('span:nth-child(2)').textContent = 'Awaiting Analysis';
+  }
+  const pausedBanner = document.getElementById('inv-paused-banner'); if(pausedBanner) pausedBanner.style.display = 'none';
+  const videoBanner = document.getElementById('inv-video-banner'); if(videoBanner) videoBanner.style.display = 'none';
+  document.querySelectorAll('#inv-actions-list .action-check').forEach(el => el.classList.remove('checked'));
+}
+
+function newInvestigation() {
+  clearCurrentAudio();
+  switchPage('page-dashboard', document.getElementById('nav-dashboard'));
+  triggerUpload();
 }
 
 function audioBufferToWav(buffer) {
@@ -1045,23 +2184,54 @@ function runDemo(){
   drawSpectrogram(demoRaw,16000,120);
   document.getElementById('spec-dur-label').textContent='6.2s';
   const blob=genDemoWav();
+  
+  // Wire up audio playback for demo
+  if(currentAudio) { currentAudio.pause(); currentAudio.src=""; }
+  currentAudio = new Audio(URL.createObjectURL(blob));
+  currentAudio.addEventListener('ended', () => {
+    isPlaying=false; document.getElementById('play-icon').className='ti ti-player-play';
+    wavePos=0; document.getElementById('prog-fill').style.width='0%';
+    drawWave(waveData, 0);
+  });
+  currentAudio.addEventListener('timeupdate', (e) => {
+    const audio = e.target;
+    if(audio.duration) {
+      wavePos = audio.currentTime / audio.duration;
+      document.getElementById('prog-fill').style.width=(wavePos*100)+'%';
+      drawWave(waveData,wavePos);
+    }
+  });
+
   const f=new File([blob],'DEMO_SYNTHETIC_TONE_001.wav',{type:'audio/wav'});
+  STAGED_FILE = f;
+  
+  setUploadZoneState('loaded', f.name, formatSize(f.size) + ' · 16kHz · 6.2s · PCM/WAV');
+  document.getElementById('clear-btn').style.display='flex';
+  
   runAnalysis(f);
 }
 
-async function downloadReport(){
+function downloadReport(){
   if(!LAST_ANALYSIS){alert('Run an analysis first to generate a report.');return;}
-  try{
-    const r=await fetch(BACKEND_URL+'/generate-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({case_id:LAST_ANALYSIS.case_id})});
-    if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}
-    const blob=await r.blob();const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download='VoiceGuard_Report_'+LAST_ANALYSIS.case_id+'.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-  }catch(err){alert('Report export failed: '+(err.message||'Unknown error')+'\n\nIs the backend running at '+BACKEND_URL+'?');}
+  window.print();
 }
 
 async function loadSystemStatus(){
-  try{const s=await apiGet('/model-status');document.getElementById('s-mdl').className='pill pill-on';document.getElementById('s-mdl').textContent=s.model_loaded?'LOADED':'PLACEHOLDER';document.getElementById('s-inf').textContent=s.inference_ready?'READY':'NOT READY';document.getElementById('s-back').className='pill pill-conn';}catch(e){document.getElementById('s-back').className='pill pill-idle';document.getElementById('s-back').textContent='OFFLINE';}
-  try{const h=await apiGet('/health');document.getElementById('s-api').textContent=h.backend_api==='CONNECTED'?'ONLINE':'OFFLINE';document.getElementById('s-db').textContent=h.database==='CONNECTED'?'CONNECTED':'OFFLINE';}catch(e){document.getElementById('s-api').className='pill pill-idle';document.getElementById('s-api').textContent='OFFLINE';}
+  try{
+    const s=await apiGet('/model-status');
+    const sm=document.getElementById('s-mdl');if(sm){sm.className='pill pill-on';sm.textContent=s.model_loaded?'LOADED':'PLACEHOLDER';}
+    const si=document.getElementById('s-inf');if(si){si.textContent=s.inference_ready?'READY':'NOT READY';}
+    const sb=document.getElementById('s-back');if(sb){sb.className='pill pill-conn';sb.textContent='CONNECTED';}
+  }catch(e){
+    const sb=document.getElementById('s-back');if(sb){sb.className='pill pill-idle';sb.textContent='OFFLINE';}
+  }
+  try{
+    const h=await apiGet('/health');
+    const sa=document.getElementById('s-api');if(sa){sa.textContent=h.backend_api==='CONNECTED'?'ONLINE':'OFFLINE';}
+    const sd=document.getElementById('s-db');if(sd){sd.textContent=h.database==='CONNECTED'?'CONNECTED':'OFFLINE';}
+  }catch(e){
+    const sa=document.getElementById('s-api');if(sa){sa.className='pill pill-idle';sa.textContent='OFFLINE';}
+  }
 }
 loadSystemStatus();setInterval(loadSystemStatus,15000);
 
@@ -1110,7 +2280,7 @@ async function retrainModel(){
 }
 
 function switchPage(pageId, navItem) {
-  const pages = ['page-dashboard', 'page-intel', 'page-reports'];
+  const pages = ['page-dashboard', 'page-intel', 'page-stats', 'page-kb', 'page-audit', 'page-investigator'];
   pages.forEach(p => {
     const el = document.getElementById(p);
     if(el) el.style.display = (p === pageId) ? 'block' : 'none';
@@ -1137,4 +2307,640 @@ function switchPage(pageId, navItem) {
     }, 50);
   }
 }
+
+// System Clock
+function updateClock() {
+  const el = document.getElementById('hdr-clock');
+  if (el) {
+    el.textContent = new Date().toLocaleTimeString('en-IN', { hour12: false });
+  }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Popover click event handlers
+document.addEventListener('click', (e) => {
+  const notifBtn = document.querySelector('.hdr-notif');
+  const notifDropdown = document.getElementById('notif-dropdown');
+  const profileBtn = document.querySelector('.hdr-avatar');
+  const profileDropdown = document.getElementById('profile-dropdown');
+  const diagBtn = document.getElementById('hdr-chip');
+  const diagDropdown = document.getElementById('diagnostics-dropdown');
+
+  // Toggle notif
+  if (notifBtn && notifBtn.contains(e.target)) {
+    notifDropdown.style.display = notifDropdown.style.display === 'none' ? 'block' : 'none';
+    if (profileDropdown) profileDropdown.style.display = 'none';
+    if (diagDropdown) diagDropdown.style.display = 'none';
+  }
+  // Toggle profile
+  else if (profileBtn && profileBtn.contains(e.target)) {
+    profileDropdown.style.display = profileDropdown.style.display === 'none' ? 'block' : 'none';
+    if (notifDropdown) notifDropdown.style.display = 'none';
+    if (diagDropdown) diagDropdown.style.display = 'none';
+  }
+  // Toggle diag
+  else if (diagBtn && diagBtn.contains(e.target)) {
+    diagDropdown.style.display = diagDropdown.style.display === 'none' ? 'block' : 'none';
+    if (notifDropdown) notifDropdown.style.display = 'none';
+    if (profileDropdown) profileDropdown.style.display = 'none';
+  }
+  // Click outside to close
+  else {
+    // Make sure we didn't click inside any of the dropdowns
+    if (notifDropdown && !notifDropdown.contains(e.target)) notifDropdown.style.display = 'none';
+    if (profileDropdown && !profileDropdown.contains(e.target)) profileDropdown.style.display = 'none';
+    if (diagDropdown && !diagDropdown.contains(e.target)) diagDropdown.style.display = 'none';
+  }
+});
+
+// Initialize default view
+switchIntakeTab('file');
+
+// ==================== NEW WORKFLOW FEATURES ====================
+
+// ========== CHAT KNOWLEDGE BASE ==========
+const CHAT_KNOWLEDGE = {
+  'replay': 'A <b>replay attack</b> occurs when a fraudster records a genuine customer\'s voice and replays it to fool voice authentication. VoiceGuard detects this via temporal inconsistencies, spectral smoothness anomalies, and re-recording artifacts.',
+  'clone': 'An <b>AI voice clone</b> is generated using deep learning TTS/VC models trained on a few seconds of real audio. The cloned voice mimics the target but lacks natural micro-variations in jitter, shimmer, and pitch that VoiceGuard monitors.',
+  'deepfake': 'A <b>deepfake speech</b> attack uses generative AI (GANs or diffusion models) to produce highly realistic synthetic audio. These are harder to detect and show up as abnormal spectral features and phase discontinuities.',
+  'confidence': 'The <b>confidence score</b> reflects the model\'s certainty. 95%+ = very high certainty. 70–94% = moderate, secondary verification recommended. Below 70% = uncertain, flag for manual review.',
+  'voiceguard': 'VoiceGuard uses a <b>Fusion Architecture</b>: (1) Biological Engine — 349 features including jitter, shimmer, HNR, pitch. (2) Deep Learning Engine — Wav2Vec2 extracts 2048 embeddings. Both feed a Fusion Core for final fraud probability.',
+  'jitter': '<b>Jitter</b> is cycle-to-cycle frequency variation in vocal folds. <b>Shimmer</b> is amplitude variation between pulses. <b>HNR</b> (Harmonics-to-Noise Ratio) measures harmonic purity. Synthetic voices show abnormal values in all three.',
+  'sop': '<b>RBI SOP for Voice Fraud:</b><br>1. Verify customer identity via OTP/Video KYC<br>2. Freeze suspicious transactions<br>3. Escalate to Fraud Investigation Cell<br>4. Preserve audio evidence per CERT-In guidelines<br>5. Notify the customer<br>6. File regulatory report if value exceeds ₹1 lakh<br>7. Submit case for model retraining',
+};
+
+// ========== AGENT NOTES (Reports page) ==========
+function appendNote(text) {
+  const ta = document.getElementById('agent-notes');
+  if(ta) { ta.value = ta.value ? ta.value + '\n' + text : text; ta.focus(); }
+}
+function saveNotes() {
+  const saved = document.getElementById('notes-saved');
+  if(saved) { saved.style.display = 'flex'; saved.style.alignItems = 'center'; saved.style.gap = '4px'; setTimeout(()=>{ saved.style.display='none'; }, 2000); }
+  addAuditEntry('NOTES SAVED', 'Notes updated');
+}
+
+// ========== AGENT NOTES (Investigator page) ==========
+function appendInvNote(text) {
+  const ta = document.getElementById('inv-notes');
+  if(ta) { ta.value = ta.value ? ta.value + '\n' + text : text; ta.focus(); }
+}
+function saveInvNotes() {
+  const saved = document.getElementById('inv-notes-saved');
+  if(saved) { saved.style.display = 'flex'; saved.style.alignItems = 'center'; saved.style.gap = '4px'; setTimeout(()=>{ saved.style.display='none'; }, 2000); }
+  addAuditEntry('NOTES SAVED', 'Investigator notes updated');
+}
+
+// ========== KNOWLEDGE BASE TOGGLE ==========
+function toggleKb(el) { if(el) el.classList.toggle('open'); }
+
+// ========== CONFIDENCE METER ==========
+function updateConfidenceMeter(fraudScore, replayPct, confidence) {
+  const cmAi = document.getElementById('cm-ai');
+  const cmReplay = document.getElementById('cm-replay');
+  const cmOverall = document.getElementById('cm-overall');
+  if(cmAi) { cmAi.style.width = Math.min(100,fraudScore)+'%'; const pct = document.getElementById('cm-ai-pct'); if(pct) pct.textContent = fraudScore+'%'; }
+  if(cmReplay) { cmReplay.style.width = Math.min(100,replayPct)+'%'; const pct = document.getElementById('cm-replay-pct'); if(pct) pct.textContent = replayPct+'%'; }
+  if(cmOverall) { cmOverall.style.width = Math.min(100,confidence)+'%'; const pct = document.getElementById('cm-overall-pct'); if(pct) pct.textContent = confidence+'%'; }
+}
+
+// ========== ATTACK TYPE BANNER ==========
+function updateAttackBanner(threatType) {
+  const banner = document.getElementById('attack-banner');
+  const icon = document.getElementById('attack-icon');
+  const title = document.getElementById('attack-title');
+  const sub = document.getElementById('attack-sub');
+  if(!banner) return;
+  let cls='atb-unknown', ic='ti-question-mark', t='Unknown Voice', s='Threat type could not be classified.';
+  if(threatType) {
+    const tt = threatType.toUpperCase();
+    if(tt.includes('AI') || tt.includes('CLONE') || tt.includes('SYNTH')) {
+      cls='atb-ai'; ic='ti-robot'; t='AI Voice Clone Detected'; s='Synthetic TTS or voice conversion model detected. High biological feature deviation.';
+    } else if(tt.includes('REPLAY')) {
+      cls='atb-replay'; ic='ti-repeat'; t='Replay Attack Detected'; s='Pre-recorded voice segment identified. Temporal and spectral replay artifacts present.';
+    } else if(tt.includes('DEEP') || tt.includes('FAKE')) {
+      cls='atb-deepfake'; ic='ti-layers-intersect'; t='Deepfake Speech Detected'; s='Generative AI audio detected. Advanced GAN or diffusion model signatures present.';
+    } else if(tt.includes('HUMAN') || tt.includes('REAL')) {
+      cls='atb-human'; ic='ti-user-check'; t='Human Voice — Authentic'; s='No synthetic artifacts detected. Biological features within normal range.';
+    }
+  }
+  banner.className = 'attack-type-banner ' + cls;
+  icon.className = 'ti ' + ic;
+  title.textContent = t;
+  sub.textContent = s;
+}
+
+// ========== SIMILAR CASES ==========
+const FAKE_CASES = [
+  {id:'VG-A2F91B',lang:'Hindi',attack:'Replay Attack',risk:94,outcome:'Transaction Blocked',sim:97},
+  {id:'VG-C8D34E',lang:'Bengali',attack:'AI Voice Clone',risk:91,outcome:'Escalated to Cyber Cell',sim:88},
+  {id:'VG-F1290A',lang:'Hindi',attack:'AI Voice Clone',risk:89,outcome:'Video KYC Requested',sim:84},
+  {id:'VG-D5E72C',lang:'English',attack:'Replay Attack',risk:87,outcome:'Transaction Blocked',sim:79},
+  {id:'VG-B3391F',lang:'Tamil',attack:'AI Voice Clone',risk:82,outcome:'Customer Notified',sim:72},
+];
+function showSimilarCases(verdict) {
+  const wrap = document.getElementById('similar-cases-wrap');
+  if(!wrap) return;
+  if(verdict === 'REAL' || verdict === 'CLEAN') {
+    wrap.innerHTML = '<div style="font-size:11px;color:var(--success);text-align:center;padding:16px 0;"><i class="ti ti-check-circle" style="font-size:18px;display:block;margin-bottom:4px"></i>No similar fraud cases — audio appears authentic.</div>';
+    return;
+  }
+  const found = document.createElement('div');
+  found.innerHTML = `<div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:600"><i class="ti ti-files" style="font-size:13px;color:var(--bank);margin-right:4px"></i>Found ${FAKE_CASES.length} similar cases</div>`;
+  FAKE_CASES.forEach((c, idx) => {
+    const isTop = idx === 0;
+    found.innerHTML += `
+    <div class="case-card"${isTop?' style="border-color:var(--bank);background:#F0F7FF"':''}>
+      <div class="case-hdr"><span class="case-id">${c.id}</span><span class="case-badge blocked">Transaction Blocked</span></div>
+      <div class="case-row"><span><i class="ti ti-language"></i>${c.lang}</span><span><i class="ti ti-bug"></i>${c.attack}</span><span><i class="ti ti-shield-exclamation" style="color:var(--danger)"></i><span style="color:var(--danger);font-weight:600">${c.risk}%</span></span></div>
+      <div class="case-sim">Similarity: ${c.sim}%</div>
+      <div class="case-sim-bar"><div class="case-sim-fill" style="width:${c.sim}%"></div></div>
+    </div>`;
+  });
+  wrap.innerHTML = '';
+  wrap.appendChild(found);
+}
+
+// ========== AUDIT LOGS ==========
+let auditLogs = [];
+function addAuditEntry(action, decision, caseId) {
+  const now = new Date().toLocaleTimeString('en-IN',{hour12:false});
+  const cid = caseId || (LAST_ANALYSIS ? LAST_ANALYSIS.case_id : 'VG-——');
+  auditLogs.unshift({case: cid, time: now, officer: 'FK', action, decision, status: 'Logged'});
+  renderAuditLog();
+  const badge = document.getElementById('audit-count');
+  if(badge) badge.textContent = auditLogs.length;
+  const logCnt = document.getElementById('audit-log-count');
+  if(logCnt) logCnt.textContent = auditLogs.length + ' entries';
+}
+function renderAuditLog() {
+  const tbody = document.getElementById('audit-tbody');
+  if(!tbody) return;
+  if(!auditLogs.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No audit entries yet.</td></tr>'; return; }
+  tbody.innerHTML = auditLogs.map(e => {
+    let acls = 'a-analysis';
+    if(e.action.includes('REPORT') || e.action.includes('EXPORT')) acls = 'a-report';
+    else if(e.action.includes('FEEDBACK') || e.action.includes('NOTES')) acls = 'a-feedback';
+    else if(e.action.includes('EMAIL') || e.action.includes('CSV')) acls = 'a-export';
+    return `<tr>
+      <td style="font-family:var(--mono);color:var(--bank);font-weight:600">${e.case}</td>
+      <td style="font-family:var(--mono);color:var(--text3)">${e.time}</td>
+      <td style="color:var(--text2)">${e.officer}</td>
+      <td><span class="audit-action ${acls}">${e.action}</span></td>
+      <td style="color:var(--text2)">${e.decision}</td>
+      <td style="color:var(--success);font-size:10px;font-weight:600">${e.status}</td>
+    </tr>`;
+  }).join('');
+}
+function clearAuditLogs() {
+  auditLogs = [];
+  renderAuditLog();
+  const badge = document.getElementById('audit-count');
+  if(badge) badge.textContent = '0';
+  const logCnt = document.getElementById('audit-log-count');
+  if(logCnt) logCnt.textContent = '0 entries';
+}
+
+// ========== EXPORT HELPERS ==========
+function exportExcel() {
+  if(!LAST_ANALYSIS){alert('Run an analysis first.');return;}
+  const csv = `Case ID,Timestamp,Risk Score,Confidence,Verdict,Threat Type,Replay,Language,Duration\n${LAST_ANALYSIS.case_id},${LAST_ANALYSIS.timestamp},${LAST_ANALYSIS.fraud_score}%,${LAST_ANALYSIS.confidence}%,${LAST_ANALYSIS.verdict},${LAST_ANALYSIS.threat_intel.threat_type},${LAST_ANALYSIS.threat_intel.replay_indicators},${LAST_ANALYSIS.metadata?.language||'Detected'},${LAST_ANALYSIS.performance.audio_duration_sec}s`;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='VoiceGuard_'+LAST_ANALYSIS.case_id+'.csv'; document.body.appendChild(a); a.click(); a.remove();
+  addAuditEntry('EXPORT CSV', 'Excel export');
+}
+function exportSummary() {
+  if(!LAST_ANALYSIS){alert('Run an analysis first.');return;}
+  const r = LAST_ANALYSIS;
+  const txt = `VoiceGuard Investigation Summary\n${'='.repeat(40)}\nCase ID: ${r.case_id}\nDate: ${new Date(r.timestamp).toLocaleString('en-IN')}\nRisk Score: ${r.fraud_score}%\nConfidence: ${r.confidence}%\nVerdict: ${r.verdict}\nThreat: ${r.threat_intel.threat_type}\nRecommendation: ${r.recommendation}\nAnalyst Notes: ${document.getElementById('agent-notes')?.value||'None'}\n`;
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Summary_'+r.case_id+'.txt'; document.body.appendChild(a); a.click(); a.remove();
+  addAuditEntry('EXPORT SUMMARY', 'Text summary');
+}
+function exportEmail() {
+  if(!LAST_ANALYSIS){alert('Run an analysis first.');return;}
+  const r = LAST_ANALYSIS;
+  const body = encodeURIComponent(`Fraud Investigation Alert - ${r.case_id}\n\nCase: ${r.case_id}\nRisk Score: ${r.fraud_score}%\nVerdict: ${r.verdict}\nThreat Type: ${r.threat_intel.threat_type}\nConfidence: ${r.confidence}%\n\nRecommended Action: ${r.recommendation}\n\n-- VoiceGuard Fraud Intelligence Division`);
+  window.open(`mailto:fraudteam@ucobank.com?subject=VoiceGuard Alert: ${r.case_id} - ${r.verdict}&body=${body}`);
+  addAuditEntry('EMAIL DRAFTED', 'Email report');
+}
+
+// ========== AI CHAT (Reports page) ==========
+async function sendChat(quickText) {
+  const input = document.getElementById('chat-input');
+  const msgs = document.getElementById('chat-msgs');
+  const typing = document.getElementById('chat-typing');
+  if(!input || !msgs) return;
+  const text = (quickText || input.value || '').trim();
+  if(!text) return;
+  input.value = '';
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble bubble-user';
+  userBubble.textContent = text;
+  msgs.appendChild(userBubble);
+  msgs.scrollTop = msgs.scrollHeight;
+  if(typing) { typing.style.display = 'block'; msgs.scrollTop = msgs.scrollHeight; }
+
+  // Fallback to local knowledge (no external API call needed)
+  setTimeout(() => {
+    if(typing) typing.style.display = 'none';
+    const aiBubble = document.createElement('div');
+    aiBubble.className = 'chat-bubble bubble-ai';
+    const tl = text.toLowerCase();
+    let reply = 'I can assist with fraud investigation queries. Try one of the quick questions above, or ask about replay attacks, AI cloning, confidence scores, or RBI SOP.';
+    if(tl.includes('replay')) reply = CHAT_KNOWLEDGE.replay;
+    else if(tl.includes('clone') || tl.includes('ai voice') || tl.includes('synthetic')) reply = CHAT_KNOWLEDGE.clone;
+    else if(tl.includes('deepfake')) reply = CHAT_KNOWLEDGE.deepfake;
+    else if(tl.includes('confidence') || tl.includes('score')) reply = CHAT_KNOWLEDGE.confidence;
+    else if(tl.includes('jitter') || tl.includes('shimmer') || tl.includes('hnr')) reply = CHAT_KNOWLEDGE.jitter;
+    else if(tl.includes('voiceguard') || tl.includes('work') || tl.includes('how') || tl.includes('feature')) reply = CHAT_KNOWLEDGE.voiceguard;
+    else if(tl.includes('sop') || tl.includes('rbi') || tl.includes('procedure')) reply = CHAT_KNOWLEDGE.sop;
+    else if(tl.includes('action') || tl.includes('recommend') || tl.includes('next')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Recommended Actions for ${LAST_ANALYSIS.case_id}:</b><br>1. ${LAST_ANALYSIS.recommendation}<br>2. Verify customer identity via OTP<br>3. Pause any pending transactions<br>4. Escalate to Fraud Investigation Cell<br>5. File audit trail and notify customer.`;
+      } else reply = 'Run an analysis first to get case-specific recommendations.';
+    } else if(tl.includes('flag') || tl.includes('why') || tl.includes('reason')) {
+      if(LAST_ANALYSIS) {
+        reply = `Case <b>${LAST_ANALYSIS.case_id}</b> was flagged because: Risk score is <b>${LAST_ANALYSIS.fraud_score}%</b>. Threat classified as <b>${LAST_ANALYSIS.threat_intel?.threat_type}</b>. Primary trigger: <b>${LAST_ANALYSIS.primary_trigger}</b>. Fusion confidence: ${LAST_ANALYSIS.confidence}%.`;
+      } else reply = 'Upload an audio file and run analysis first to explain why a call was flagged.';
+    } else if(tl.includes('summar')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Investigation Summary — ${LAST_ANALYSIS.case_id}</b><br>Verdict: <b>${LAST_ANALYSIS.verdict}</b> | Risk: <b>${LAST_ANALYSIS.fraud_score}%</b> | Confidence: ${LAST_ANALYSIS.confidence}%<br>Threat: ${LAST_ANALYSIS.threat_intel?.threat_type} | Duration: ${LAST_ANALYSIS.performance?.audio_duration_sec}s<br>Action: ${LAST_ANALYSIS.recommendation}`;
+      } else reply = 'Run an analysis first to generate a summary.';
+    } else if(tl.includes('report')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Forensic Report — ${LAST_ANALYSIS.case_id}</b><br>Verdict: ${LAST_ANALYSIS.verdict}<br>Risk: ${LAST_ANALYSIS.fraud_score}% | Confidence: ${LAST_ANALYSIS.confidence}%<br>Threat: ${LAST_ANALYSIS.threat_intel?.threat_type}<br>Recommendation: ${LAST_ANALYSIS.recommendation}<br><br>Use the Export buttons to download full PDF or CSV.`;
+      } else reply = 'Run an analysis to generate a report.';
+    }
+    aiBubble.innerHTML = '<b>Assistant:</b> ' + reply;
+    msgs.appendChild(aiBubble);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 600 + Math.random() * 800);
+
+  addAuditEntry('CHAT QUERY', text.slice(0,30)+'...');
+}
+
+// ========== AI CHAT (Investigator page) ==========
+async function invChat(quickText) {
+  const input = document.getElementById('inv-chat-input');
+  const msgs = document.getElementById('inv-chat-msgs');
+  const typing = document.getElementById('inv-chat-typing');
+  if(!input || !msgs) return;
+  const text = (quickText || input.value || '').trim();
+  if(!text) return;
+  input.value = '';
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble bubble-user';
+  userBubble.textContent = text;
+  msgs.appendChild(userBubble);
+  msgs.scrollTop = msgs.scrollHeight;
+  if(typing) { typing.style.display = 'block'; msgs.scrollTop = msgs.scrollHeight; }
+
+  setTimeout(() => {
+    if(typing) typing.style.display = 'none';
+    const aiBubble = document.createElement('div');
+    aiBubble.className = 'chat-bubble bubble-ai';
+    const tl = text.toLowerCase();
+    let reply = 'I can assist with specialized forensics queries. Try one of the quick options above.';
+    if(tl.includes('fake') || tl.includes('why')) {
+      if(LAST_ANALYSIS) {
+        reply = `Case <b>${LAST_ANALYSIS.case_id}</b> exhibits a risk score of <b>${LAST_ANALYSIS.fraud_score}%</b> with classified threat <b>${LAST_ANALYSIS.threat_intel?.threat_type}</b>. The primary trigger was identified as <b>${LAST_ANALYSIS.primary_trigger}</b>. Confidence: ${LAST_ANALYSIS.confidence}%.`;
+      } else reply = 'Please upload a recording and run analysis first.';
+    } else if(tl.includes('evidence')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Case Evidence Summary:</b><br>- AI Voice probability: ${LAST_ANALYSIS.fraud_score}%<br>- Fusion Confidence: ${LAST_ANALYSIS.confidence}%<br>- Verdict: ${LAST_ANALYSIS.verdict}<br>- Primary Trigger: ${LAST_ANALYSIS.primary_trigger}<br>- Recommendation: ${LAST_ANALYSIS.recommendation}`;
+      } else reply = 'Awaiting analysis input for evidence extraction.';
+    } else if(tl.includes('replay')) reply = CHAT_KNOWLEDGE.replay;
+    else if(tl.includes('clone') || tl.includes('synthetic') || tl.includes('compare') || tl.includes('voice')) reply = CHAT_KNOWLEDGE.clone;
+    else if(tl.includes('breakdown') || tl.includes('feature')) reply = CHAT_KNOWLEDGE.voiceguard;
+    else if(tl.includes('risk') || tl.includes('score') || tl.includes('explain')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Risk Score Breakdown:</b><br>Overall Risk: <b>${LAST_ANALYSIS.fraud_score}%</b><br>Contributing factors: Biological feature deviation, spectral artifacts, deep learning embeddings.<br>Primary trigger: <b>${LAST_ANALYSIS.primary_trigger}</b><br>Threat classification: ${LAST_ANALYSIS.threat_intel?.threat_type}`;
+      } else reply = CHAT_KNOWLEDGE.confidence;
+    } else if(tl.includes('action') || tl.includes('next')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Next Action Checklist for ${LAST_ANALYSIS.case_id}:</b><br>1. ${LAST_ANALYSIS.recommendation}<br>2. Verify caller identity using Video KYC.<br>3. Block transaction if risk > 80%.<br>4. Escalate to Fraud Investigation Cell.`;
+      } else reply = 'Run an analysis to generate next-step recommendations.';
+    } else if(tl.includes('summar')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Forensics Summary:</b> Case ${LAST_ANALYSIS.case_id} has verdict <b>${LAST_ANALYSIS.verdict}</b> with fraud risk ${LAST_ANALYSIS.fraud_score}%. Processing took ${LAST_ANALYSIS.performance?.processing_time_ms || LAST_ANALYSIS.performance?.inference_time_ms || 210}ms.`;
+      } else reply = 'Run an analysis to summarize.';
+    } else if(tl.includes('report') || tl.includes('generate')) {
+      if(LAST_ANALYSIS) {
+        reply = `<b>Investigation Report — ${LAST_ANALYSIS.case_id}</b><br>Verdict: ${LAST_ANALYSIS.verdict} | Risk: ${LAST_ANALYSIS.fraud_score}%<br>Confidence: ${LAST_ANALYSIS.confidence}% | Threat: ${LAST_ANALYSIS.threat_intel?.threat_type}<br>Recommendation: ${LAST_ANALYSIS.recommendation}<br><br>Use the Report Generator panel to export full PDF.`;
+      } else reply = 'Run an analysis to generate a report.';
+    } else if(tl.includes('similar') || tl.includes('fraud') || tl.includes('cases')) {
+      reply = 'Similar cases are displayed in the Similar Fraud Cases table on this page. Top matches include VG-A4F2C1 (94% similarity, Replay) and VG-B7E3D9 (88% similarity, AI Voice Clone).';
+    }
+    aiBubble.innerHTML = '<b>Investigator:</b> ' + reply;
+    msgs.appendChild(aiBubble);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 600 + Math.random() * 800);
+
+}
+
+// ========== TOGGLE ACTION CHECKBOX & CHECKLIST HANDLERS ==========
+function toggleAction(el) {
+  // kept as fallback
+  const check = el.querySelector('.action-check');
+  if(check) {
+    check.classList.toggle('checked');
+    const label = el.querySelector('strong')?.textContent || 'Action';
+    addAuditEntry('ACTION ' + (check.classList.contains('checked') ? 'COMPLETED' : 'UNCHECKED'), label);
+  }
+}
+
+function handleChecklistClick(type) {
+  const row = document.getElementById('chk-row-' + type);
+  if(!row) return;
+  const check = row.querySelector('.action-check');
+  if(!check) return;
+  
+  if (type === 'otp') {
+    // If already checked, uncheck
+    if (check.classList.contains('checked')) {
+      check.classList.remove('checked');
+      document.getElementById('chk-otp-popup').style.display = 'none';
+      addAuditEntry('ACTION UNCHECKED', 'OTP Verification');
+      return;
+    }
+    // Show simulation prompt
+    const popup = document.getElementById('chk-otp-popup');
+    if (popup) popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+    return;
+  }
+  
+  // For other types, toggle check state
+  check.classList.toggle('checked');
+  const isChecked = check.classList.contains('checked');
+  
+  if (type === 'pause') {
+    const banner = document.getElementById('inv-paused-banner');
+    const badge = document.getElementById('inv-status-badge');
+    if (isChecked) {
+      if (banner) banner.style.display = 'flex';
+      if (badge) {
+        badge.className = 'status-chip chip-risk';
+        badge.querySelector('span:nth-child(2)').textContent = 'HELD / FROZEN';
+      }
+      addAuditEntry('ACTION COMPLETED', 'Pause Transaction (HELD)');
+    } else {
+      if (banner) banner.style.display = 'none';
+      if (badge) {
+        badge.className = 'status-chip chip-complete';
+        badge.querySelector('span:nth-child(2)').textContent = LAST_ANALYSIS ? (LAST_ANALYSIS.verdict_label || LAST_ANALYSIS.verdict) : 'Awaiting Analysis';
+      }
+      addAuditEntry('ACTION UNCHECKED', 'Pause Transaction');
+    }
+  } else if (type === 'video') {
+    const banner = document.getElementById('inv-video-banner');
+    if (banner) banner.style.display = isChecked ? 'block' : 'none';
+    addAuditEntry(isChecked ? 'ACTION COMPLETED' : 'ACTION UNCHECKED', 'Video KYC Link Generated');
+  } else if (type === 'escalate') {
+    const badge = document.getElementById('inv-status-badge');
+    if (isChecked) {
+      if (badge) {
+        badge.className = 'status-chip chip-suspect';
+        badge.querySelector('span:nth-child(2)').textContent = 'ESCALATED';
+      }
+      addAuditEntry('ACTION COMPLETED', 'Escalate to Central Security');
+    } else {
+      if (badge) {
+        badge.className = 'status-chip chip-complete';
+        badge.querySelector('span:nth-child(2)').textContent = LAST_ANALYSIS ? (LAST_ANALYSIS.verdict_label || LAST_ANALYSIS.verdict) : 'Awaiting Analysis';
+      }
+      addAuditEntry('ACTION UNCHECKED', 'Escalate to Central Security');
+    }
+  }
+}
+
+function verifyChecklistOtp() {
+  const val = document.getElementById('chk-otp-input').value.trim();
+  const status = document.getElementById('chk-otp-status');
+  if (val === '123456') {
+    status.style.color = 'var(--success)';
+    status.textContent = '✅ Verification Success - Amit Sharma Identity Confirmed';
+    const row = document.getElementById('chk-row-otp');
+    if (row) {
+      const check = row.querySelector('.action-check');
+      if (check) check.classList.add('checked');
+    }
+    setTimeout(() => {
+      document.getElementById('chk-otp-popup').style.display = 'none';
+      document.getElementById('chk-otp-input').value = '';
+      status.textContent = '';
+    }, 2000);
+    addAuditEntry('ACTION COMPLETED', 'OTP Verification Success');
+  } else {
+    status.style.color = 'var(--danger)';
+    status.textContent = '❌ Invalid Code - Try Again (Hint: 123456)';
+    addAuditEntry('ACTION FAILED', 'OTP Verification Failed');
+  }
+}
+
+// ========== HOOK INTO showResults ==========
+const _origShowResults = showResults;
+showResults = function(result, clientMs) {
+  _origShowResults(result, clientMs);
+
+  // Update screen-only summary card
+  const scrCaseId = document.getElementById('scr-case-id');
+  const scrRiskScore = document.getElementById('scr-risk-score');
+  const scrThreatType = document.getElementById('scr-threat-type');
+  const scrVerdictBadge = document.getElementById('scr-verdict-badge');
+  const scrAwaiting = document.getElementById('screen-report-awaiting');
+  const scrSummary = document.getElementById('screen-report-summary');
+
+  if(scrCaseId) scrCaseId.textContent = result.case_id;
+  if(scrRiskScore) {
+    scrRiskScore.textContent = result.fraud_score + '%';
+    scrRiskScore.className = 'rpt-val' + (result.verdict === 'FRAUD' ? ' danger' : '');
+  }
+  if(scrThreatType) scrThreatType.textContent = result.threat_intel?.threat_type || 'None';
+  if(scrVerdictBadge) {
+    scrVerdictBadge.textContent = result.verdict_label || result.verdict;
+    scrVerdictBadge.className = 'status-chip ' + (result.verdict === 'FRAUD' ? 'chip-risk' : result.verdict === 'SUSPICIOUS' ? 'chip-suspect' : 'chip-complete');
+  }
+  if(scrAwaiting) scrAwaiting.style.display = 'none';
+  if(scrSummary) scrSummary.style.display = 'block';
+
+  // Confidence meter
+  const replayPct = result.threat_intel?.replay_indicators?.includes('DETECTED') ? Math.round(result.fraud_score * 0.95) : Math.round(result.fraud_score * 0.3);
+  updateConfidenceMeter(result.fraud_score, replayPct, result.confidence);
+  // Attack type banner
+  updateAttackBanner(result.threat_intel?.threat_type);
+  // Similar cases
+  showSimilarCases(result.verdict);
+  // Audit log
+  addAuditEntry('ANALYSIS RUN', result.verdict + ' · ' + result.fraud_score + '%', result.case_id);
+  // Stats update
+  const stTotal = document.getElementById('st-total');
+  if(stTotal) stTotal.textContent = (1200 + auditLogs.length).toLocaleString('en-IN');
+
+  // ===== Populate Investigation Console =====
+  const fs = result.fraud_score, fc = result.confidence, ver = result.verdict;
+  const isHigh = ver === 'FRAUD', isMed = ver === 'SUSPICIOUS';
+
+  // Hero section
+  const invScore = document.getElementById('inv-risk-score');
+  if(invScore) {
+    invScore.textContent = fs + '%';
+    invScore.style.color = isHigh ? 'var(--danger)' : isMed ? 'var(--warn)' : 'var(--success)';
+  }
+  const invStatus = document.getElementById('inv-hero-status');
+  if(invStatus) invStatus.textContent = result.verdict_label || ver;
+  const invSub = document.getElementById('inv-hero-sub');
+  if(invSub) invSub.textContent = 'Case ' + result.case_id + ' · ' + new Date(result.timestamp).toLocaleString('en-IN', {hour12:false});
+  const invBadge = document.getElementById('inv-case-badge');
+  if(invBadge) invBadge.textContent = result.case_id;
+  const invTime = document.getElementById('inv-current-time');
+  if(invTime) invTime.textContent = new Date(result.timestamp).toLocaleTimeString('en-IN', {hour12:false});
+
+  // Status badge
+  const invSBadge = document.getElementById('inv-status-badge');
+  if(invSBadge) {
+    invSBadge.className = 'status-chip ' + (isHigh ? 'chip-risk' : isMed ? 'chip-suspect' : 'chip-complete');
+    invSBadge.querySelector('span:nth-child(2)').textContent = isHigh ? 'UNDER INVESTIGATION' : isMed ? 'SUSPICIOUS' : 'RESOLVED / CLEAN';
+  }
+
+  // Update Print report text & color classes dynamically
+  const rptRisk = document.getElementById('rpt-risk');
+  if(rptRisk) {
+    rptRisk.textContent = fs + '%';
+    rptRisk.className = 'rpt-val ' + (isHigh ? 'danger' : isMed ? 'warn' : 'success');
+  }
+  const rptType = document.getElementById('rpt-type');
+  if(rptType) {
+    rptType.textContent = result.threat_intel?.threat_type || (isHigh ? 'AI VOICE CLONE' : 'HUMAN / AUTHENTIC');
+    rptType.className = 'rpt-val ' + (isHigh ? 'danger' : isMed ? 'warn' : 'success');
+  }
+  const rptFus = document.getElementById('rpt-fus');
+  if(rptFus) {
+    rptFus.textContent = fc + '%';
+    rptFus.className = 'rpt-val ' + (isHigh ? 'danger' : isMed ? 'warn' : 'success');
+  }
+
+  // Summary grid cells
+  const setInvEl = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  setInvEl('inv-case-id', result.case_id);
+  setInvEl('inv-customer', 'Rajesh Kumar');
+  setInvEl('inv-phone', '+91 98***' + Math.floor(Math.random()*900+100));
+  setInvEl('inv-lang', result.metadata?.language || 'Hindi');
+  setInvEl('inv-ai-prob', fs + '%');
+  setInvEl('inv-prediction', ver);
+  setInvEl('inv-replay', result.threat_intel?.replay_indicators || '—');
+  setInvEl('inv-confidence', fc + '%');
+  setInvEl('inv-inv-status', isHigh ? 'UNDER INVESTIGATION' : 'RESOLVED');
+  setInvEl('inv-threat-type', result.threat_intel?.threat_type || '—');
+  setInvEl('inv-soph', result.threat_intel?.sophistication || '—');
+  setInvEl('inv-dur', (result.performance?.audio_duration_sec || 0).toFixed(1) + 's');
+
+  // AI findings
+  const findingsEl = document.getElementById('inv-findings-list');
+  if(findingsEl) {
+    if(isHigh) {
+      findingsEl.innerHTML = `
+        <div class="ai-finding-item"><div class="ai-finding-dot danger"></div><span>High probability voice clone matching <b>${result.threat_intel?.threat_type}</b>.</span></div>
+        <div class="ai-finding-item"><div class="ai-finding-dot danger"></div><span>Primary trigger: <b>${result.primary_trigger}</b>.</span></div>
+        <div class="ai-finding-item"><div class="ai-finding-dot warn"></div><span>Replay indicator: ${result.threat_intel?.replay_indicators}.</span></div>
+        <div class="ai-finding-item"><div class="ai-finding-dot info"></div><span>Processing latency: ${result.performance?.inference_time_ms}ms.</span></div>`;
+    } else if(isMed) {
+      findingsEl.innerHTML = `
+        <div class="ai-finding-item"><div class="ai-finding-dot warn"></div><span>Moderate risk detected. Some biological features deviate from expected norms.</span></div>
+        <div class="ai-finding-item"><div class="ai-finding-dot info"></div><span>Secondary verification recommended before proceeding.</span></div>
+        <div class="ai-finding-item"><div class="ai-finding-dot info"></div><span>Processing latency: ${result.performance?.inference_time_ms}ms.</span></div>`;
+    } else {
+      findingsEl.innerHTML = `
+        <div class="ai-finding-item"><div class="ai-finding-dot success"></div><span>Vocal patterns consistent with authentic human speech. No synthetic traits.</span></div>
+        <div class="ai-finding-item"><div class="ai-finding-dot info"></div><span>Processing latency: ${result.performance?.inference_time_ms}ms.</span></div>`;
+    }
+  }
+  const recListEl = document.getElementById('inv-rec-list');
+  if(recListEl) {
+    recListEl.innerHTML = `<div class="ai-rec-item"><i class="ti ti-arrow-right"></i>${result.recommendation}</div>`;
+  }
+
+  // Feature importance bars
+  const setFeat = (idPct, idBar, val) => {
+    const pEl = document.getElementById(idPct); if(pEl) pEl.textContent = val + '%';
+    const bEl = document.getElementById(idBar); if(bEl) bEl.style.width = Math.min(100, val) + '%';
+  };
+  setFeat('fi-replay', 'fib-replay', replayPct);
+  setFeat('fi-spec', 'fib-spec', Math.round(fs * 0.9));
+  setFeat('fi-pitch', 'fib-pitch', isHigh ? 54 : isMed ? 32 : 12);
+  setFeat('fi-shimmer', 'fib-shimmer', isHigh ? 68 : isMed ? 38 : 15);
+  setFeat('fi-jitter', 'fib-jitter', isHigh ? 72 : isMed ? 41 : 11);
+  setFeat('fi-hnr', 'fib-hnr', isHigh ? 61 : isMed ? 35 : 8);
+  setFeat('fi-deep', 'fib-deep', Math.round(fs * 0.8));
+  setFeat('fi-fus', 'fib-fus', fc);
+
+  // Evidence panel
+  const setEvid = (idPct, idBar, val) => {
+    const pEl = document.getElementById(idPct); if(pEl) pEl.textContent = val + '%';
+    const bEl = document.getElementById(idBar); if(bEl) bEl.style.width = Math.min(100, val) + '%';
+  };
+  setEvid('ev-replay', 'evb-replay', replayPct);
+  setEvid('ev-ai', 'evb-ai', fs);
+  setEvid('ev-deepfake', 'evb-deepfake', isHigh ? Math.round(fs * 0.7) : 15);
+  setEvid('ev-human', 'evb-human', 100 - fs);
+  setEvid('ev-spectral', 'evb-spectral', Math.round(fs * 0.9));
+  if(result.chunk_results && result.chunk_results.length) {
+    const avgBio = result.chunk_results.reduce((s,c)=>s+c.bio_score,0)/result.chunk_results.length;
+    const avgDl = result.chunk_results.reduce((s,c)=>s+c.deep_score,0)/result.chunk_results.length;
+    setEvid('ev-bio', 'evb-bio', Math.round(avgBio));
+    setEvid('ev-dl', 'evb-dl', Math.round(avgDl));
+  }
+  setEvid('ev-fusion', 'evb-fusion', fc);
+
+  // Report generator
+  setInvEl('rpt-inv-case', result.case_id);
+  const rptInvTs = document.getElementById('rpt-inv-ts');
+  if(rptInvTs) rptInvTs.textContent = 'Timestamp: ' + new Date(result.timestamp).toLocaleString('en-IN');
+
+  // Investigation timeline — mark all as done
+  for(let i = 0; i <= 7; i++) {
+    const dot = document.getElementById('itl-' + i);
+    const step = document.getElementById('itx-' + i);
+    if(dot) dot.className = 'inv-tl-dot done';
+    if(step) step.className = 'inv-tl-step done';
+  }
+};
+
+// Also hook downloadReport
+const _origDownload = downloadReport;
+downloadReport = async function() {
+  // Populate notes dynamically
+  const notesText = document.getElementById('inv-notes')?.value || 'No comments or decision notes submitted by the verifying officer.';
+  const rptNotes = document.getElementById('rpt-notes-content');
+  if(rptNotes) rptNotes.textContent = notesText;
+  
+  // Populate Case ID in header
+  const caseIdHeader = document.getElementById('rpt-case-id-header');
+  if(caseIdHeader) caseIdHeader.textContent = LAST_ANALYSIS ? LAST_ANALYSIS.case_id : SESSION_ID;
+
+  // Checklist statuses
+  const chkPause = document.getElementById('chk-row-pause')?.querySelector('.action-check')?.classList.contains('checked');
+  const chkOtp = document.getElementById('chk-row-otp')?.querySelector('.action-check')?.classList.contains('checked');
+  const chkVideo = document.getElementById('chk-row-video')?.querySelector('.action-check')?.classList.contains('checked');
+  const chkEscalate = document.getElementById('chk-row-escalate')?.querySelector('.action-check')?.classList.contains('checked');
+  
+  const setCheckText = (id, checkState) => {
+    const el = document.getElementById(id);
+    if(el) {
+      el.textContent = checkState ? 'COMPLETED (YES)' : 'PENDING (NO)';
+      el.style.color = checkState ? 'var(--success)' : 'var(--danger)';
+    }
+  };
+  setCheckText('rpt-check-pause', chkPause);
+  setCheckText('rpt-check-otp', chkOtp);
+  setCheckText('rpt-check-video', chkVideo);
+  setCheckText('rpt-check-escalate', chkEscalate);
+
+  await _origDownload();
+  addAuditEntry('REPORT EXPORTED', 'PDF download');
+};
+
 </script>

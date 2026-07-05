@@ -288,30 +288,37 @@ async def analyze_audio(file: UploadFile = File(...)):
         bio_data = {c: [bio_feats.get(c, 0.0)] for c in model_state.bio_feature_cols}
         df_bio_input = pd.DataFrame(bio_data)
         
-        # 2. Deep extraction
+        # 2. Deep extraction — MCT dual-pass (clean 2048D + lowpass-degraded 2048D = 4096D)
         max_audio_samples = 10 * 16000
-        if len(y) > max_audio_samples:
-            y_clean = y[:max_audio_samples]
-        else:
-            y_clean = y
+        y_for_deep = y[:max_audio_samples].astype(np.float32) if len(y) > max_audio_samples else y.astype(np.float32)
 
-        inputs = model_state.processor([y_clean], sampling_rate=16000, return_tensors="pt", padding=True)
-        inputs = {k: v.to(model_state.device) for k, v in inputs.items()}
+        # === FILTER PARAMS — identical to extract_deep.py ===
+        from scipy.signal import butter, lfilter
+        b_lp, a_lp = butter(4, 4000.0 / (16000.0 / 2.0), btype='low')
+        y_degraded = lfilter(b_lp, a_lp, y_for_deep).astype(np.float32)
 
-        with torch.no_grad():
-            if model_state.device.type == 'cuda':
-                with torch.amp.autocast('cuda'):
-                    outputs = model_state.w2v_model(**inputs)
-            else:
-                outputs = model_state.w2v_model(**inputs)
+        def wav2vec_pass(audio_array):
+            inp = model_state.processor([audio_array], sampling_rate=16000, return_tensors="pt", padding=True)
+            inp = {k: v.to(model_state.device) for k, v in inp.items()}
+            with torch.no_grad():
+                if model_state.device.type == 'cuda':
+                    with torch.amp.autocast('cuda'):
+                        out = model_state.w2v_model(**inp)
+                else:
+                    out = model_state.w2v_model(**inp)
+            h12 = out.hidden_states[12]
+            mean = torch.mean(h12, dim=1).float().cpu().numpy()[0]  # 1024D
+            std  = torch.std(h12,  dim=1).float().cpu().numpy()[0]  # 1024D
+            return np.concatenate([mean, std])  # 2048D
 
-        hidden_states = outputs.hidden_states[12]
-        pooled_mean = torch.mean(hidden_states, dim=1).float().cpu().numpy()[0]
-        pooled_std = torch.std(hidden_states, dim=1).float().cpu().numpy()[0]
+        feats_clean    = wav2vec_pass(y_for_deep)   # 2048D
+        feats_degraded = wav2vec_pass(y_degraded)    # 2048D
+        feats_mct      = np.concatenate([feats_clean, feats_degraded])  # 4096D
 
+        # Build 4096D feature DataFrame
         deep_feats_dict = {}
-        for k in range(1024): deep_feats_dict[f'Deep_{k}'] = [float(pooled_mean[k])]
-        for k in range(1024): deep_feats_dict[f'Deep_{1024 + k}'] = [float(pooled_std[k])]
+        for k in range(4096):
+            deep_feats_dict[f'Deep_{k}'] = [float(feats_mct[k])]
         df_deep_input = pd.DataFrame(deep_feats_dict)
 
         # 3. Base Stream Predictions (raw multiclass probabilities)
@@ -324,16 +331,19 @@ async def analyze_audio(file: UploadFile = File(...)):
 
         if model_state.xgb_deep is not None:
             if model_state.contrastive_head is not None:
-                raw_cols = [f'Deep_{k}' for k in range(2048)]
+                # Project 4096D → 128D via contrastive head
+                raw_cols = [f'Deep_{k}' for k in range(4096)]
                 X_deep_raw = df_deep_input[raw_cols].values.astype(np.float32)
                 with torch.no_grad():
-                    X_deep_proj = model_state.contrastive_head(torch.tensor(X_deep_raw, dtype=torch.float32).to(model_state.device)).cpu().numpy()
+                    X_deep_proj = model_state.contrastive_head(
+                        torch.tensor(X_deep_raw, dtype=torch.float32).to(model_state.device)
+                    ).cpu().numpy()
                 proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
                 df_deep_proj = pd.DataFrame(X_deep_proj, columns=proj_cols)
                 p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_proj)[0]
             else:
-                # Fallback: align raw features
-                deep_cols = model_state.deep_feature_cols if model_state.deep_feature_cols else [f'Deep_{k}' for k in range(2048)]
+                # Fallback: use raw 4096D features aligned to model's feature names
+                deep_cols = model_state.deep_feature_cols if model_state.deep_feature_cols else [f'Deep_{k}' for k in range(4096)]
                 for c in deep_cols:
                     if c not in df_deep_input.columns:
                         df_deep_input[c] = 0.0
