@@ -2980,5 +2980,247 @@ downloadReport = async function() {
   await _origDownload();
   addAuditEntry('REPORT EXPORTED', 'PDF download');
 };
+</script>
+
+<!-- GLOBAL FLOATING CHATBOT WIDGET -->
+<div id="floating-chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; font-family: var(--sans);">
+  <!-- Floating Button Badge -->
+  <div id="chat-badge" style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--bank), #003d7a); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;">
+    <i class="ti ti-messages" style="font-size: 24px;"></i>
+    <!-- Hover Close Button ('x') -->
+    <div id="close-badge-btn" title="Close chat assistant" style="position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; border-radius: 50%; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 1.5px solid #fff; opacity: 0; transition: opacity 0.2s; pointer-events: auto;">×</div>
+  </div>
+
+  <!-- Floating Chat Window -->
+  <div id="chat-window" style="display: none; position: absolute; bottom: 70px; right: 0; width: 340px; height: 460px; border-radius: 12px; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 1px solid var(--border); flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, var(--bank), #003d7a); color: #fff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite;"></div>
+        <span style="font-weight: 600; font-size: 13px;">VoiceGuard AI Forensic Agent</span>
+      </div>
+      <i class="ti ti-minus" id="minimize-chat-btn" style="cursor: pointer; font-size: 14px;" title="Minimize"></i>
+    </div>
+    <!-- Messages Container -->
+    <div id="floating-chat-msgs" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; font-size: 12px;">
+      <div class="chat-bubble bubble-ai" style="padding: 8px 12px; border-radius: 8px; background: #fff; max-width: 90%; align-self: flex-start; border: 1px solid var(--border);">
+        <b>Forensic AI:</b> Hello! I am the global VoiceGuard Assistant. Ask me anything about this platform, technical pipeline specs, RBI SOP rules, or case analysis diagnostics. I support spelling-tolerant questions.
+      </div>
+    </div>
+    <!-- Quick buttons -->
+    <div style="display: flex; gap: 5px; flex-wrap: wrap; padding: 8px 12px; border-top: 1px solid var(--border); background: #fff; border-bottom: 1px solid var(--border);">
+      <span class="cq-btn" onclick="sendFloatingQuery('Why is this case flagged?')" style="font-size: 10px; padding: 4px 8px; background: #f1f5f9; border-radius: 4px; cursor: pointer; border: 1px solid var(--border);">Why flagged?</span>
+      <span class="cq-btn" onclick="sendFloatingQuery('What is the RBI SOP?')" style="font-size: 10px; padding: 4px 8px; background: #f1f5f9; border-radius: 4px; cursor: pointer; border: 1px solid var(--border);">RBI SOP</span>
+      <span class="cq-btn" onclick="sendFloatingQuery('Explain Biometric Features')" style="font-size: 10px; padding: 4px 8px; background: #f1f5f9; border-radius: 4px; cursor: pointer; border: 1px solid var(--border);">Biometrics</span>
+      <span class="cq-btn" onclick="sendFloatingQuery('Explain 4096D Deep Features')" style="font-size: 10px; padding: 4px 8px; background: #f1f5f9; border-radius: 4px; cursor: pointer; border: 1px solid var(--border);">Deep Features</span>
+    </div>
+    <!-- Input area -->
+    <div style="display: flex; padding: 8px 12px; gap: 6px; background: #fff;">
+      <input id="floating-chat-input" placeholder="Ask AI anything..." style="flex: 1; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; font-size: 12px; outline: none; font-family: var(--sans);" onkeydown="if(event.key==='Enter')sendFloatingChat()">
+      <button onclick="sendFloatingChat()" style="width: 32px; height: 32px; background: var(--bank); color: #fff; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+#chat-badge:hover #close-badge-btn {
+  opacity: 1 !important;
+}
+#chat-badge:hover {
+  transform: scale(1.08);
+}
+</style>
+
+<script>
+// Floating Chat toggle
+(function() {
+  const badge = document.getElementById('chat-badge');
+  const win = document.getElementById('chat-window');
+  const closeBadge = document.getElementById('close-badge-btn');
+  const widget = document.getElementById('floating-chat-widget');
+  const minimize = document.getElementById('minimize-chat-btn');
+
+  if(badge && win) {
+    badge.addEventListener('click', (e) => {
+      if(e.target === closeBadge) {
+        widget.style.display = 'none';
+        return;
+      }
+      if(win.style.display === 'none' || !win.style.display) {
+        win.style.display = 'flex';
+      } else {
+        win.style.display = 'none';
+      }
+    });
+  }
+  if(minimize && win) {
+    minimize.addEventListener('click', () => {
+      win.style.display = 'none';
+    });
+  }
+})();
+
+function sendFloatingQuery(text) {
+  const input = document.getElementById('floating-chat-input');
+  if(input) {
+    input.value = text;
+    sendFloatingChat();
+  }
+}
+
+// Global Knowledge Base Search Engine for any question
+const GLOBAL_KB = [
+  {
+    q: ["replay", "recording", "re-recorded", "playback", "static room tone", "temporal consistency"],
+    a: "<b>Replay Attack:</b> Replays occur when someone plays a pre-recorded call. VoiceGuard flags this using spectral smoothness checks, temporal continuity boundaries, and lowpass cutoff rolls typical of mobile playback speakers."
+  },
+  {
+    q: ["clone", "synthetic", "tts", "cloned", "voice clone", "ai voice", "elevenlabs", "fish audio", "xtts", "f5-tts"],
+    a: "<b>AI Voice Cloning:</b> Generative AI clones have clean spectrum profiles but lack natural physiological jitters. We verify them using high-resolution biological features and deep learning projection discrepancies."
+  },
+  {
+    q: ["deepfake", "gan", "diffusion", "deep fake", "ai generated"],
+    a: "<b>Deepfake Speech:</b> Generative deepfakes are identified by analyzing spectral phase discontinuities and frame-to-frame synthesis artifacts in the 4096D dual-pass Wav2Vec2 encoder."
+  },
+  {
+    q: ["features", "dimensions", "4441", "345", "4096", "extract", "vector", "biometric", "deep"],
+    a: "<b>Feature Dimensions:</b> VoiceGuard extracts a total of <b>4,441 dimensions</b>: 345 biological features (pitch, jitter, shimmer, HNR) + 4,096 Multi-Condition Training (MCT) deep features."
+  },
+  {
+    q: ["jitter", "shimmer", "hnr", "pitch", "formants", "harmonics", "micro-variation"],
+    a: "<b>Biological Features:</b> Jitter measures pitch cycle variations, Shimmer measures amplitude variations, and HNR (Harmonics-to-Noise Ratio) measures tone clarity. AI voices show abnormally uniform micro-variations."
+  },
+  {
+    q: ["sop", "rbi", "procedure", "regulatory", "escalate", "fraud cell", "₹1 lakh", "reporting limit", "kyc", "otp"],
+    a: "<b>RBI SOP Compliance:</b> Freeze transactions on high-risk flags (>54%). Verify via OTP or Video KYC. Any fraud attempt exceeding <b>₹1 Lakh</b> must be reported to the RBI within 24 hours."
+  },
+  {
+    q: ["calibration", "regress", "scale", "isotonic", "platt", "fusion weights", "0.764", "0.236"],
+    a: "<b>Model Calibration:</b> We calibrate XGBoost raw scores using Isotonic regression and Platt scaling. The fusion weight is distributed as <b>0.764</b> for the biological stream and <b>0.236</b> for the deep stream."
+  },
+  {
+    q: ["datasets", "languages", "bengali", "malayalam", "telugu", "noisy", "fake", "dataset paths"],
+    a: "<b>Dataset Folders:</b> Bengli, Malayalam, and Telugu voice files are stored in <code>data/1_genuine</code> (real noisy) and <code>data/2_synthetic</code> (fakes). They are standard 16kHz mono WAV files."
+  },
+  {
+    q: ["accuracy", "eer", "metrics", "performance", "threshold", "0.94", "0.54", "0.30"],
+    a: "<b>Pipeline Performance:</b> The latest XGBoost model achieves an **Equal Error Rate (EER) of 0.94%**. Calibrated thresholds are high-risk (fraud) >= 0.54 and moderate-risk (suspicious) >= 0.30."
+  },
+  {
+    q: ["why flagged", "reason", "active case", "score", "verdict"],
+    a: "<b>Active Case Flag:</b> Check the main console. If a case is loaded, the engine explains the primary trigger, deep learning score, biological score, and recommends action based on RBI SOP guidelines."
+  }
+];
+
+// TF-IDF / Token similarity matching for any arbitrary query
+async function sendFloatingChat() {
+  const input = document.getElementById('floating-chat-input');
+  const msgs = document.getElementById('floating-chat-msgs');
+  if(!input || !msgs) return;
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble bubble-user';
+  userBubble.style.padding = '8px 12px';
+  userBubble.style.borderRadius = '8px';
+  userBubble.style.background = '#e2e8f0';
+  userBubble.style.alignSelf = 'flex-end';
+  userBubble.style.maxWidth = '90%';
+  userBubble.textContent = text;
+  msgs.appendChild(userBubble);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Simulate typing
+  const typing = document.createElement('div');
+  typing.className = 'chat-bubble bubble-ai';
+  typing.style.padding = '8px 12px';
+  typing.style.borderRadius = '8px';
+  typing.style.background = '#fff';
+  typing.style.alignSelf = 'flex-start';
+  typing.style.border = '1px solid var(--border)';
+  typing.innerHTML = '<i>Typing...</i>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  setTimeout(() => {
+    msgs.removeChild(typing);
+    const aiBubble = document.createElement('div');
+    aiBubble.className = 'chat-bubble bubble-ai';
+    aiBubble.style.padding = '8px 12px';
+    aiBubble.style.borderRadius = '8px';
+    aiBubble.style.background = '#fff';
+    aiBubble.style.alignSelf = 'flex-start';
+    aiBubble.style.border = '1px solid var(--border)';
+    aiBubble.style.maxWidth = '90%';
+
+    const clean = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+    const tokens = clean.split(/\s+/);
+
+    let bestReply = "";
+    let bestScore = 0;
+
+    for (const kb of GLOBAL_KB) {
+      let score = 0;
+      for (const token of tokens) {
+        if (token.length < 3) continue;
+        for (const target of kb.q) {
+          const sim = wordSimilarity(token, target);
+          if (sim > 0.8) {
+            score += sim * 2.0;
+          } else if (target.includes(token) || token.includes(target)) {
+            score += 0.5;
+          }
+        }
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestReply = kb.a;
+      }
+    }
+
+    if (bestScore < 1.0) {
+      if (matchTokens(tokens, ['flag', 'why', 'reason', 'trigger', 'score', 'verdict', 'case'])) {
+        if (LAST_ANALYSIS) {
+          bestReply = `Case <b>${LAST_ANALYSIS.case_id}</b> was flagged as <b>${LAST_ANALYSIS.verdict}</b> with a risk score of <b>${LAST_ANALYSIS.fraud_score}%</b>. Primary trigger: <b>${LAST_ANALYSIS.primary_trigger}</b>. Threat type: <b>${LAST_ANALYSIS.threat_intel?.threat_type}</b>.`;
+          bestScore = 5.0;
+        }
+      } else if (matchTokens(tokens, ['action', 'recommend', 'next', 'do', 'escalate'])) {
+        if (LAST_ANALYSIS) {
+          bestReply = `<b>Actions for ${LAST_ANALYSIS.case_id}:</b> First: <b>${LAST_ANALYSIS.recommendation}</b>. Next: Request Video KYC, freeze account limits, notify Security cell.`;
+          bestScore = 5.0;
+        }
+      }
+    }
+
+    let finalReply = "";
+    if (bestScore > 0.6) {
+      finalReply = `<b>Forensic AI:</b> ` + bestReply;
+    } else {
+      finalReply = `<b>Forensic AI:</b> I'm not fully sure about "${text}", but I'm trained on all aspects of the VoiceGuard platform. You can ask me about:<br>
+      • <b>SOP & UCO Rules</b>: RBI guidelines, freezing limits (₹1 Lakh).<br>
+      • <b>Technical Features</b>: 4441D vectors (345 biometric, 4096 deep), EER 0.94%.<br>
+      • <b>Forensics</b>: Replay attacks, AI voice cloning, deepfakes, pitch jitter/shimmer.<br>
+      • <b>Model Calibration</b>: XGBoost calib paths, Platt scaling weights.`;
+    }
+
+    aiBubble.innerHTML = finalReply;
+    msgs.appendChild(aiBubble);
+    msgs.scrollTop = msgs.scrollHeight;
+    
+    addAuditEntry('GLOBAL CHAT QUERY', text.slice(0,30)+'...');
+  }, 400 + Math.random() * 400);
+}
+</script>
 
 </script>
