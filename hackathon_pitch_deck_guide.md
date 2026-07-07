@@ -25,17 +25,36 @@ This guide is structured to help you deliver a winning presentation and demo for
 
 ---
 
-### Slide 3: Dataset Ingestion & Diversity Moat (Our Hard Work)
+### Slide 3: Dataset Ingestion & Diversity Moat (The Exact Numbers)
 * **Core Points:**
-  * **Multilingual Diversity:** Over **9,100+ active samples** built across **5 major languages** (English, Hindi, Bengali, Telugu, and Malayalam).
-  * **Accents & Channels:** Captures noisy domestic accents, WhatsApp voice notes (PTTs), and degraded mobile channel recordings.
-  * **Generators Covered:** Synthetic fakes were created using a diverse array of advanced voice generators:
-    1. **ElevenLabs** (High-quality cloned speech)
-    2. **Resemble AI** (Targeted speaker clones)
-    3. **Fish Audio & Minimax** (State-of-the-art fast clone architectures)
-    4. **Kiki Voice & Standard TTS** (Edge-TTS, GTTS, and IndicSynth systems)
+  * **Total Training Database:** **9,170 active, fully-processed samples** (clean-purged of mislabeled data).
+  * **Multilingual Coverage:** Standardized, telephony-resampled G.711/AMR simulation over **5 major languages**:
+    * **Genuine Human Voices (Label 0):** **4,684 samples**
+    * **Synthetic/AI Voices (Label 1):** **4,411 samples**
+    * **Replay Attacks (Label 2):** **75 samples**
+  * **Exact Raw Folders & Ingestion Distribution:**
+    * **Genuine Audio (4,684):**
+      * *LJSpeech (Clean baseline):* 2,000 files
+      * *ASVspoof 2021 DF (Telephony baseline):* 1,000 files
+      * *Hindi Common Voice (Multilingual real):* 957 files
+      * *Hindi Telephony Noisy:* 575 files
+      * *Bengali Telephony Noisy:* 301 files
+      * *Telugu Telephony Noisy:* 151 files (Imported Speaker 1 WhatsApp notes)
+      * *Malayalam Telephony Noisy:* 99 files
+      * *Hard Negatives (Whispering, heavy breathing):* 60 files
+    * **Synthetic/AI Audio (4,411):**
+      * *WaveFake (Multi-architecture fakes):* 2,000 files
+      * *IndicSynth Hindi (Multi-condition TTS):* 657 files
+      * *Resemble AI (Targeted clones - Hindi/English):* 656 files
+      * *ElevenLabs Clones:* 300 files
+      * *Generic Synthetic TTS (GTTS, Edge-TTS):* 300 files
+      * *Bengali Fake Clones:* 298 files
+      * *Telugu Fake Clones:* 104 files
+      * *Malayalam Fake Clones:* 99 files
+    * **Replays (75):**
+      * *Real Physical Replays (telephony mic-to-speaker loop):* 75 files
 * **The Pitch (2.5 Mins):**
-  * Boast about the effort: *"We didn't just use standard open-source datasets. We went through the rigorous process of gathering real-world WhatsApp audio recordings (PTTs) in regional Indian languages (Bengali, Malayalam, Telugu, Hindi) and cloned those exact voices using five advanced AI cloning platforms. This custom dataset ensures our model is highly robust to the specific speech patterns and background noise environments of Indian banking clients."*
+  * Present these exact counts clearly. Emphasize: *"We constructed a highly specialized multilingual dataset reflecting Indian banking demographics. We gathered real-world WhatsApp audio recordings (PTTs) in Bengali, Hindi, Telugu, and Malayalam, and cloned those exact voices using five advanced AI platforms (ElevenLabs, Resemble, Fish Audio, Kiki, and Minimax). This means our model understands how local regional accents degrade over phone lines."*
 
 ---
 
@@ -116,7 +135,7 @@ This guide is structured to help you deliver a winning presentation and demo for
 
 ---
 
-## 🛡️ Part 3: Frontend Feature Defense Cheat Sheet
+## 🛡️ Part 4: Frontend Feature Defense Cheat Sheet
 
 If a jury member points to any element on your dashboard, use this cheat sheet to answer confidently:
 
