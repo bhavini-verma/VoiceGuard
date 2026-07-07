@@ -228,7 +228,7 @@ We train two separate Extreme Gradient Boosting (`XGBClassifier`) models on the 
     where $\Omega(f_k) = \gamma T_k + \frac{1}{2} \lambda \sum_{j=1}^{T_k} w_j^2$ is the tree complexity regularization penalty (limiting the number of leaves $T_k$ and leaf weights $w_j$).
 
 ### 2. Platt Scaling & Isotonic Regression Calibration
-Gradient booster outputs are raw, uncalibrated log-odds. To output true, statistically valid risk probabilities, we calibrate predictions:
+Classifier raw prediction scores are often uncalibrated (they don't represent real-world probability). To output true, statistically valid risk probabilities, we calibrate predictions:
 1.  **Platt Scaling (Parametric):**
     Fits a sigmoid function to transform classifier outputs into calibrated probabilities:
     $$P(y=1 | s) = \frac{1}{1 + \exp(A \cdot s + B)}$$
@@ -311,4 +311,4 @@ To catch spoofing attacks targeting specific streams, the backend implements ove
                          └── No: Allow KYC Flow
 ```
 *   **Inline Integration (IVR Calls):** VoiceGuard hooks directly into the telephony session controller (SIP/RTP streaming). Audio blocks of 3 seconds are streamed to the `/analyze` API to detect spoofing in real-time.
-*   **Onboarding Integration (KYC):** The Video KYC application uploads the customer audio recording directly to VoiceGuard. The API returns a JSON payload containing the calibrated risk score, verdict, and classification labels, routing the onboarding case to standard approval or the Fraud Security Cell.
+*   **Onboarding Integration (KYC):** The Video KYC application uploads the customer audio recording directly to VoiceGuard. The API returns a JSON payload containing the calibrated risk score, verdict, and classification labels, routing the onboarding case to approval or the Fraud Security Cell.
