@@ -2523,7 +2523,12 @@ function exportSummary() {
 function exportEmail() {
   if(!LAST_ANALYSIS){alert('Run an analysis first.');return;}
   const r = LAST_ANALYSIS;
-  const body = encodeURIComponent(`Fraud Investigation Alert - ${r.case_id}\n\nCase: ${r.case_id}\nRisk Score: ${r.fraud_score}%\nVerdict: ${r.verdict}\nThreat Type:// A simple token-matching engine with spelling distance tolerance
+  const body = encodeURIComponent(`Fraud Investigation Alert - ${r.case_id}\n\nCase: ${r.case_id}\nRisk Score: ${r.fraud_score}%\nVerdict: ${r.verdict}\nThreat Type: ${r.threat_intel?.threat_type}\nConfidence: ${r.confidence}%\n\nRecommended Action: ${r.recommendation}\n\n-- VoiceGuard Fraud Intelligence Division`);
+  window.open(`mailto:fraudteam@ucobank.com?subject=VoiceGuard Alert: ${r.case_id} - ${r.verdict}&body=${body}`);
+  addAuditEntry('EMAIL DRAFTED', 'Email report');
+}
+
+// A simple token-matching engine with spelling distance tolerance
 function getLevenshteinDistance(a, b) {
   const tmp = [];
   for (let i = 0; i <= a.length; i++) { tmp[i] = [i]; }
