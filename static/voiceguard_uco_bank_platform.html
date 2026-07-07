@@ -2523,64 +2523,53 @@ function exportSummary() {
 function exportEmail() {
   if(!LAST_ANALYSIS){alert('Run an analysis first.');return;}
   const r = LAST_ANALYSIS;
-  const body = encodeURIComponent(`Fraud Investigation Alert - ${r.case_id}\n\nCase: ${r.case_id}\nRisk Score: ${r.fraud_score}%\nVerdict: ${r.verdict}\nThreat Type: ${r.threat_intel.threat_type}\nConfidence: ${r.confidence}%\n\nRecommended Action: ${r.recommendation}\n\n-- VoiceGuard Fraud Intelligence Division`);
-  window.open(`mailto:fraudteam@ucobank.com?subject=VoiceGuard Alert: ${r.case_id} - ${r.verdict}&body=${body}`);
-  addAuditEntry('EMAIL DRAFTED', 'Email report');
+  const body = encodeURIComponent(`Fraud Investigation Alert - ${r.case_id}\n\nCase: ${r.case_id}\nRisk Score: ${r.fraud_score}%\nVerdict: ${r.verdict}\nThreat Type:// A simple token-matching engine with spelling distance tolerance
+function getLevenshteinDistance(a, b) {
+  const tmp = [];
+  for (let i = 0; i <= a.length; i++) { tmp[i] = [i]; }
+  for (let j = 0; j <= b.length; j++) { tmp[0][j] = j; }
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      tmp[i][j] = Math.min(
+        tmp[i - 1][j] + 1,
+        tmp[i][j - 1] + 1,
+        tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+  return tmp[a.length][b.length];
 }
 
-// ========== AI CHAT (Reports page) ==========
-async function sendChat(quickText) {
-  const input = document.getElementById('chat-input');
-  const msgs = document.getElementById('chat-msgs');
-  const typing = document.getElementById('chat-typing');
-  if(!input || !msgs) return;
-  const text = (quickText || input.value || '').trim();
-  if(!text) return;
-  input.value = '';
-  const userBubble = document.createElement('div');
-  userBubble.className = 'chat-bubble bubble-user';
-  userBubble.textContent = text;
-  msgs.appendChild(userBubble);
-  msgs.scrollTop = msgs.scrollHeight;
-  if(typing) { typing.style.display = 'block'; msgs.scrollTop = msgs.scrollHeight; }
+function wordSimilarity(word1, word2) {
+  if (word1 === word2) return 1.0;
+  const dist = getLevenshteinDistance(word1, word2);
+  const maxLen = Math.max(word1.length, word2.length);
+  if (maxLen === 0) return 1.0;
+  return 1.0 - dist / maxLen;
+}
 
-  // Fallback to local knowledge (no external API call needed)
-  setTimeout(() => {
-    if(typing) typing.style.display = 'none';
-    const aiBubble = document.createElement('div');
-    aiBubble.className = 'chat-bubble bubble-ai';
-    const tl = text.toLowerCase();
-    let reply = 'I can assist with fraud investigation queries. Try one of the quick questions above, or ask about replay attacks, AI cloning, confidence scores, or RBI SOP.';
-    if(tl.includes('replay')) reply = CHAT_KNOWLEDGE.replay;
-    else if(tl.includes('clone') || tl.includes('ai voice') || tl.includes('synthetic')) reply = CHAT_KNOWLEDGE.clone;
-    else if(tl.includes('deepfake')) reply = CHAT_KNOWLEDGE.deepfake;
-    else if(tl.includes('confidence') || tl.includes('score')) reply = CHAT_KNOWLEDGE.confidence;
-    else if(tl.includes('jitter') || tl.includes('shimmer') || tl.includes('hnr')) reply = CHAT_KNOWLEDGE.jitter;
-    else if(tl.includes('voiceguard') || tl.includes('work') || tl.includes('how') || tl.includes('feature')) reply = CHAT_KNOWLEDGE.voiceguard;
-    else if(tl.includes('sop') || tl.includes('rbi') || tl.includes('procedure')) reply = CHAT_KNOWLEDGE.sop;
-    else if(tl.includes('action') || tl.includes('recommend') || tl.includes('next')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Recommended Actions for ${LAST_ANALYSIS.case_id}:</b><br>1. ${LAST_ANALYSIS.recommendation}<br>2. Verify customer identity via OTP<br>3. Pause any pending transactions<br>4. Escalate to Fraud Investigation Cell<br>5. File audit trail and notify customer.`;
-      } else reply = 'Run an analysis first to get case-specific recommendations.';
-    } else if(tl.includes('flag') || tl.includes('why') || tl.includes('reason')) {
-      if(LAST_ANALYSIS) {
-        reply = `Case <b>${LAST_ANALYSIS.case_id}</b> was flagged because: Risk score is <b>${LAST_ANALYSIS.fraud_score}%</b>. Threat classified as <b>${LAST_ANALYSIS.threat_intel?.threat_type}</b>. Primary trigger: <b>${LAST_ANALYSIS.primary_trigger}</b>. Fusion confidence: ${LAST_ANALYSIS.confidence}%.`;
-      } else reply = 'Upload an audio file and run analysis first to explain why a call was flagged.';
-    } else if(tl.includes('summar')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Investigation Summary — ${LAST_ANALYSIS.case_id}</b><br>Verdict: <b>${LAST_ANALYSIS.verdict}</b> | Risk: <b>${LAST_ANALYSIS.fraud_score}%</b> | Confidence: ${LAST_ANALYSIS.confidence}%<br>Threat: ${LAST_ANALYSIS.threat_intel?.threat_type} | Duration: ${LAST_ANALYSIS.performance?.audio_duration_sec}s<br>Action: ${LAST_ANALYSIS.recommendation}`;
-      } else reply = 'Run an analysis first to generate a summary.';
-    } else if(tl.includes('report')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Forensic Report — ${LAST_ANALYSIS.case_id}</b><br>Verdict: ${LAST_ANALYSIS.verdict}<br>Risk: ${LAST_ANALYSIS.fraud_score}% | Confidence: ${LAST_ANALYSIS.confidence}%<br>Threat: ${LAST_ANALYSIS.threat_intel?.threat_type}<br>Recommendation: ${LAST_ANALYSIS.recommendation}<br><br>Use the Export buttons to download full PDF or CSV.`;
-      } else reply = 'Run an analysis to generate a report.';
+function matchTokens(tokens, targetKeywords) {
+  for (const token of tokens) {
+    if (token.length < 3) {
+      if (targetKeywords.includes(token)) return true;
+      continue;
     }
-    aiBubble.innerHTML = '<b>Assistant:</b> ' + reply;
-    msgs.appendChild(aiBubble);
-    msgs.scrollTop = msgs.scrollHeight;
-  }, 600 + Math.random() * 800);
+    for (const kw of targetKeywords) {
+      if (kw.length < 3) {
+        if (token === kw) return true;
+        continue;
+      }
+      if (wordSimilarity(token, kw) > 0.8) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
-  addAuditEntry('CHAT QUERY', text.slice(0,30)+'...');
+// ========== AI CHAT (Reports page - Fallback) ==========
+async function sendChat(quickText) {
+  invChat(quickText);
 }
 
 // ========== AI CHAT (Investigator page) ==========
@@ -2603,43 +2592,92 @@ async function invChat(quickText) {
     if(typing) typing.style.display = 'none';
     const aiBubble = document.createElement('div');
     aiBubble.className = 'chat-bubble bubble-ai';
-    const tl = text.toLowerCase();
-    let reply = 'I can assist with specialized forensics queries. Try one of the quick options above.';
-    if(tl.includes('fake') || tl.includes('why')) {
-      if(LAST_ANALYSIS) {
-        reply = `Case <b>${LAST_ANALYSIS.case_id}</b> exhibits a risk score of <b>${LAST_ANALYSIS.fraud_score}%</b> with classified threat <b>${LAST_ANALYSIS.threat_intel?.threat_type}</b>. The primary trigger was identified as <b>${LAST_ANALYSIS.primary_trigger}</b>. Confidence: ${LAST_ANALYSIS.confidence}%.`;
-      } else reply = 'Please upload a recording and run analysis first.';
-    } else if(tl.includes('evidence')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Case Evidence Summary:</b><br>- AI Voice probability: ${LAST_ANALYSIS.fraud_score}%<br>- Fusion Confidence: ${LAST_ANALYSIS.confidence}%<br>- Verdict: ${LAST_ANALYSIS.verdict}<br>- Primary Trigger: ${LAST_ANALYSIS.primary_trigger}<br>- Recommendation: ${LAST_ANALYSIS.recommendation}`;
-      } else reply = 'Awaiting analysis input for evidence extraction.';
-    } else if(tl.includes('replay')) reply = CHAT_KNOWLEDGE.replay;
-    else if(tl.includes('clone') || tl.includes('synthetic') || tl.includes('compare') || tl.includes('voice')) reply = CHAT_KNOWLEDGE.clone;
-    else if(tl.includes('breakdown') || tl.includes('feature')) reply = CHAT_KNOWLEDGE.voiceguard;
-    else if(tl.includes('risk') || tl.includes('score') || tl.includes('explain')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Risk Score Breakdown:</b><br>Overall Risk: <b>${LAST_ANALYSIS.fraud_score}%</b><br>Contributing factors: Biological feature deviation, spectral artifacts, deep learning embeddings.<br>Primary trigger: <b>${LAST_ANALYSIS.primary_trigger}</b><br>Threat classification: ${LAST_ANALYSIS.threat_intel?.threat_type}`;
-      } else reply = CHAT_KNOWLEDGE.confidence;
-    } else if(tl.includes('action') || tl.includes('next')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Next Action Checklist for ${LAST_ANALYSIS.case_id}:</b><br>1. ${LAST_ANALYSIS.recommendation}<br>2. Verify caller identity using Video KYC.<br>3. Block transaction if risk > 80%.<br>4. Escalate to Fraud Investigation Cell.`;
-      } else reply = 'Run an analysis to generate next-step recommendations.';
-    } else if(tl.includes('summar')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Forensics Summary:</b> Case ${LAST_ANALYSIS.case_id} has verdict <b>${LAST_ANALYSIS.verdict}</b> with fraud risk ${LAST_ANALYSIS.fraud_score}%. Processing took ${LAST_ANALYSIS.performance?.processing_time_ms || LAST_ANALYSIS.performance?.inference_time_ms || 210}ms.`;
-      } else reply = 'Run an analysis to summarize.';
-    } else if(tl.includes('report') || tl.includes('generate')) {
-      if(LAST_ANALYSIS) {
-        reply = `<b>Investigation Report — ${LAST_ANALYSIS.case_id}</b><br>Verdict: ${LAST_ANALYSIS.verdict} | Risk: ${LAST_ANALYSIS.fraud_score}%<br>Confidence: ${LAST_ANALYSIS.confidence}% | Threat: ${LAST_ANALYSIS.threat_intel?.threat_type}<br>Recommendation: ${LAST_ANALYSIS.recommendation}<br><br>Use the Report Generator panel to export full PDF.`;
-      } else reply = 'Run an analysis to generate a report.';
-    } else if(tl.includes('similar') || tl.includes('fraud') || tl.includes('cases')) {
-      reply = 'Similar cases are displayed in the Similar Fraud Cases table on this page. Top matches include VG-A4F2C1 (94% similarity, Replay) and VG-B7E3D9 (88% similarity, AI Voice Clone).';
+    
+    // Process input
+    const cleanText = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+    const tokens = cleanText.split(/\s+/);
+    
+    let reply = "";
+    
+    // 1. Replay Attacks
+    if (matchTokens(tokens, ['replay', 'replayed', 'recording', 're-recorded', 'playback', 'replai', 'recoding'])) {
+      reply = CHAT_KNOWLEDGE.replay;
     }
-    aiBubble.innerHTML = '<b>Investigator:</b> ' + reply;
+    // 2. AI Cloning / Synthesis
+    else if (matchTokens(tokens, ['clone', 'cloned', 'cloning', 'synthetic', 'tts', 'generated', 'generative', 'clon', 'synthetik', 'fake'])) {
+      reply = CHAT_KNOWLEDGE.clone;
+    }
+    // 3. Deepfake
+    else if (matchTokens(tokens, ['deepfake', 'deep-fake', 'gan', 'diffusion', 'df', 'depefake'])) {
+      reply = CHAT_KNOWLEDGE.deepfake;
+    }
+    // 4. Model Confidence
+    else if (matchTokens(tokens, ['confidence', 'certainty', 'score', 'prob', 'probability', 'confidense', 'certanty'])) {
+      if (LAST_ANALYSIS) {
+        reply = `The confidence score for Case <b>${LAST_ANALYSIS.case_id}</b> is <b>${LAST_ANALYSIS.confidence}%</b>. This combines standard error models with biological descriptor thresholds to calibrate our security risk probability.`;
+      } else {
+        reply = CHAT_KNOWLEDGE.confidence;
+      }
+    }
+    // 5. Biometric descriptors
+    else if (matchTokens(tokens, ['jitter', 'shimmer', 'hnr', 'harmonics', 'formant', 'pitch', 'acoustic', 'biology', 'biological', 'jiter', 'shimer'])) {
+      reply = CHAT_KNOWLEDGE.jitter;
+    }
+    // 6. VoiceGuard Architecture
+    else if (matchTokens(tokens, ['voiceguard', 'architecture', 'fusion', 'model', 'system', 'engine', 'pipeline', 'workflow'])) {
+      reply = CHAT_KNOWLEDGE.voiceguard;
+    }
+    // 7. RBI SOP / Policies
+    else if (matchTokens(tokens, ['sop', 'rbi', 'procedure', 'regulatory', 'guideline', 'guidelines', 'rules', 'rule', 'escalate', 'reporting', 'limit', 'lakh', 'one'])) {
+      reply = CHAT_KNOWLEDGE.sop;
+    }
+    // 8. Next actions
+    else if (matchTokens(tokens, ['action', 'recommend', 'next', 'do', 'what to do', 'block', 'freeze', 'held', 'hold', 'verify'])) {
+      if (LAST_ANALYSIS) {
+        reply = `<b>Recommended Actions for ${LAST_ANALYSIS.case_id}:</b><br>• Primary Action: ${LAST_ANALYSIS.recommendation}<br>• Trigger Video KYC verification for this caller.<br>• Freeze pending transactions on this account.<br>• Escalate case logs to UCO Bank Fraud Control Cell.`;
+      } else {
+        reply = `Please upload and analyze a recording first. Standard next steps include freezing the transaction, requesting Video KYC, and notifying the Security Escalation Team.`;
+      }
+    }
+    // 9. Flag reason
+    else if (matchTokens(tokens, ['flag', 'why', 'reason', 'trigger', 'flagged', 'why fake', 'explain risk'])) {
+      if (LAST_ANALYSIS) {
+        reply = `Case <b>${LAST_ANALYSIS.case_id}</b> was flagged as <b>${LAST_ANALYSIS.verdict}</b> with a risk score of <b>${LAST_ANALYSIS.fraud_score}%</b>. The primary trigger was identified as: <b>${LAST_ANALYSIS.primary_trigger}</b>. Threat classification: <b>${LAST_ANALYSIS.threat_intel?.threat_type || 'Voice Spoofing'}</b>.`;
+      } else {
+        reply = 'Please upload a recording and run analysis first to check case flags.';
+      }
+    }
+    // 10. Summary
+    else if (matchTokens(tokens, ['summarize', 'summary', 'case info', 'details', 'verdict', 'sumary', 'brief'])) {
+      if (LAST_ANALYSIS) {
+        reply = `<b>Forensics Case Summary (${LAST_ANALYSIS.case_id}):</b><br>• Verdict: <b>${LAST_ANALYSIS.verdict}</b><br>• Risk Score: <b>${LAST_ANALYSIS.fraud_score}%</b><br>• Confidence: <b>${LAST_ANALYSIS.confidence}%</b><br>• Duration: <b>${LAST_ANALYSIS.performance?.audio_duration_sec || 'N/A'}s</b><br>• Processing Time: <b>${LAST_ANALYSIS.performance?.processing_time_ms || LAST_ANALYSIS.performance?.inference_time_ms || 210}ms</b>`;
+      } else {
+        reply = 'Run an analysis first to get a summary.';
+      }
+    }
+    // 11. Similar cases
+    else if (matchTokens(tokens, ['similar', 'cases', 'match', 'history', 'past cases'])) {
+      reply = 'Similar fraud patterns show matches with:<br>• <b>VG-A4F2C1</b> (94% similarity, Replay Attack)<br>• <b>VG-B7E3D9</b> (88% similarity, AI Voice Clone).<br>Both were successfully frozen under UCO Bank SOP.';
+    }
+    // 12. Report
+    else if (matchTokens(tokens, ['report', 'pdf', 'csv', 'export', 'download'])) {
+      if (LAST_ANALYSIS) {
+        reply = `<b>Forensic Report ready for ${LAST_ANALYSIS.case_id}:</b> Use the "Print PDF Report" button to print a formal cyber incident report with signature lines and compliance logs.`;
+      } else {
+        reply = `Run an analysis to generate a report.`;
+      }
+    }
+    // Default smart fallback
+    else {
+      reply = `I am the VoiceGuard Forensic AI Agent. I didn't quite capture that, but I can answer bank policies, technical pipeline specs, or active cases. Try asking about:<br>• <b>Technical</b>: Jitter/Shimmer, Wav2Vec2 model, 4441D feature dimensions, calibration.<br>• <b>Banking / SOP</b>: RBI guidelines, freezing accounts, escalation thresholds (₹1 Lakh).<br>• <b>Case Analysis</b>: Understanding why the current call was flagged or what to do next.<br><br><i>Tip: I support spelling-tolerant questions like "explian replai" or "what is jiter"!</i>`;
+    }
+    
+    aiBubble.innerHTML = '<b>Investigator AI:</b> ' + reply;
     msgs.appendChild(aiBubble);
     msgs.scrollTop = msgs.scrollHeight;
-  }, 600 + Math.random() * 800);
-
+    
+    addAuditEntry('CHAT QUERY', text.slice(0,30)+'...');
+  }, 500 + Math.random() * 500);
 }
 
 // ========== TOGGLE ACTION CHECKBOX & CHECKLIST HANDLERS ==========
