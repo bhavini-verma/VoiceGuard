@@ -1,6 +1,6 @@
 {
-    "threshold_high": 0.5930407745294468,
-    "threshold_mid": 0.49542942610486523,
+    "threshold_high": 0.7780195407109332,
+    "threshold_mid": 0.35700161344179304,
     "feature_names": [
         "bio_score",
         "deep_score",
@@ -11,7 +11,7 @@
         "audio_dur",
         "silence_ratio"
     ],
-    "val_eer": 0.009749303621169917,
-    "test_eer": 0.018571428571428572,
-    "fixed_weight_test_eer": 0.012857142857142857
+    "val_eer": 0.001326259946949602,
+    "test_eer": 0.0,
+    "fixed_weight_test_eer": 0.0
 }
