@@ -190,10 +190,12 @@ def model_status():
 
 @app.post("/analyze")
 async def analyze_audio(file: UploadFile = File(...)):
+    print("Request Received")
     start_time = time.time()
     
     # Read the file content
     content = await file.read()
+    print("Audio Uploaded")
     
     # Clean the audio content from trailing junk/watermarks (e.g. OPPO watermark)
     oppo_idx = content.find(b"oppoMark")
@@ -224,6 +226,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         f.write(content)
 
     try:
+        print("Preprocessing Started")
         # Load audio robustly: Try librosa first (for MP3/OGG/FLAC), then fallback to scipy (for manual JS WAVs)
         try:
             y, sr = librosa.load(temp_path, sr=16000, mono=True)
@@ -296,6 +299,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         print(f"Loaded audio: {len(y)} samples, first 5: {y[:5]}")
         
         # 1. Bio extraction
+        print("Extracting Biological Features")
         bio_feats = extract_bio_features(temp_path)
         if not bio_feats:
             raise ValueError("Bio feature extraction failed")
@@ -303,6 +307,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         df_bio_input = pd.DataFrame(bio_data)
         
         # 2. Deep extraction
+        print("Extracting Deep Features")
         y_sim = simulate_phone_codec(y, sr=16000)
         max_audio_samples = 10 * 16000
         if len(y_sim) > max_audio_samples:
@@ -366,6 +371,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         df_deep_input.to_csv(os.path.join(base_dir, "scratch", "temp_deep.csv"), index=False)
 
         # 4. Deep Learning Fusion Prediction
+        print("Running Fusion Model")
         p_fused = 0.5
         t_high = 0.90
         t_mid = 0.50
@@ -402,6 +408,7 @@ async def analyze_audio(file: UploadFile = File(...)):
             t_mid = 0.30
         
         # Calculate dynamic confidence score (clamped between 70.0% and 99.9%)
+        print("Generating Risk Score")
         raw_conf = 70.0 + 30.0 * (abs(p_fused - 0.5) / 0.5)
         confidence = round(min(99.9, max(70.0, raw_conf)), 1)
 
@@ -454,6 +461,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
+    print("Returning JSON Response")
     return JSONResponse(content=result)
 
 @app.post("/feedback")
