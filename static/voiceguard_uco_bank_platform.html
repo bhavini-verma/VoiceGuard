@@ -762,6 +762,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
           <button class="upload-btn" id="start-btn" onclick="startStagedAnalysis()" style="flex: 1; margin-top:0; background:#15803D; display:none; align-items:center; justify-content:center; gap:6px; padding: 8px 12px; font-size: 11px;"><i class="ti ti-player-play" style="font-size:12px"></i> START FORENSIC ANALYSIS</button>
           <button class="btn-outline" id="clear-btn" onclick="clearCurrentAudio()" style="flex: 0.3; margin-top:0; display:none; color:var(--text2); border-color:var(--border); padding: 8px;"><i class="ti ti-trash" style="font-size:12px"></i> Clear</button>
         </div>
+        <div id="pipeline-status" style="display:none; margin-top:8px; padding:8px 12px; background:rgba(0,91,172,0.06); border:1px solid rgba(0,91,172,0.15); border-radius:6px; font-size:11px; font-weight:600; color:var(--bank); text-align:center;"><i class="ti ti-loader" style="font-size:13px;margin-right:4px;vertical-align:-2px;animation:spin 1s linear infinite"></i><span id="pipeline-status-text">Initializing...</span></div>
       </div>
 
       <div class="card">
@@ -1576,8 +1577,8 @@ function clearInf(){['inf-time','inf-conf','inf-dur','inf-ch'].forEach(id=>{cons
 let LAST_ANALYSIS=null;
 let storedAudioBuffer=null;
 
-async function apiGet(p){const r=await fetch(BACKEND_URL+p);if(!r.ok)throw new Error(r.status);return r.json();}
-async function apiPost(p,file){const fd=new FormData();fd.append('file',file);const r=await fetch(BACKEND_URL+p,{method:'POST',body:fd});if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}return r.json();}
+async function apiGet(p){const r=await fetch(BACKEND_URL+p,{headers:{'x-api-key':'voiceguard123'}});if(!r.ok)throw new Error(r.status);return r.json();}
+async function apiPost(p,file){const fd=new FormData();fd.append('file',file);const r=await fetch(BACKEND_URL+p,{method:'POST',headers:{'x-api-key':'voiceguard123'},body:fd});if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}return r.json();}
 
 let STAGED_FILE=null;
 
@@ -1685,19 +1686,30 @@ function resetResults(){
 
 async function runAnalysis(file){
   resetResults();
+  const pStatus=document.getElementById('pipeline-status');
+  const pText=document.getElementById('pipeline-status-text');
+  if(pStatus){pStatus.style.display='block';}
+  const statusMsgs=['Uploading Audio...','Preprocessing & Standardizing Audio...','Running Biological Feature Extraction...','Running Deep Feature Extraction (Wav2Vec2)...','Running Fusion & Risk Classification...','Generating Report...'];
+  let si=0;
+  if(pText)pText.textContent=statusMsgs[0];
+  const siv=setInterval(()=>{si=Math.min(si+1,statusMsgs.length-1);if(pText)pText.textContent=statusMsgs[si];},600);
   const t0=performance.now();
   let step=0;advTl(0);
   const iv=setInterval(()=>{step=Math.min(step+1,STEPS.length-2);advTl(step);},450);
   try{
     const r=await apiPost('/analyze',file);
-    clearInterval(iv);
+    clearInterval(iv);clearInterval(siv);
+    if(pText)pText.textContent='\u2705 Analysis Complete';
+    if(pStatus){pStatus.style.background='rgba(21,128,61,0.08)';pStatus.style.borderColor='rgba(21,128,61,0.25)';pStatus.style.color='#15803D';}
     advTl(STEPS.length-1);
     setTimeout(()=>{
       for(let i=0;i<STEPS.length;i++){const d=document.getElementById('tl-'+i);if(d){d.className='tl-dot done';document.getElementById('tx-'+i).className='tl-text done';}}
       showResults(r,Math.round(performance.now()-t0));
     },300);
   }catch(err){
-    clearInterval(iv);setHdrChip('ready');
+    clearInterval(iv);clearInterval(siv);setHdrChip('ready');
+    if(pText)pText.textContent='\u274C Analysis Failed';
+    if(pStatus){pStatus.style.background='rgba(220,38,38,0.08)';pStatus.style.borderColor='rgba(220,38,38,0.25)';pStatus.style.color='#DC2626';}
     const _sje=document.getElementById('s-job');if(_sje){_sje.className='pill pill-idle';_sje.textContent='ERROR';}
     const _tble=document.getElementById('tbl-status');if(_tble){_tble.textContent='ERROR';_tble.style.color='var(--danger)';}
     const _tbe=document.getElementById('chunk-tbody');if(_tbe)_tbe.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:24px;font-size:12px">Analysis failed: ${(err.message||'Unknown error').replace(/</g,'&lt;')}<br><span style="color:var(--text3);font-size:11px">Is the VoiceGuard backend running at ${BACKEND_URL}?</span></td></tr>`;
@@ -2256,7 +2268,7 @@ async function submitTrueLabel(trueLabel){
     const form = new FormData();
     form.append('is_correct', 'true');
     form.append('true_label', trueLabel);
-    const res = await fetch(BACKEND_URL + '/feedback', {method:'POST', body:form});
+    const res = await fetch(BACKEND_URL + '/feedback', {method:'POST', headers:{'x-api-key':'voiceguard123'}, body:form});
     const j = await res.json();
     const st = document.getElementById('feedback-status');
     st.textContent = j.message; st.style.display='block'; st.style.color='#15803D';
@@ -2270,7 +2282,7 @@ async function retrainModel(){
   const st = document.getElementById('feedback-status');
   st.textContent = "Retraining in background... please wait."; st.style.display='block'; st.style.color='#D97706';
   try{
-    const res = await fetch(BACKEND_URL + '/retrain', {method:'POST'});
+    const res = await fetch(BACKEND_URL + '/retrain', {method:'POST', headers:{'x-api-key':'voiceguard123'}});
     const j = await res.json();
     st.textContent = j.message; st.style.color='#15803D';
   }catch(e){

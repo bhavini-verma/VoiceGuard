@@ -4,6 +4,7 @@ import json
 import time
 import torch
 import librosa
+import logging
 import numpy as np
 import scipy.io.wavfile as wavfile
 import joblib
@@ -11,11 +12,16 @@ import uuid
 import pandas as pd
 import xgboost as xgb
 import threading
-from fastapi import FastAPI, UploadFile, File, Request, Form
+from fastapi import FastAPI, UploadFile, File, Request, Form, Depends
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from auth import verify_api_key
 import warnings
+
+# Configure structured logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s\t%(message)s')
+logger = logging.getLogger("voiceguard")
 
 warnings.filterwarnings('ignore')
 
@@ -62,7 +68,11 @@ class BinaryWrapper(BaseEstimator, ClassifierMixin):
         p_proba = self.predict_proba(X)
         return (p_proba[:, 1] >= 0.5).astype(int)
 
-app = FastAPI(title="FraudRadar AI - Fixed Weight Fusion (Retrained)")
+app = FastAPI(
+    title="VoiceGuard AI - Dual-Stream Voice Deepfake Detection API",
+    description="Real-time multilingual voice spoofing detection for banking telephony & Video-KYC.",
+    version="2.0.0"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -155,7 +165,7 @@ def load_models():
         model_state.calibrated_bio = joblib.load(os.path.join(base_dir, 'models', 'calibrated_bio.pkl'))
         model_state.calibrated_deep = joblib.load(os.path.join(base_dir, 'models', 'calibrated_deep.pkl'))
     except Exception as e:
-        print(f"Calibrated classifiers load failed: {e}")
+        logger.warning(f"Calibrated classifiers load failed: {e}")
 
     # 4. Load Meta-Classifier (kept for reference)
     try:
@@ -163,17 +173,23 @@ def load_models():
         with open(os.path.join(base_dir, 'models', 'meta_config.json'), 'r') as f:
             model_state.meta_cfg = json.load(f)
     except Exception as e:
-        print(f"Meta-classifier load failed: {e}")
+        logger.warning(f"Meta-classifier load failed: {e}")
 
     model_state.is_loaded = True
-    print("Models loaded successfully!")
+    logger.info("Models loaded successfully!")
 
 @app.get("/health")
 def health_check():
-    return {"backend_api": "CONNECTED", "database": "CONNECTED"}
+    return {
+        "status": "healthy",
+        "backend_api": "CONNECTED",
+        "models_loaded": model_state.is_loaded,
+        "device": str(model_state.device),
+        "version": "2.0.0"
+    }
 
 @app.get("/model-status")
-def model_status():
+def model_status(auth: str = Depends(verify_api_key)):
     return {
         "feature_counts": {
             "biological_features": 349,
@@ -184,18 +200,18 @@ def model_status():
     }
 
 @app.post("/analyze")
-async def analyze_audio(file: UploadFile = File(...)):
-    print("Request Received")
+async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify_api_key)):
+    logger.info("Request Received")
     start_time = time.time()
     
     # Read the file content
     content = await file.read()
-    print("Audio Uploaded")
+    logger.info("Audio Uploaded")
     
     # Clean the audio content from trailing junk/watermarks (e.g. OPPO watermark)
     oppo_idx = content.find(b"oppoMark")
     if oppo_idx != -1:
-        print(f"Found oppoMark at byte index {oppo_idx}. Truncating trailing metadata.")
+        logger.info(f"Found oppoMark at byte index {oppo_idx}. Truncating trailing metadata.")
         content = content[:oppo_idx]
         
     # Detect the correct extension based on magic bytes and filename
@@ -221,7 +237,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         f.write(content)
 
     try:
-        print("Preprocessing Started")
+        logger.info("Preprocessing Started")
         # Load audio robustly: Try librosa first (for MP3/OGG/FLAC), then fallback to scipy (for manual JS WAVs)
         try:
             y, sr = librosa.load(temp_path, sr=16000, mono=True)
@@ -240,7 +256,7 @@ async def analyze_audio(file: UploadFile = File(...)):
                 debug_path = os.path.join(base_dir, "scratch", f"failed_live_audio_{uuid.uuid4().hex}{ext}")
                 import shutil
                 shutil.copy(temp_path, debug_path)
-                print(f"FAILED TO READ AUDIO. Saved to {debug_path}")
+                logger.error(f"FAILED TO READ AUDIO. Saved to {debug_path}")
                 raise ValueError(f"Audio format not supported. librosa error: {e_librosa}. scipy error: {e_scipy}")
             
         duration = len(y) / sr
@@ -284,7 +300,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         file_size = os.path.getsize(temp_path)
         
         # 1. Bio extraction
-        print("Extracting Biological Features")
+        logger.info("Extracting Biological Features")
         bio_feats = extract_bio_features(temp_path)
         if not bio_feats:
             raise ValueError("Bio feature extraction failed")
@@ -292,7 +308,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         df_bio_input = pd.DataFrame(bio_data)
         
         # 2. Deep extraction
-        print("Extracting Deep Features")
+        logger.info("Extracting Deep Features")
         # Dual-pass Wav2Vec2 extraction (MCT)
         y_for_deep = y[:10*16000].astype(np.float32) if len(y) > 10*16000 else y.astype(np.float32)
         
@@ -362,7 +378,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         df_deep_input.to_csv(os.path.join(base_dir, "scratch", "temp_deep.csv"), index=False)
 
         # 4. Fixed-Weight Decision Classifier (yields lower/better EER: 0.47% vs 0.71% EER)
-        print("Running Fusion Model")
+        logger.info("Running Fusion Model")
         try:
             with open(os.path.join(base_dir, 'models', 'fusion_weights.json'), 'r') as f:
                 weights = json.load(f)
@@ -375,7 +391,7 @@ async def analyze_audio(file: UploadFile = File(...)):
         p_fused = w_deep * p_deep + w_bio * p_bio
         
         # Calculate dynamic confidence score (clamped between 70.0% and 99.9%)
-        print("Generating Risk Score")
+        logger.info("Generating Risk Score")
         raw_conf = 70.0 + 30.0 * (abs(p_fused - 0.5) / 0.5)
         confidence = round(min(99.9, max(70.0, raw_conf)), 1)
         
@@ -441,11 +457,11 @@ async def analyze_audio(file: UploadFile = File(...)):
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-    print("Returning JSON Response")
+    logger.info("Returning JSON Response")
     return JSONResponse(content=result)
 
 @app.post("/feedback")
-async def process_feedback(is_correct: str = Form(...), true_label: str = Form(...)):
+async def process_feedback(is_correct: str = Form(...), true_label: str = Form(...), auth: str = Depends(verify_api_key)):
     is_correct = (is_correct.lower() == 'true')
     label = 0 if true_label == "Real" else 1
     
@@ -496,8 +512,8 @@ async def process_feedback(is_correct: str = Form(...), true_label: str = Form(.
         return JSONResponse(status_code=400, content={"status": "error", "message": "No recent analysis found."})
 
 @app.post("/retrain")
-async def retrain_model():
-    print("Retraining meta-classifier triggered...")
+async def retrain_model(auth: str = Depends(verify_api_key)):
+    logger.info("Retraining meta-classifier triggered...")
     # Call the training script
     os.system(f"{sys.executable} src/train_meta.py")
     
@@ -509,7 +525,7 @@ async def retrain_model():
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
 @app.post("/generate-report")
-async def generate_report():
+async def generate_report(auth: str = Depends(verify_api_key)):
     return {"status": "Placeholder for PDF report"}
 
 @app.get("/")

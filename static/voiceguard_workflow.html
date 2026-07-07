@@ -2130,8 +2130,8 @@ function clearInf(){['inf-time','inf-conf','inf-dur','inf-ch'].forEach(id=>{cons
 let LAST_ANALYSIS=null;
 let storedAudioBuffer=null;
 
-async function apiGet(p){const r=await fetch(BACKEND_URL+p);if(!r.ok)throw new Error(r.status);return r.json();}
-async function apiPost(p,file){const fd=new FormData();fd.append('file',file);const r=await fetch(BACKEND_URL+p,{method:'POST',body:fd});if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}return r.json();}
+async function apiGet(p){const r=await fetch(BACKEND_URL+p,{headers:{'x-api-key':'voiceguard123'}});if(!r.ok)throw new Error(r.status);return r.json();}
+async function apiPost(p,file){const fd=new FormData();fd.append('file',file);const r=await fetch(BACKEND_URL+p,{method:'POST',headers:{'x-api-key':'voiceguard123'},body:fd});if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}return r.json();}
 
 let STAGED_FILE=null;
 
@@ -2432,7 +2432,7 @@ function runDemo(){
 async function downloadReport(){
   if(!LAST_ANALYSIS){alert('Run an analysis first to generate a report.');return;}
   try{
-    const r=await fetch(BACKEND_URL+'/generate-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({case_id:LAST_ANALYSIS.case_id})});
+    const r=await fetch(BACKEND_URL+'/generate-report',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'voiceguard123'},body:JSON.stringify({case_id:LAST_ANALYSIS.case_id})});
     if(!r.ok){let d=r.statusText;try{const j=await r.json();d=j.detail||d;}catch(e){}throw new Error(d);}
     const blob=await r.blob();const url=URL.createObjectURL(blob);
     const a=document.createElement('a');a.href=url;a.download='VoiceGuard_Report_'+LAST_ANALYSIS.case_id+'.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
@@ -2746,7 +2746,7 @@ async function submitTrueLabel(trueLabel){
     const form = new FormData();
     form.append('is_correct', 'true');
     form.append('true_label', trueLabel);
-    const res = await fetch(BACKEND_URL + '/feedback', {method:'POST', body:form});
+    const res = await fetch(BACKEND_URL + '/feedback', {method:'POST', headers:{'x-api-key':'voiceguard123'}, body:form});
     const j = await res.json();
     const st = document.getElementById('feedback-status');
     st.textContent = j.message; st.style.display='block'; st.style.color='#15803D';
@@ -2760,7 +2760,7 @@ async function retrainModel(){
   const st = document.getElementById('feedback-status');
   st.textContent = "Retraining in background... please wait."; st.style.display='block'; st.style.color='#D97706';
   try{
-    const res = await fetch(BACKEND_URL + '/retrain', {method:'POST'});
+    const res = await fetch(BACKEND_URL + '/retrain', {method:'POST', headers:{'x-api-key':'voiceguard123'}});
     const j = await res.json();
     st.textContent = j.message; st.style.color='#15803D';
   }catch(e){
