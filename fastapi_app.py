@@ -214,8 +214,8 @@ def health_check():
 def model_status(auth: str = Depends(verify_api_key)):
     return {
         "feature_counts": {
-            "biological_features": 349,
-            "deep_features": len(model_state.deep_feature_cols) if model_state.deep_feature_cols else 2048
+            "biological_features": len(model_state.bio_feature_cols) if model_state.bio_feature_cols else 97,
+            "deep_features": len(model_state.deep_feature_cols) if model_state.deep_feature_cols else 4096
         },
         "model_loaded": model_state.is_loaded,
         "inference_ready": model_state.is_loaded
@@ -371,25 +371,13 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
             p_bio = 0.5
 
         if model_state.xgb_deep is not None:
-            if model_state.contrastive_head is not None:
-                # Project 4096D → 128D via contrastive head
-                raw_cols = [f'Deep_{k}' for k in range(4096)]
-                X_deep_raw = df_deep_input[raw_cols].values.astype(np.float32)
-                with torch.no_grad():
-                    X_deep_proj = model_state.contrastive_head(
-                        torch.tensor(X_deep_raw, dtype=torch.float32).to(model_state.device)
-                    ).cpu().numpy()
-                proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
-                df_deep_proj = pd.DataFrame(X_deep_proj, columns=proj_cols)
-                p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_proj)[0]
-            else:
-                # Fallback: use raw 4096D features aligned to model's feature names
-                deep_cols = model_state.deep_feature_cols if model_state.deep_feature_cols else [f'Deep_{k}' for k in range(4096)]
-                for c in deep_cols:
-                    if c not in df_deep_input.columns:
-                        df_deep_input[c] = 0.0
-                df_deep_input_aligned = df_deep_input[deep_cols]
-                p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_input_aligned)[0]
+            # Feed raw 4096D features aligned to model's feature names (primary route)
+            deep_cols = model_state.deep_feature_cols if model_state.deep_feature_cols else [f'Deep_{k}' for k in range(4096)]
+            for c in deep_cols:
+                if c not in df_deep_input.columns:
+                    df_deep_input[c] = 0.0
+            df_deep_input_aligned = df_deep_input[deep_cols]
+            p_deep_classes = model_state.xgb_deep.predict_proba(df_deep_input_aligned)[0]
             p_deep = float(1.0 - p_deep_classes[0])
         else:
             p_deep_classes = np.array([0.5, 0.16, 0.16, 0.18])
@@ -432,34 +420,170 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
             t_high = 0.54
             t_mid = 0.30
         
-        # Calculate dynamic confidence score (clamped between 70.0% and 99.9%)
-        logger.info("Generating Risk Score")
+        # ──────────────────────────────────────────────────────
+        # 5-TIER RISK CLASSIFICATION WITH EXPLAINABILITY
+        # ──────────────────────────────────────────────────────
+        logger.info("Generating Risk Score & Explanation")
+        disagreement = abs(p_bio - p_deep)
+
+        # ── Disagreement override: elevate fused score when streams conflict ──
+        if disagreement > 0.30:
+            p_fused = max(p_bio, p_deep, p_fused)
+
+        # ── 5-tier mapping ──
+        def classify_risk(score):
+            if score >= 0.75:
+                return "CRITICAL", "HIGH", "🔴 Critical Risk — AI-Generated Audio Detected"
+            elif score >= 0.50:
+                return "HIGH_RISK", "HIGH", "🟠 High Risk — Strong Synthesis Indicators"
+            elif score >= 0.25:
+                return "MODERATE", "MEDIUM", "🟡 Moderate Risk — Analyst Review Required"
+            elif score >= 0.10:
+                return "LOW_RISK", "LOW", "🟢 Low Risk — Minor Anomalies Detected"
+            else:
+                return "CLEAR", "LOW", "🟢 Clear — Genuine Human Voice"
+
+        verdict, risk_level, label = classify_risk(p_fused)
+
+        # ── Dynamic confidence (clamped 70–99.9%) ──
         raw_conf = 70.0 + 30.0 * (abs(p_fused - 0.5) / 0.5)
         confidence = round(min(99.9, max(70.0, raw_conf)), 1)
-        
-        # Override Rule as safety net
-        if p_deep > 0.70 and p_bio < 0.30:
-            p_fused = max(p_deep, p_fused)
-            verdict = "SUSPICIOUS"
-            risk_level = "MEDIUM"
-            label = "🟡 Deep Stream Disagreement (AI Voice)"
-        elif p_bio > 0.70 and 0.15 < p_deep < 0.30:
-            p_fused = max(p_bio, p_fused)
-            verdict = "SUSPICIOUS"
-            risk_level = "MEDIUM"
-            label = "🟡 Bio Stream Disagreement (AI Voice)"
-        elif p_fused >= t_high:
-            verdict = "FRAUD"
-            risk_level = "HIGH"
-            label = "🔴 AI-Generated Audio Detected"
-        elif p_fused >= t_mid:
-            verdict = "SUSPICIOUS"
-            risk_level = "MEDIUM"
-            label = "🟡 Suspicious Audio Detected"
+
+        # ── Explainability flags ──
+        flags = []
+        risk_factors = []
+        mitigating_factors = []
+
+        # Stream agreement analysis
+        if disagreement > 0.30:
+            flags.append("HIGH_DISAGREEMENT")
+            if p_bio > p_deep:
+                risk_factors.append(f"High model disagreement ({disagreement*100:.1f}%) — Bio stream flags synthetic patterns the Deep stream missed")
+            else:
+                risk_factors.append(f"High model disagreement ({disagreement*100:.1f}%) — Deep stream detects vocoder artifacts the Bio stream missed")
+        elif disagreement < 0.10:
+            flags.append("STREAMS_AGREE")
+            if p_fused < 0.25:
+                mitigating_factors.append("Both analysis streams agree this is genuine human speech")
+            else:
+                risk_factors.append("Both analysis streams independently detect synthesis indicators")
+
+        # Stream-specific borderline detection
+        if 0.35 <= p_bio <= 0.65:
+            flags.append("BIO_BORDERLINE")
+            risk_factors.append(f"Bio stream score ({p_bio*100:.1f}%) is in the uncertain zone — biological features are inconclusive")
+        elif p_bio > 0.65:
+            flags.append("BIO_ALERT")
+            risk_factors.append(f"Bio stream detects strong synthetic patterns ({p_bio*100:.1f}%)")
+        elif p_bio < 0.15:
+            mitigating_factors.append(f"Bio stream is confident this is human ({p_bio*100:.1f}%)")
+
+        if 0.35 <= p_deep <= 0.65:
+            flags.append("DEEP_BORDERLINE")
+            risk_factors.append(f"Deep stream score ({p_deep*100:.1f}%) is in the uncertain zone — Wav2Vec2 embeddings are inconclusive")
+        elif p_deep > 0.65:
+            flags.append("DEEP_ALERT")
+            risk_factors.append(f"Deep stream detects strong vocoder artifacts ({p_deep*100:.1f}%)")
+        elif p_deep < 0.15:
+            mitigating_factors.append(f"Deep stream is confident this is human ({p_deep*100:.1f}%)")
+
+        # Bio-specific feature flags (analyze individual bio features for explainability)
+        bio_feats_raw = bio_feats if bio_feats else {}
+        jitter_val = bio_feats_raw.get('Jitter_Mean', None)
+        shimmer_val = bio_feats_raw.get('Shimmer_Mean', None)
+        hnr_val = bio_feats_raw.get('HNR_Mean', None)
+        pitch_std_val = bio_feats_raw.get('Pitch_Std', None)
+        flatness_val = bio_feats_raw.get('Flatness_Mean', None)
+
+        if jitter_val is not None and jitter_val < 0.003:
+            flags.append("LOW_JITTER")
+            risk_factors.append(f"Jitter is unusually low ({jitter_val:.4f}) — synthetic voices often lack natural pitch perturbation")
+        if shimmer_val is not None and shimmer_val < 0.02:
+            flags.append("LOW_SHIMMER")
+            risk_factors.append(f"Shimmer is unusually low ({shimmer_val:.4f}) — synthetic voices have unnaturally stable amplitude")
+        if hnr_val is not None and hnr_val > 30:
+            flags.append("HIGH_HNR")
+            risk_factors.append(f"HNR is unusually high ({hnr_val:.1f} dB) — voice is unnaturally clean, typical of neural vocoders")
+        if pitch_std_val is not None and pitch_std_val < 5.0:
+            flags.append("FLAT_PITCH")
+            risk_factors.append(f"Pitch variation is very low ({pitch_std_val:.1f} Hz) — monotone delivery typical of early TTS")
+        if flatness_val is not None and flatness_val < 0.001:
+            flags.append("LOW_SPECTRAL_FLATNESS")
+            risk_factors.append("Spectral flatness is very low — unnaturally tonal, possible formant synthesis artifact")
+
+        # Confidence qualifier
+        if p_fused > 0.85 or p_fused < 0.10:
+            flags.append("HIGH_CONFIDENCE")
+        elif 0.30 <= p_fused <= 0.60:
+            flags.append("LOW_CONFIDENCE")
+            risk_factors.append("Fusion score is in the uncertain range — treat verdict with caution")
+
+        # ── Stream assessment text ──
+        def stream_assessment(score, stream_name):
+            if score < 0.10:
+                return f"Confident genuine — no {stream_name} anomalies detected"
+            elif score < 0.25:
+                return f"Likely genuine — minor {stream_name} anomalies present"
+            elif score < 0.50:
+                return f"Borderline — {stream_name} patterns are atypical but not conclusive"
+            elif score < 0.75:
+                return f"Likely synthetic — {stream_name} detects significant anomalies"
+            else:
+                return f"Confident synthetic — strong {stream_name} indicators of AI generation"
+
+        def agreement_level(d):
+            if d < 0.10:
+                return f"HIGH ({d*100:.1f}% disagreement)"
+            elif d < 0.20:
+                return f"MODERATE ({d*100:.1f}% disagreement)"
+            elif d < 0.30:
+                return f"LOW ({d*100:.1f}% disagreement)"
+            else:
+                return f"CRITICAL ({d*100:.1f}% disagreement)"
+
+        # ── Primary concern text ──
+        if disagreement > 0.30 and p_bio > p_deep:
+            primary_concern = "Bio stream detects potential synthesis artifacts that the Deep stream does not recognize — possible novel vocoder not in training data"
+        elif disagreement > 0.30 and p_deep > p_bio:
+            primary_concern = "Deep stream detects vocoder artifacts that biological features miss — possible high-quality clone with natural prosody"
+        elif p_fused >= 0.50:
+            primary_concern = "Both streams indicate this audio contains synthetic speech characteristics"
+        elif p_fused >= 0.25:
+            primary_concern = "Inconclusive analysis — audio shows some atypical patterns that warrant human review"
         else:
-            verdict = "LEGITIMATE"
-            risk_level = "LOW"
-            label = "🟢 Genuine Human Voice"
+            primary_concern = "No significant synthesis indicators detected"
+
+        # ── Recommendation ──
+        RECOMMENDATIONS = {
+            "CRITICAL": {"action": "BLOCK", "urgency": "CRITICAL", "detail": "Immediately block and escalate. Both analysis streams detect strong AI generation signatures. Flag source number for investigation."},
+            "HIGH_RISK": {"action": "BLOCK", "urgency": "HIGH", "detail": "Block the call and queue for supervisor review. Significant synthesis indicators detected across the analysis pipeline."},
+            "MODERATE": {"action": "REVIEW", "urgency": "MEDIUM", "detail": "Route to analyst queue for manual spectrogram inspection. Audio shows patterns that may indicate a synthesis method not yet fully characterized."},
+            "LOW_RISK": {"action": "ALLOW_MONITOR", "urgency": "LOW", "detail": "Allow the call but log for pattern analysis. Minor anomalies detected that are likely benign but worth tracking."},
+            "CLEAR": {"action": "ALLOW", "urgency": "NONE", "detail": "No action required. Audio is consistent with natural human speech across all analysis dimensions."}
+        }
+        rec = RECOMMENDATIONS[verdict]
+
+        # Override recommendation for disagreement cases
+        if "HIGH_DISAGREEMENT" in flags and verdict in ("CLEAR", "LOW_RISK"):
+            rec = {"action": "REVIEW", "urgency": "MEDIUM", "detail": "Model disagreement exceeds safety threshold. Route to analyst for manual review despite low fusion score."}
+            verdict = "MODERATE"
+            risk_level = "MEDIUM"
+            label = "🟡 Moderate Risk — High Model Disagreement"
+
+        # ── Build explanation object ──
+        explanation = {
+            "summary": primary_concern,
+            "flags": flags,
+            "stream_analysis": {
+                "bio_score": round(p_bio * 100, 1),
+                "bio_assessment": stream_assessment(p_bio, "biological/prosodic"),
+                "deep_score": round(p_deep * 100, 1),
+                "deep_assessment": stream_assessment(p_deep, "vocoder/spectral"),
+                "agreement": agreement_level(disagreement)
+            },
+            "risk_factors": risk_factors if risk_factors else ["No significant risk factors identified"],
+            "mitigating_factors": mitigating_factors if mitigating_factors else ["No specific mitigating factors"]
+        }
 
         # Chunk results (used by UI plots)
         chunk_results = [
@@ -472,23 +596,25 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
             "fraud_score": round(p_fused * 100, 1),
             "confidence": confidence,
             "risk_level": risk_level,
+            "risk_tier": verdict,
             "verdict": verdict,
             "verdict_label": label,
             "primary_trigger": "Robust 5-input Meta Classifier" if using_meta else "Fixed Weight Fusion",
             "secondary_trigger": "Wav2Vec2 Anomaly" if p_deep > p_bio else "Bio Feature Anomaly",
-            "recommendation": "Block User" if verdict == "FRAUD" else ("Manual Review" if verdict == "SUSPICIOUS" else "Allow"),
+            "explanation": explanation,
+            "recommendation": rec,
             "using_real_models": True,
             "metadata": {"filename": file.filename, "format": "WAV", "sample_rate": 16000, "channels": 1, "duration": round(duration, 2), "file_size_bytes": file_size},
-            "performance": {"model_version": "v2.1-MetaClassifier" if using_meta else "v2.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
+            "performance": {"model_version": "v3.0-5TierExplainable" if using_meta else "v3.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
             "threat_intel": {
                 "threat_type": (
                     "ElevenLabs Clone" if np.argmax(p_deep_classes[1:]) == 0 else (
                         "Resemble AI Clone" if np.argmax(p_deep_classes[1:]) == 1 else "Generic TTS Clone"
                     )
-                ) if verdict != "LEGITIMATE" else "None",
-                "sophistication": "Advanced" if verdict != "LEGITIMATE" else "None",
+                ) if verdict not in ("CLEAR", "LOW_RISK") else "None",
+                "sophistication": "Advanced" if verdict in ("CRITICAL", "HIGH_RISK") else ("Moderate" if verdict == "MODERATE" else "None"),
                 "replay_indicators": "None",
-                "synthetic_confidence": round(float(max(p_deep_classes[1:])) * 100, 1) if verdict != "LEGITIMATE" else 0.0
+                "synthetic_confidence": round(float(max(p_deep_classes[1:])) * 100, 1) if verdict not in ("CLEAR", "LOW_RISK") else 0.0
             },
             "chunk_results": chunk_results
         }
