@@ -9,6 +9,18 @@ LOCAL_IMAGE = "voiceguard-ai"
 # Force standard compatible API version to prevent 500 Internal Server Error
 os.environ["DOCKER_API_VERSION"] = "1.41"
 
+# Auto-discover Docker on Windows if not in PATH
+if sys.platform == "win32":
+    standard_paths = [
+        r"C:\Program Files\Docker\Docker\resources\bin",
+        r"C:\Program Files\Docker\Docker\resources",
+        r"C:\Program Files\Docker\Docker\Docker\resources\bin"
+    ]
+    for p in standard_paths:
+        if os.path.exists(os.path.join(p, "docker.exe")):
+            os.environ["PATH"] = p + os.pathsep + os.environ.get("PATH", "")
+            break
+
 def run_command(cmd):
     print(f"Running: {' '.join(cmd)}")
     try:

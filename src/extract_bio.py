@@ -137,10 +137,8 @@ def extract_bio_features(audio_path):
     if len(f0_clean) > 0:
         features['Pitch_Mean'] = float(np.mean(f0_clean))
         features['Pitch_Std'] = float(np.std(f0_clean))
-        features['Pitch_Min'] = float(np.min(f0_clean))
-        features['Pitch_Max'] = float(np.max(f0_clean))
     else:
-        features['Pitch_Mean'], features['Pitch_Std'], features['Pitch_Min'], features['Pitch_Max'] = 0.0, 0.0, 0.0, 0.0
+        features['Pitch_Mean'], features['Pitch_Std'] = 0.0, 0.0
 
     # 3. Jitter and Shimmer
     j_mean, j_std = compute_jitter(f0_clean)
@@ -157,23 +155,21 @@ def extract_bio_features(audio_path):
     perc_energy = np.sum(y_perc**2)
     features['HNR_Mean'] = float(10 * np.log10(harm_energy / perc_energy)) if perc_energy > 0 else 0.0
 
-    # 5. MFCCs (40 coefficients for finer spectral texture detail across entire spectrum)
-    mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40, hop_length=hop_length)
-    for i in range(40):
+    # 5. MFCCs (13 coefficients for general spectral texture)
+    mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13, hop_length=hop_length)
+    for i in range(13):
         features[f'MFCC_{i+1}_Mean'] = float(np.mean(mfccs[i]))
         features[f'MFCC_{i+1}_Std'] = float(np.std(mfccs[i]))
-        features[f'MFCC_{i+1}_Min'] = float(np.min(mfccs[i]))
-        features[f'MFCC_{i+1}_Max'] = float(np.max(mfccs[i]))
 
     # 5b. Delta MFCCs (rate of spectral change — captures phoneme transition smoothness)
     delta_mfccs = librosa.feature.delta(mfccs)
-    for i in range(40):
+    for i in range(13):
         features[f'Delta_MFCC_{i+1}_Mean'] = float(np.mean(delta_mfccs[i]))
         features[f'Delta_MFCC_{i+1}_Std'] = float(np.std(delta_mfccs[i]))
 
     # 5c. Delta-Delta MFCCs (acceleration of spectral change)
     delta2_mfccs = librosa.feature.delta(mfccs, order=2)
-    for i in range(40):
+    for i in range(13):
         features[f'Delta2_MFCC_{i+1}_Mean'] = float(np.mean(delta2_mfccs[i]))
         features[f'Delta2_MFCC_{i+1}_Std'] = float(np.std(delta2_mfccs[i]))
 
@@ -181,8 +177,6 @@ def extract_bio_features(audio_path):
     rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr, roll_percent=0.95, hop_length=hop_length)[0]
     features['RollOff_Mean'] = float(np.mean(rolloff))
     features['RollOff_Std'] = float(np.std(rolloff))
-    features['RollOff_Min'] = float(np.min(rolloff))
-    features['RollOff_Max'] = float(np.max(rolloff))
 
     # 7. Spectral Flatness & Contrast
     flatness = librosa.feature.spectral_flatness(y=y, hop_length=hop_length)[0]

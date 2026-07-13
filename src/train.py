@@ -151,28 +151,25 @@ def main():
     torch.save(contrastive_head.state_dict(), os.path.join(models_dir, 'contrastive_head.pt'))
     print("Contrastive projection head saved to models/contrastive_head.pt")
     
-    # Project features for XGB_Deep
-    contrastive_head.eval()
-    with torch.no_grad():
-        X_train_deep_proj = contrastive_head(torch.tensor(X_train_deep, dtype=torch.float32).to(device)).cpu().numpy()
-        X_val_deep_proj = contrastive_head(torch.tensor(val_df[deep_cols].values, dtype=torch.float32).to(device)).cpu().numpy()
-        X_test_deep_proj = contrastive_head(torch.tensor(test_df[deep_cols].values, dtype=torch.float32).to(device)).cpu().numpy()
-        
-    proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
-    train_df_proj = pd.DataFrame(X_train_deep_proj, columns=proj_cols, index=train_df.index)
-    val_df_proj = pd.DataFrame(X_val_deep_proj, columns=proj_cols, index=val_df.index)
-    test_df_proj = pd.DataFrame(X_test_deep_proj, columns=proj_cols, index=test_df.index)
-    
-    print("\nTraining XGB_Deep (Wav2Vec2 stream in multiclass space on 128D projected features)...")
-    xgb_deep = xgb.XGBClassifier(objective='multi:softprob', num_class=4, n_estimators=200, max_depth=5, learning_rate=0.05, n_jobs=-1, random_state=42)
-    xgb_deep.fit(train_df_proj, train_df['MulticlassLabel'])
+    # Train XGBoost directly on full 4096D MCT features with strong regularization
+    print("\nTraining XGB_Deep (Wav2Vec2 stream on full 4096D MCT features, strongly regularized)...")
+    xgb_deep = xgb.XGBClassifier(
+        objective='multi:softprob', num_class=4,
+        n_estimators=150, max_depth=3, learning_rate=0.05,
+        colsample_bytree=0.3,   # Each tree sees only 30% of 4096 features
+        subsample=0.8,           # Each tree sees 80% of samples
+        reg_alpha=1.5,           # L1 sparsity penalty
+        reg_lambda=3.0,          # L2 weight shrinkage
+        n_jobs=-1, random_state=42
+    )
+    xgb_deep.fit(train_df[deep_cols], train_df['MulticlassLabel'])
 
     print("Training XGB_Bio (Biological stream in multiclass)...")
     xgb_bio = xgb.XGBClassifier(objective='multi:softprob', num_class=4, n_estimators=200, max_depth=5, learning_rate=0.05, n_jobs=-1, random_state=42)
     xgb_bio.fit(train_df[bio_cols], train_df['MulticlassLabel'])
 
     # Optimize Fusion
-    p_val_deep = 1.0 - xgb_deep.predict_proba(val_df_proj)[:, 0]
+    p_val_deep = 1.0 - xgb_deep.predict_proba(val_df[deep_cols])[:, 0]
     p_val_bio = 1.0 - xgb_bio.predict_proba(val_df[bio_cols])[:, 0]
     y_val = val_df['Label'].values
 
@@ -184,7 +181,7 @@ def main():
     print(f"\nOptimization complete. Optimal Deep Weight: {optimal_w:.3f}")
 
     # Test Eval
-    p_test_deep = 1.0 - xgb_deep.predict_proba(test_df_proj)[:, 0]
+    p_test_deep = 1.0 - xgb_deep.predict_proba(test_df[deep_cols])[:, 0]
     p_test_bio = 1.0 - xgb_bio.predict_proba(test_df[bio_cols])[:, 0]
     p_test_fused = optimal_w * p_test_deep + (1 - optimal_w) * p_test_bio
     y_test = test_df['Label'].values
@@ -194,10 +191,7 @@ def main():
     
     hin_test_df = df.loc[hin_ts]
     if len(hin_test_df) > 0:
-        with torch.no_grad():
-            X_hin_deep = contrastive_head(torch.tensor(hin_test_df[deep_cols].values, dtype=torch.float32).to(device)).cpu().numpy()
-        hin_test_df_proj = pd.DataFrame(X_hin_deep, columns=proj_cols, index=hin_test_df.index)
-        p_hin_deep = 1.0 - xgb_deep.predict_proba(hin_test_df_proj)[:, 0]
+        p_hin_deep = 1.0 - xgb_deep.predict_proba(hin_test_df[deep_cols])[:, 0]
         p_hin_bio = 1.0 - xgb_bio.predict_proba(hin_test_df[bio_cols])[:, 0]
         p_hin_fused = optimal_w * p_hin_deep + (1 - optimal_w) * p_hin_bio
         y_hin = hin_test_df['Label'].values
@@ -209,20 +203,14 @@ def main():
     eleven_mask = test_df['Filename'].str.contains('elevenlabs', case=False)
     eleven_test_df = test_df[eleven_mask]
     if len(eleven_test_df) > 0:
-        with torch.no_grad():
-            X_el_deep = contrastive_head(torch.tensor(eleven_test_df[deep_cols].values, dtype=torch.float32).to(device)).cpu().numpy()
-        eleven_test_df_proj = pd.DataFrame(X_el_deep, columns=proj_cols, index=eleven_test_df.index)
-        p_el_deep = 1.0 - xgb_deep.predict_proba(eleven_test_df_proj)[:, 0]
+        p_el_deep = 1.0 - xgb_deep.predict_proba(eleven_test_df[deep_cols])[:, 0]
         p_el_bio = 1.0 - xgb_bio.predict_proba(eleven_test_df[bio_cols])[:, 0]
         p_el_fused = optimal_w * p_el_deep + (1 - optimal_w) * p_el_bio
         
         real_mask = test_df['Label'] == 0
         real_test_df = test_df[real_mask].sample(n=min(len(eleven_test_df), len(test_df[real_mask])), random_state=42)
         
-        with torch.no_grad():
-            X_real_deep = contrastive_head(torch.tensor(real_test_df[deep_cols].values, dtype=torch.float32).to(device)).cpu().numpy()
-        real_test_df_proj = pd.DataFrame(X_real_deep, columns=proj_cols, index=real_test_df.index)
-        p_real_deep = 1.0 - xgb_deep.predict_proba(real_test_df_proj)[:, 0]
+        p_real_deep = 1.0 - xgb_deep.predict_proba(real_test_df[deep_cols])[:, 0]
         
         eval_df = pd.concat([eleven_test_df, real_test_df])
         p_eval_fused = np.concatenate([p_el_fused, (optimal_w * p_real_deep + (1 - optimal_w) * (1.0 - xgb_bio.predict_proba(real_test_df[bio_cols])[:, 0]))])

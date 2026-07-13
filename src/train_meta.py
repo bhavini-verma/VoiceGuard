@@ -90,11 +90,12 @@ def load_audio_fast(path):
     return librosa.load(path, sr=16000, mono=True)
 
 class BinaryWrapper(BaseEstimator, ClassifierMixin):
-    def __init__(self, multiclass_xgb, contrastive_head=None):
+    def __init__(self, multiclass_xgb, contrastive_head=None, pca=None):
         self.multiclass_xgb = multiclass_xgb
         self.contrastive_head = contrastive_head
+        self.pca = pca
         self.classes_ = np.array([0, 1])
-        if contrastive_head is not None:
+        if contrastive_head is not None or pca is not None:
             self.feature_names_in_ = [f'Proj_Deep_{i}' for i in range(128)]
             self.n_features_in_ = 128
         else:
@@ -105,7 +106,12 @@ class BinaryWrapper(BaseEstimator, ClassifierMixin):
         return self
 
     def predict_proba(self, X):
-        if self.contrastive_head is not None:
+        if self.pca is not None:
+            X_proj = self.pca.transform(X)
+            proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
+            X_df = pd.DataFrame(X_proj, columns=proj_cols)
+            p_raw = self.multiclass_xgb.predict_proba(X_df)
+        elif self.contrastive_head is not None:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.contrastive_head.eval()
             with torch.no_grad():
@@ -139,6 +145,10 @@ def main():
     contrastive_head = ContrastiveProjectionHead().to(device)
     contrastive_head.load_state_dict(torch.load(os.path.join(base_dir, 'models', 'contrastive_head.pt'), map_location=device))
     contrastive_head.eval()
+    
+    # Load PCA model (Unsupervised dimensional reducer)
+    import joblib
+    pca = joblib.load(os.path.join(base_dir, 'models', 'pca_model.pkl'))
     
     # MCT deep features: 4096D per row (clean 2048D + degraded 2048D)
     deep_cols = [f'Deep_{i}' for i in range(4096)]
@@ -232,9 +242,9 @@ def main():
     # We use BinaryWrapper directly to get raw probabilities on a 0.0-1.0 scale.
     # Sigmoid calibration is removed because the 0.00% EER validation set makes sigmoid fitting numerically unstable (complete separation).
     calibrated_bio = BinaryWrapper(xgb_bio)
-    calibrated_deep = BinaryWrapper(xgb_deep, contrastive_head=contrastive_head)
+    calibrated_deep = BinaryWrapper(xgb_deep)  # Direct 4096D → XGBoost, no projection needed
 
-    # 2. Build 8-column meta-features mapping function
+    # 2. Build 5-column meta-features mapping function (Robust, no metadata shortcuts)
     def build_meta_features(df_split):
         X_bio = df_split[bio_cols].apply(pd.to_numeric, errors='coerce').fillna(0.0).values
         X_deep = df_split[deep_cols].apply(pd.to_numeric, errors='coerce').fillna(0.0).values
@@ -243,20 +253,12 @@ def main():
         p_bio = calibrated_bio.predict_proba(X_bio)[:, 1]
         p_deep = calibrated_deep.predict_proba(X_deep)[:, 1]
         
-        # Audio quality features from lookup table
-        snr = df_split['Filename'].map(lambda x: aq_features[x]['snr']).values
-        audio_dur = df_split['Filename'].map(lambda x: aq_features[x]['audio_dur']).values
-        silence_ratio = df_split['Filename'].map(lambda x: aq_features[x]['silence_ratio']).values
-        
         meta_df = pd.DataFrame({
             'bio_score': p_bio,
             'deep_score': p_deep,
             'disagreement': np.abs(p_bio - p_deep),
             'max_score': np.maximum(p_bio, p_deep),
-            'min_score': np.minimum(p_bio, p_deep),
-            'snr': snr,
-            'audio_dur': audio_dur,
-            'silence_ratio': silence_ratio
+            'min_score': np.minimum(p_bio, p_deep)
         })
         return meta_df
 
@@ -293,13 +295,6 @@ def main():
     test_probs = meta_clf.predict_proba(X_test_meta)[:, 1]
     test_eer, _ = compute_eer(y_test, test_probs)
 
-    # 5-input baseline comparison (scores only)
-    X_train_5in = X_train_meta[['bio_score', 'deep_score', 'disagreement', 'max_score', 'min_score']]
-    X_test_5in = X_test_meta[['bio_score', 'deep_score', 'disagreement', 'max_score', 'min_score']]
-    meta_5in = LogisticRegression(C=1.0, max_iter=1000, class_weight='balanced')
-    meta_5in.fit(X_train_5in, y_train)
-    test_eer_5in, _ = compute_eer(y_test, meta_5in.predict_proba(X_test_5in)[:, 1])
-
     # Fixed weight baseline comparison
     try:
         with open(os.path.join(base_dir, 'models', 'fusion_weights.json'), 'r') as f:
@@ -315,21 +310,14 @@ def main():
     X_test_deep_raw = test_df[deep_cols].apply(pd.to_numeric, errors='coerce').fillna(0.0).values
     p_bio_raw = 1.0 - xgb_bio.predict_proba(X_test_bio_raw)[:, 0]
     
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    with torch.no_grad():
-        X_test_deep_tensor = torch.tensor(X_test_deep_raw, dtype=torch.float32).to(device)
-        X_test_deep_proj = contrastive_head(X_test_deep_tensor).cpu().numpy()
-    proj_cols = [f'Proj_Deep_{i}' for i in range(128)]
-    df_test_deep_proj = pd.DataFrame(X_test_deep_proj, columns=proj_cols)
-    p_deep_raw = 1.0 - xgb_deep.predict_proba(df_test_deep_proj)[:, 0]
+    p_deep_raw = 1.0 - xgb_deep.predict_proba(X_test_deep_raw)[:, 0]
     
     p_fixed_weight = w_deep * p_deep_raw + w_bio * p_bio_raw
     fixed_eer, _ = compute_eer(y_test, p_fixed_weight)
 
     print("\n================ COMPARISON METRICS ================")
-    print(f"Fixed weight EER (test):      {fixed_eer*100:.2f}% (deep weight: {w_deep})")
-    print(f"5-input meta EER (test):      {test_eer_5in*100:.2f}%")
-    print(f"8-input meta EER (test):      {test_eer*100:.2f}%")
+    print(f"Fixed weight EER (test):           {fixed_eer*100:.2f}% (deep weight: {w_deep})")
+    print(f"Robust 5-input Meta EER (test):    {test_eer*100:.2f}%")
     print("====================================================")
 
     # Save trained calibrated wrappers and meta classifier

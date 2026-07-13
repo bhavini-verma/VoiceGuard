@@ -175,6 +175,28 @@ def load_models():
     except Exception as e:
         logger.warning(f"Meta-classifier load failed: {e}")
 
+    # 5. Warm Up Deep Learning Models to prevent cold start latency
+    if model_state.w2v_model is not None and model_state.processor is not None and model_state.contrastive_head is not None:
+        try:
+            logger.info("Warming up Deep Learning models on startup...")
+            dummy_audio = np.zeros((16000,), dtype=np.float32)
+            dummy_input = model_state.processor([dummy_audio], sampling_rate=16000, return_tensors="pt")
+            dummy_input = {k: v.to(model_state.device) for k, v in dummy_input.items()}
+            with torch.no_grad():
+                if model_state.device.type == 'cuda':
+                    with torch.amp.autocast('cuda'):
+                        out = model_state.w2v_model(**dummy_input)
+                else:
+                    out = model_state.w2v_model(**dummy_input)
+                h12 = out.hidden_states[12]
+                
+                # Warm up contrastive head
+                dummy_deep_feats = torch.zeros((1, 4096), dtype=torch.float32).to(model_state.device)
+                _ = model_state.contrastive_head(dummy_deep_feats)
+            logger.info("Deep Learning models warmed up successfully!")
+        except Exception as warmup_err:
+            logger.warning(f"Model warmup failed: {warmup_err}")
+
     model_state.is_loaded = True
     logger.info("Models loaded successfully!")
 
@@ -377,26 +399,43 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
         df_bio_input.to_csv(os.path.join(base_dir, "scratch", "temp_bio.csv"), index=False)
         df_deep_input.to_csv(os.path.join(base_dir, "scratch", "temp_deep.csv"), index=False)
 
-        # 4. Fixed-Weight Decision Classifier (yields lower/better EER: 0.47% vs 0.71% EER)
+        # 4. Decision Fusion (uses Robust 5-input Meta-Classifier if trained, otherwise falls back to Fixed-Weight)
         logger.info("Running Fusion Model")
-        try:
-            with open(os.path.join(base_dir, 'models', 'fusion_weights.json'), 'r') as f:
-                weights = json.load(f)
-            w_deep = weights.get('w_deep', 0.236)
-            w_bio = weights.get('w_bio', 0.764)
-        except:
-            w_deep = 0.236
-            w_bio = 0.764
-            
-        p_fused = w_deep * p_deep + w_bio * p_bio
+        using_meta = False
+        if model_state.meta_clf is not None and model_state.meta_cfg is not None:
+            try:
+                meta_features = pd.DataFrame([{
+                    'bio_score': p_bio,
+                    'deep_score': p_deep,
+                    'disagreement': abs(p_bio - p_deep),
+                    'max_score': max(p_bio, p_deep),
+                    'min_score': min(p_bio, p_deep)
+                }])
+                p_fused = float(model_state.meta_clf.predict_proba(meta_features)[0][1])
+                t_high = model_state.meta_cfg.get("threshold_high", 0.54)
+                t_mid = model_state.meta_cfg.get("threshold_mid", 0.30)
+                using_meta = True
+                logger.info("Flipped prediction to Robust 5-input Meta Classifier")
+            except Exception as meta_err:
+                logger.warning(f"Meta-classifier inference failed: {meta_err}. Falling back to fixed weight.")
+
+        if not using_meta:
+            try:
+                with open(os.path.join(base_dir, 'models', 'fusion_weights.json'), 'r') as f:
+                    weights = json.load(f)
+                w_deep = weights.get('w_deep', 0.236)
+                w_bio = weights.get('w_bio', 0.764)
+            except:
+                w_deep = 0.236
+                w_bio = 0.764
+            p_fused = w_deep * p_deep + w_bio * p_bio
+            t_high = 0.54
+            t_mid = 0.30
         
         # Calculate dynamic confidence score (clamped between 70.0% and 99.9%)
         logger.info("Generating Risk Score")
         raw_conf = 70.0 + 30.0 * (abs(p_fused - 0.5) / 0.5)
         confidence = round(min(99.9, max(70.0, raw_conf)), 1)
-        
-        t_high = 0.54
-        t_mid = 0.30
         
         # Override Rule as safety net
         if p_deep > 0.70 and p_bio < 0.30:
@@ -435,12 +474,12 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
             "risk_level": risk_level,
             "verdict": verdict,
             "verdict_label": label,
-            "primary_trigger": "Fixed Weight Fusion" if p_fused > 0.5 else "None",
+            "primary_trigger": "Robust 5-input Meta Classifier" if using_meta else "Fixed Weight Fusion",
             "secondary_trigger": "Wav2Vec2 Anomaly" if p_deep > p_bio else "Bio Feature Anomaly",
             "recommendation": "Block User" if verdict == "FRAUD" else ("Manual Review" if verdict == "SUSPICIOUS" else "Allow"),
             "using_real_models": True,
             "metadata": {"filename": file.filename, "format": "WAV", "sample_rate": 16000, "channels": 1, "duration": round(duration, 2), "file_size_bytes": file_size},
-            "performance": {"model_version": "v2.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
+            "performance": {"model_version": "v2.1-MetaClassifier" if using_meta else "v2.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
             "threat_intel": {
                 "threat_type": (
                     "ElevenLabs Clone" if np.argmax(p_deep_classes[1:]) == 0 else (
