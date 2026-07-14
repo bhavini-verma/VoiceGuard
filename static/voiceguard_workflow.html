@@ -1088,7 +1088,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
         <div class="hero-stat"><div class="hero-stat-label">Classification</div><div class="hero-stat-val" id="h-class">—</div></div>
         <div class="hero-stat"><div class="hero-stat-label">Confidence</div><div class="hero-stat-val" id="h-conf">—</div></div>
         <div class="hero-stat"><div class="hero-stat-label">Duration</div><div class="hero-stat-val" id="h-dur">—</div></div>
-        <div class="hero-stat"><div class="hero-stat-label">Proc. Time</div><div class="hero-stat-val" id="h-proc">—</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Processing Time</div><div class="hero-stat-val" id="h-proc">—</div></div>
       </div>
       <div class="hero-rec" id="hero-rec"><i class="ti ti-info-circle"></i><span id="hero-rec-text">No active analysis — submit audio to receive a forensic recommendation.</span></div>
     </div>
@@ -1201,20 +1201,20 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
             <!-- Bio circle -->
             <circle cx="110" cy="170" r="70" fill="#EFF8FF" stroke="#38BDF8" stroke-width="1.5"/>
             <text x="110" y="150" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="#005BAC">Biological</text>
-            <text x="110" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">349 Features</text>
+            <text x="110" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">97 Features</text>
             <text x="110" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#38BDF8" id="bio-score-text">—</text>
 
             <!-- DL circle -->
             <circle cx="430" cy="170" r="70" fill="#ECFDF5" stroke="#14B8A6" stroke-width="1.5"/>
             <text x="430" y="150" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill="#0F766E">Deep Learning</text>
-            <text x="430" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">2048 Features</text>
+            <text x="430" y="167" text-anchor="middle" font-family="Inter" font-size="11" fill="#6B7280">4096 Features</text>
             <text x="430" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#14B8A6" id="dl-score-text">—</text>
 
             <!-- Center Fusion circle -->
             <circle cx="270" cy="170" r="78" fill="#F0F7FF" stroke="#005BAC" stroke-width="2"/>
             <circle cx="270" cy="170" r="74" fill="none" stroke="#005BAC" stroke-width=".5" stroke-dasharray="4 3" opacity=".4"/>
             <text x="270" y="148" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#005BAC">FUSION CORE</text>
-            <text x="270" y="163" text-anchor="middle" font-family="Inter" font-size="10" fill="#6B7280">2,397 Features</text>
+            <text x="270" y="163" text-anchor="middle" font-family="Inter" font-size="10" fill="#6B7280">4,193 Features</text>
             <text x="270" y="180" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" fill="#005BAC" id="fus-score-text">—</text>
             <text x="270" y="198" text-anchor="middle" font-family="Inter" font-size="9" fill="#6B7280">Fraud Probability</text>
             <text x="270" y="213" text-anchor="middle" font-family="Inter" font-size="10" font-weight="600" fill="#6B7280" id="fus-risk-text">—</text>
@@ -1588,7 +1588,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
             </div>
             <div class="kb-item" onclick="toggleKb(this)">
               <div class="kb-item-hdr"><div class="kb-q">How does VoiceGuard work?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
-              <div class="kb-ans">VoiceGuard uses a dual-engine Fusion Architecture: (1) Biological Feature Engine — extracts 349 features including jitter, shimmer, HNR, pitch variation, and prosody. (2) Deep Learning Engine — uses Wav2Vec2 to extract 2048 embeddings. Both engines feed into a Fusion Core that generates a final fraud probability score and risk classification.</div>
+              <div class="kb-ans">VoiceGuard uses a dual-engine Fusion Architecture: (1) Biological Feature Engine — extracts 97 features including jitter, shimmer, HNR, pitch variation, and prosody. (2) Deep Learning Engine — uses Wav2Vec2 to extract 4096 embeddings. Both engines feed into a Fusion Core that generates a final fraud probability score and risk classification.</div>
             </div>
             <div class="kb-item" onclick="toggleKb(this)">
               <div class="kb-item-hdr"><div class="kb-q">What does the confidence score mean?</div><i class="ti ti-chevron-down" style="font-size:13px;color:var(--text3)"></i></div>
@@ -1707,7 +1707,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
                 <div style="font-size:12px;font-weight:700;color:var(--text)">AI Investigation Summary</div>
                 <div style="font-size:10px;color:var(--text3)">Automated forensic analysis · Fusion v2.0</div>
               </div>
-              <div style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--success)"><div style="width:5px;height:5px;border-radius:50%;background:var(--success)"></div><span id="inv-ai-summary-status">Analysis Complete</span></div>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--success)"><div style="width:5px;height:5px;border-radius:50%;background:var(--success)"></div><span id="inv-ai-summary-status">Forensic Analysis Complete</span></div>
             </div>
             <div style="padding:14px 16px" id="inv-ai-summary-body">
               <div class="ai-finding-section">
@@ -1754,7 +1754,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
           </div>
           <div class="inv-chat-quick">
             <span class="cq-btn" onclick="invChat('Why is this voice fake?')">Why is this fake?</span>
-            <span class="cq-btn" onclick="invChat('Show all evidence for this case.')">Show evidence</span>
+            <span class="cq-btn" onclick="sendChat('Show all evidence for this case.')">Show evidence</span>
             <span class="cq-btn" onclick="invChat('Explain what a replay attack is.')">Replay attack</span>
             <span class="cq-btn" onclick="invChat('Generate a full investigation report summary.')">Generate report</span>
             <span class="cq-btn" onclick="invChat('What should be the next action?')">Next action</span>
@@ -1931,9 +1931,9 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
           <div class="inv-tl-wrap" id="inv-timeline">
             <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-0"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-0">Audio Received</div><div class="inv-tl-detail" id="itd-0">Awaiting audio submission</div></div></div>
             <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-1"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-1">Preprocessing</div><div class="inv-tl-detail" id="itd-1">Standardization · Noise reduction</div></div></div>
-            <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-2"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-2">Feature Extraction</div><div class="inv-tl-detail" id="itd-2">2,397 features extracted</div></div></div>
+            <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-2"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-2">Feature Extraction</div><div class="inv-tl-detail" id="itd-2">4,290 features extracted</div></div></div>
             <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-3"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-3">Replay Detection</div><div class="inv-tl-detail" id="itd-3">Spectral & temporal analysis</div></div></div>
-            <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-4"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-4">Deep Learning Analysis</div><div class="inv-tl-detail" id="itd-4">Wav2Vec2 + ResNet inference</div></div></div>
+            <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-4"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-4">Deep Learning Analysis</div><div class="inv-tl-detail" id="itd-4">Wav2Vec2 Inference</div></div></div>
             <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-5"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-5">Fusion Engine</div><div class="inv-tl-detail" id="itd-5">Biological + DL score fusion</div></div></div>
             <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-6"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-6">Risk Classification</div><div class="inv-tl-detail" id="itd-6">Threat level assigned</div></div></div>
             <div class="inv-tl-item"><div class="inv-tl-dot pend" id="itl-7"></div><div class="inv-tl-body"><div class="inv-tl-step pend" id="itx-7">Investigation Report</div><div class="inv-tl-detail" id="itd-7">Forensic report generated</div></div></div>
@@ -2032,6 +2032,15 @@ const wCtx=waveCanvas.getContext('2d');
 let waveData=[];let isPlaying=false;let wavePos=0;
 function resizeWave(){waveCanvas.width=waveCanvas.offsetWidth*devicePixelRatio;waveCanvas.height=waveCanvas.offsetHeight*devicePixelRatio;wCtx.scale(devicePixelRatio,devicePixelRatio);}
 resizeWave();
+waveCanvas.style.cursor='pointer';
+waveCanvas.addEventListener('click',(e)=>{
+  if(!currentAudio||!currentAudio.duration||waveData.length===0)return;
+  const rect=waveCanvas.getBoundingClientRect();
+  const seekRatio=(e.clientX-rect.left)/rect.width;
+  currentAudio.currentTime=seekRatio*currentAudio.duration;
+  wavePos=Math.floor(seekRatio*waveData.length);
+  drawWave(waveData,wavePos);
+});
 function drawWave(data,pos){
   const w=waveCanvas.offsetWidth,h=waveCanvas.offsetHeight;
   wCtx.clearRect(0,0,w,h);
@@ -2260,17 +2269,18 @@ function showResults(result,clientMs){
   document.getElementById('wv-ch').textContent=meta.channels;
   document.getElementById('spec-dur-label').textContent=meta.duration+'s';
   const fs=result.fraud_score,fc=result.confidence,ver=result.verdict;
-  const isHigh=ver==='FRAUD',isMed=ver==='SUSPICIOUS';
+  const isHigh=ver.includes('HIGH') || ver.includes('CRITICAL');
+  const isMed=ver.includes('MEDIUM') || ver.includes('MODERATE');
   document.getElementById('hero-score').textContent=fs+'%';
   document.getElementById('hero-score').className='hero-score'+(isHigh?' risk-score':'');
   document.getElementById('hero-status').textContent=result.verdict_label||ver;
   document.getElementById('hero-sub').textContent='Case '+result.case_id+' · '+new Date(result.timestamp).toLocaleString('en-IN',{hour12:false});
   document.getElementById('h-caseid').textContent=result.case_id;
-  document.getElementById('h-class').textContent=ver;
+  document.getElementById('h-class').textContent=ver.replace('_', ' ');
   document.getElementById('h-class').style.color=isHigh?'var(--danger)':isMed?'var(--warn)':'var(--success)';
   document.getElementById('h-conf').textContent=fc+'%';
   document.getElementById('h-dur').textContent=result.performance.audio_duration_sec.toFixed(1)+'s';
-  document.getElementById('h-proc').textContent=result.performance.inference_time_ms+'ms';
+  document.getElementById('h-proc').textContent=(result.performance.inference_time_ms/1000).toFixed(2)+'s';
   document.getElementById('hero-rec-text').textContent=result.recommendation;
   setInf('inf-time',result.performance.inference_time_ms,'ms');
   setInf('inf-conf',fc+'%','fusion confidence');
@@ -2453,7 +2463,7 @@ const CHAT_KNOWLEDGE = {
   'clone': 'An <b>AI voice clone</b> is generated using deep learning TTS/VC models trained on a few seconds of real audio. The cloned voice mimics the target but lacks natural micro-variations in jitter, shimmer, and pitch that VoiceGuard monitors.',
   'deepfake': 'A <b>deepfake speech</b> attack uses generative AI (GANs or diffusion models) to produce highly realistic synthetic audio. These are harder to detect and show up as abnormal spectral features and phase discontinuities.',
   'confidence': 'The <b>confidence score</b> reflects the model\'s certainty. 95%+ = very high certainty. 70–94% = moderate, secondary verification recommended. Below 70% = uncertain, flag for manual review.',
-  'voiceguard': 'VoiceGuard uses a <b>Fusion Architecture</b>: (1) Biological Engine — 349 features including jitter, shimmer, HNR, pitch. (2) Deep Learning Engine — Wav2Vec2 extracts 2048 embeddings. Both feed a Fusion Core for final fraud probability.',
+  'voiceguard': 'VoiceGuard uses a <b>Fusion Architecture</b>: (1) Biological Engine — 97 features including jitter, shimmer, HNR, pitch. (2) Deep Learning Engine — Wav2Vec2 extracts 4096 embeddings. Both feed a Fusion Core for final fraud probability.',
   'jitter': '<b>Jitter</b> is cycle-to-cycle frequency variation in vocal folds. <b>Shimmer</b> is amplitude variation between pulses. <b>HNR</b> (Harmonics-to-Noise Ratio) measures harmonic purity. Synthetic voices show abnormal values in all three.',
   'sop': '<b>RBI SOP for Voice Fraud:</b><br>1. Verify customer identity via OTP/Video KYC<br>2. Freeze suspicious transactions<br>3. Escalate to Fraud Investigation Cell<br>4. Preserve audio evidence per CERT-In guidelines<br>5. Notify the customer<br>6. File regulatory report if value exceeds ₹1 lakh<br>7. Submit case for model retraining',
   'action': null, // dynamic

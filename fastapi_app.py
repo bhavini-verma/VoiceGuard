@@ -281,7 +281,14 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
                 logger.error(f"FAILED TO READ AUDIO. Saved to {debug_path}")
                 raise ValueError(f"Audio format not supported. librosa error: {e_librosa}. scipy error: {e_scipy}")
             
-        duration = len(y) / sr
+        orig_duration = len(y) / sr
+        duration = orig_duration
+        
+        # TRUNCATE TO MAX 10 SECONDS to prevent extreme latency on long files
+        max_duration = 10.0
+        if duration > max_duration:
+            logger.info(f"Audio is {duration:.1f}s. Truncating to {max_duration}s for real-time latency.")
+            y = y[:int(max_duration * sr)]
         
         # Apply 80Hz high-pass filter to remove low-frequency room rumble & fan hum
         from scipy.signal import butter, lfilter
@@ -602,7 +609,7 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
             "primary_trigger": "Robust 5-input Meta Classifier" if using_meta else "Fixed Weight Fusion",
             "secondary_trigger": "Wav2Vec2 Anomaly" if p_deep > p_bio else "Bio Feature Anomaly",
             "explanation": explanation,
-            "recommendation": rec,
+            "recommendation": rec["detail"] if isinstance(rec, dict) else rec,
             "using_real_models": True,
             "metadata": {"filename": file.filename, "format": "WAV", "sample_rate": 16000, "channels": 1, "duration": round(duration, 2), "file_size_bytes": file_size},
             "performance": {"model_version": "v3.0-5TierExplainable" if using_meta else "v3.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},

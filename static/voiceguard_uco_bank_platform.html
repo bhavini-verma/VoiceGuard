@@ -590,7 +590,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
         <span>Backend API Node</span><span style="font-family:var(--mono);">http://127.0.0.1:8000</span>
       </div>
       <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(0,0,0,0.03);">
-        <span>Feature Pipelines</span><span style="font-family:var(--mono);">345D Bio + 4096D MCT</span>
+        <span>Feature Pipelines</span><span style="font-family:var(--mono);">97D Bio + 4096D MCT</span>
       </div>
       <div style="display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid rgba(0,0,0,0.03);">
         <span>Inference Latency</span><span style="font-family:var(--mono); color:var(--success);">~210ms (CUDA GPU)</span>
@@ -689,7 +689,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
         <div class="hero-stat"><div class="hero-stat-label">Classification</div><div class="hero-stat-val" id="h-class">—</div></div>
         <div class="hero-stat"><div class="hero-stat-label">Confidence</div><div class="hero-stat-val" id="h-conf">—</div></div>
         <div class="hero-stat"><div class="hero-stat-label">Duration</div><div class="hero-stat-val" id="h-dur">—</div></div>
-        <div class="hero-stat"><div class="hero-stat-label">Proc. Time</div><div class="hero-stat-val" id="h-proc">—</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">Processing Time</div><div class="hero-stat-val" id="h-proc">—</div></div>
       </div>
       <div class="hero-rec" id="hero-rec"><i class="ti ti-info-circle"></i><span id="hero-rec-text">No active analysis — submit audio to receive a forensic recommendation.</span></div>
     </div>
@@ -896,7 +896,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
             <g transform="translate(100, 105)" filter="url(#shadow)">
               <circle cx="0" cy="0" r="62" fill="url(#bioGrad)" stroke="#38BDF8" stroke-width="2"/>
               <text x="0" y="-22" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#0369A1">BIOLOGICAL</text>
-              <text x="0" y="-6" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">345 Features</text>
+              <text x="0" y="-6" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">97 Features</text>
               <rect x="-35" y="8" width="70" height="20" rx="4" fill="rgba(3,105,161,0.08)"/>
               <text x="0" y="21" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="#0369A1" id="bio-matrix-score">—</text>
             </g>
@@ -921,7 +921,7 @@ canvas.spec{width:100%;height:180px;border-radius:6px;display:block;background:#
               <text x="0" y="-24" text-anchor="middle" font-family="Inter" font-size="10" font-weight="800" fill="#E0F2FE" letter-spacing="1">FUSION CORE</text>
               <text x="0" y="-8" text-anchor="middle" font-family="Inter" font-size="9" fill="#BAE6FD">Fraud Prob.</text>
               <text x="0" y="20" text-anchor="middle" font-family="JetBrains Mono" font-size="22" font-weight="700" fill="#FFFFFF" id="fus-matrix-score">—</text>
-              <text x="0" y="38" text-anchor="middle" font-family="Inter" font-size="8" font-weight="600" fill="#BAE6FD">61.8% Bio | 38.2% Deep</text>
+              <text x="0" y="38" text-anchor="middle" font-family="Inter" font-size="8" font-weight="600" fill="#BAE6FD" id="fus-matrix-weights">XGBoost Meta Fusion</text>
             </g>
           </svg>
         </div>
@@ -1419,6 +1419,15 @@ const wCtx=waveCanvas.getContext('2d');
 let waveData=[];let isPlaying=false;let wavePos=0;
 function resizeWave(){waveCanvas.width=waveCanvas.offsetWidth*devicePixelRatio;waveCanvas.height=waveCanvas.offsetHeight*devicePixelRatio;wCtx.scale(devicePixelRatio,devicePixelRatio);}
 resizeWave();
+waveCanvas.style.cursor='pointer';
+waveCanvas.addEventListener('click',(e)=>{
+  if(!currentAudio||!currentAudio.duration||waveData.length===0)return;
+  const rect=waveCanvas.getBoundingClientRect();
+  const seekRatio=(e.clientX-rect.left)/rect.width;
+  currentAudio.currentTime=seekRatio*currentAudio.duration;
+  wavePos=Math.floor(seekRatio*waveData.length);
+  drawWave(waveData,wavePos);
+});
 function drawWave(data,pos){
   const w=waveCanvas.offsetWidth,h=waveCanvas.offsetHeight;
   wCtx.clearRect(0,0,w,h);
@@ -1698,7 +1707,7 @@ async function runAnalysis(file){
   try{
     const r=await apiPost('/analyze',file);
     clearInterval(iv);clearInterval(siv);
-    if(pText)pText.textContent='\u2705 Analysis Complete';
+    if(pText)pText.innerHTML='<i class="ti ti-check" style="margin-right:4px"></i> Forensic Analysis Finalized';
     if(pStatus){pStatus.style.background='rgba(21,128,61,0.08)';pStatus.style.borderColor='rgba(21,128,61,0.25)';pStatus.style.color='#15803D';}
     advTl(STEPS.length-1);
     setTimeout(()=>{
@@ -1727,17 +1736,18 @@ function showResults(result,clientMs){
   document.getElementById('wv-ch').textContent=meta.channels;
   document.getElementById('spec-dur-label').textContent=meta.duration+'s';
   const fs=result.fraud_score,fc=result.confidence,ver=result.verdict;
-  const isHigh=ver==='FRAUD',isMed=ver==='SUSPICIOUS';
+  const isHigh=ver.includes('HIGH') || ver.includes('CRITICAL');
+  const isMed=ver.includes('MEDIUM') || ver.includes('MODERATE');
   document.getElementById('hero-score').textContent=fs+'%';
   document.getElementById('hero-score').className='hero-score'+(isHigh?' risk-score':'');
   document.getElementById('hero-status').textContent=result.verdict_label||ver;
   document.getElementById('hero-sub').textContent='Case '+result.case_id+' · '+new Date(result.timestamp).toLocaleString('en-IN',{hour12:false});
   document.getElementById('h-caseid').textContent=result.case_id;
-  document.getElementById('h-class').textContent=ver;
+  document.getElementById('h-class').textContent=ver.replace('_', ' ');
   document.getElementById('h-class').style.color=isHigh?'var(--danger)':isMed?'var(--warn)':'var(--success)';
   document.getElementById('h-conf').textContent=fc+'%';
   document.getElementById('h-dur').textContent=result.performance.audio_duration_sec.toFixed(1)+'s';
-  document.getElementById('h-proc').textContent=result.performance.inference_time_ms+'ms';
+  document.getElementById('h-proc').textContent=(result.performance.inference_time_ms/1000).toFixed(2)+'s';
   document.getElementById('hero-rec-text').textContent=result.recommendation;
   setInf('inf-time',result.performance.inference_time_ms,'ms');
   setInf('inf-conf',fc+'%','fusion confidence');
@@ -1796,6 +1806,15 @@ function showResults(result,clientMs){
     document.getElementById('bio-matrix-score').textContent=avgBio.toFixed(1)+'%';
     document.getElementById('dl-matrix-score').textContent=avgDl.toFixed(1)+'%';
     document.getElementById('fus-matrix-score').textContent=fs+'%';
+    
+    const weightsEl = document.getElementById('fus-matrix-weights');
+    if (weightsEl) {
+      if (result.performance && result.performance.model_version && result.performance.model_version.includes('5TierExplainable')) {
+        weightsEl.textContent = 'XGBoost Meta Fusion';
+      } else {
+        weightsEl.textContent = '40.0% Bio | 60.0% Deep';
+      }
+    }
     
     // Update XAI sliders
     document.getElementById('xai-bio').style.width=Math.min(100,avgBio)+'%';
@@ -2078,6 +2097,13 @@ function clearCurrentAudio() {
   // Reset risk details
   const riskNum = document.getElementById('risk-num'); if(riskNum) { riskNum.textContent = '—'; riskNum.className = 'risk-score-num lo'; }
   const rb = document.getElementById('risk-badge'); if(rb) { rb.className = 'risk-badge-big risk-badge-lo'; rb.textContent = 'AWAITING ANALYSIS'; }
+  
+  // Clear status chip
+  const pText = document.getElementById('pipeline-status-text');
+  if(pText) pText.innerHTML = 'Awaiting Audio Input...';
+  const pStatus = document.getElementById('pipeline-status');
+  if(pStatus) pStatus.style.display = 'none';
+  
   const riskFinding = document.getElementById('risk-finding'); if(riskFinding) riskFinding.textContent = 'Submit an audio recording to receive forensic risk classification and fraud probability score.';
   
   // Reset threat intel fields
@@ -2089,6 +2115,7 @@ function clearCurrentAudio() {
   const fusScore = document.getElementById('fus-matrix-score'); if(fusScore) fusScore.textContent = '—';
   const bioScore = document.getElementById('bio-matrix-score'); if(bioScore) bioScore.textContent = '—';
   const dlScore = document.getElementById('dl-matrix-score'); if(dlScore) dlScore.textContent = '—';
+  const weightsEl = document.getElementById('fus-matrix-weights'); if(weightsEl) weightsEl.textContent = 'XGBoost Meta Fusion';
   
   // Reset XAI sliders
   document.getElementById('xai-bio').style.width = '40%';
