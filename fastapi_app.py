@@ -607,11 +607,7 @@ async def analyze_audio(file: UploadFile = File(...), auth: str = Depends(verify
             "metadata": {"filename": file.filename, "format": "WAV", "sample_rate": 16000, "channels": 1, "duration": round(duration, 2), "file_size_bytes": file_size},
             "performance": {"model_version": "v3.0-5TierExplainable" if using_meta else "v3.0-FixedWeight", "inference_time_ms": int((time.time() - start_time) * 1000), "audio_duration_sec": round(duration, 2), "chunks_processed": 1},
             "threat_intel": {
-                "threat_type": (
-                    "ElevenLabs Clone" if np.argmax(p_deep_classes[1:]) == 0 else (
-                        "Resemble AI Clone" if np.argmax(p_deep_classes[1:]) == 1 else "Generic TTS Clone"
-                    )
-                ) if verdict not in ("CLEAR", "LOW_RISK") else "None",
+                "threat_type": "AI Voice Clone" if verdict not in ("CLEAR", "LOW_RISK") else "None",
                 "sophistication": "Advanced" if verdict in ("CRITICAL", "HIGH_RISK") else ("Moderate" if verdict == "MODERATE" else "None"),
                 "replay_indicators": "None",
                 "synthetic_confidence": round(float(max(p_deep_classes[1:])) * 100, 1) if verdict not in ("CLEAR", "LOW_RISK") else 0.0
@@ -630,10 +626,8 @@ async def process_feedback(is_correct: str = Form(...), true_label: str = Form(.
     is_correct = (is_correct.lower() == 'true')
     label = 0 if true_label == "Real" else 1
     
-    if true_label == "ElevenLabs":
-        prefix = "active_learning_elevenlabs"
-    elif true_label == "Resemble":
-        prefix = "active_learning_resemble"
+    if true_label == "Synthetic":
+        prefix = "active_learning_synthetic"
     elif true_label == "Generic":
         prefix = "active_learning_generic"
     else:

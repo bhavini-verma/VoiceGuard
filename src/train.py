@@ -23,6 +23,9 @@ def extract_group_id(filename):
         parts = fname.replace('.wav', '').split('_')
         return 'elevenlabs_' + parts[-1]
     
+    if '_original_chunk_' in fname or '_cloned_chunk_' in fname:
+        return fname.split('_')[0]
+        
     # For others, if we don't have explicit augmented versions in the dataset,
     # we can use the filename itself.
     return fname
