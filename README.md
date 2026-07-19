@@ -127,9 +127,15 @@ While Recurrent Neural Networks (RNNs) or GRUs could consume the temporal sequen
 Therefore, VoiceGuard AI applies rigorous Global Statistical Pooling across the temporal axis to collapse the time dimension while preserving the essential statistical distribution of the latent space.
 For each of the 1024 embedding dimensions $d$:
 1. **Global Average Pooling (Mean):** We calculate the mean activation across all time steps. This captures the average semantic "position" of the audio segment in the latent space.
-   $$ \mu_d = \frac{1}{T} \sum_{t=1}^{T} H_{t,d} $$
+ 
+  $$
+  \mu_d = \frac{1}{T} \sum_{t=1}^{T} H_{t,d}
+  $$
 2. **Global Standard Deviation (Std):** We calculate the standard deviation across all time steps. This captures the dynamic variance and acoustic volatility of the speech segment. Generative AI often struggles to replicate the exact variance distribution of authentic human speech over time.
-   $$ \sigma_d = \sqrt{\frac{1}{T} \sum_{t=1}^{T} (H_{t,d} - \mu_d)^2} $$
+ 
+  $$
+  \sigma_d = \sqrt{\frac{1}{T} \sum_{t=1}^{T} (H_{t,d} - \mu_d)^2}
+  $$
 The concatenation of the 1,024 Mean values and the 1,024 Standard Deviation values yields a 2,048-dimensional vector. 
 To further maximize robustness, the system extracts parallel representations resulting in an exact **4,096-dimensional static vector**. 
 This massive representational space serves as the deep acoustic fingerprint of the audio, capturing sub-perceptual anomalies that are entirely invisible to standard digital signal processing techniques.
@@ -153,7 +159,8 @@ Jitter measures the short-term, cycle-to-cycle variation of the fundamental peri
 We utilize a sophisticated pitch tracking algorithm (e.g., YIN or pYIN) to extract the fundamental frequency contour, isolating the exact duration of each glottal cycle $T_i$.
 VoiceGuard AI computes multiple Jitter metrics to capture different temporal scales of instability:
 - **Absolute Jitter:** The mean absolute difference between consecutive periods.
-  $$ \text{Jita} = \frac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}| $$
+  $$ \text{Jita} = \frac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}|
+  $$
 - **Relative Jitter (Jitter Local):** The absolute jitter normalized by the average period.
   $$ \text{Jitt} = \frac{\frac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}|}{\frac{1}{N} \sum_{i=1}^{N} T_i} \times 100\% $$
 - **RAP (Relative Average Perturbation) / PPQ5:** Measures the variation of a period relative to a smoothed moving average of 3 or 5 adjacent periods, capturing slower micro-tremors in the voice.
@@ -161,7 +168,8 @@ VoiceGuard AI computes multiple Jitter metrics to capture different temporal sca
 **B. Shimmer (Amplitude Instability):**
 Shimmer measures the short-term, cycle-to-cycle variation in the peak amplitude ($A_i$) of the glottal pulses. Synthetic speech often maintains unnatural amplitude consistency.
 - **Absolute Shimmer:** The mean absolute difference in logarithmic amplitude (decibels) between consecutive cycles.
-  $$ \text{ShdB} = \frac{1}{N-1} \sum_{i=1}^{N-1} |20 \log_{10}(A_i) - 20 \log_{10}(A_{i+1})| $$
+  $$ \text{ShdB} = \frac{1}{N-1} \sum_{i=1}^{N-1} |20 \log_{10}(A_i) - 20 \log_{10}(A_{i+1})|
+  $$
 - **Relative Shimmer (Shimmer Local):** The absolute amplitude difference normalized by the mean amplitude.
 - **APQ3 / APQ5 / APQ11:** Amplitude Perturbation Quotients using moving averages of 3, 5, and 11 cycles.
 
@@ -272,7 +280,8 @@ During training, these logits are evaluated using **Binary Cross-Entropy with Lo
 This function mathematically combines a Sigmoid activation layer ($\sigma(z) = \frac{1}{1 + e^{-z}}$) and the standard Binary Cross-Entropy Loss into a single, unified class. 
 This provides dramatically superior numerical stability (via the log-sum-exp trick) compared to applying a Sigmoid followed by a BCELoss, preventing underflow/overflow errors during gradient calculation.
 
-$$ L(y, z) = - \left[ y \cdot \log(\sigma(z)) + (1-y) \cdot \log(1 - \sigma(z)) \right] $$
+$$
+L(y, z) = - \left[ y \cdot \log(\sigma(z)) + (1-y) \cdot \log(1 - \sigma(z)) \right] $$
 
 Optimization is handled entirely by the **AdamW optimizer** (Adam with Decoupled Weight Decay). 
 Unlike standard Adam, which implements $L_2$ regularization inside the gradient calculation (which interacts poorly with adaptive learning rates), AdamW decouples the weight decay ($\lambda = 1e^{-4}$), applying it directly to the weight update step. 
@@ -343,7 +352,9 @@ When a client application (e.g., a banking portal or mobile app) transmits an au
 1. **Ingestion & Standardization:** The incoming binary audio stream (transmitted via Base64 JSON or multipart/form-data) is temporarily cached in high-speed RAM. It is aggressively resampled and normalized to a single-channel 16kHz WAV format using FFMPEG/Librosa, actively rejecting unsupported or corrupted proprietary codecs.
 2. **Parallel Extraction Architecture:** Time is the most critical constraint in real-time inference. The 97 Biological features and 4,096 Deep features are completely independent of one another. The backend triggers parallel asynchronous execution threads. While the massive `indicwav2vec-hindi` transformer processes the deep semantics on the GPU, the CPU simultaneously executes the complex DSP mathematics required for the biological features.
 3. **Z-Score Normalization (StandardScaler):** Deep Neural Networks require normalized inputs for stable activation values. The raw extracted feature vectors ($X_{raw}$) are scaled utilizing strict Z-Score normalization:
-   $$ X_{scaled} = \frac{X_{raw} - \mu_{train}}{\sigma_{train}} $$
+ 
+  $$
+  X_{scaled} = \frac{X_{raw} - \mu_{train}}{\sigma_{train}} $$
    Crucially, the $\mu_{train}$ (mean) and $\sigma_{train}$ (variance) parameters are completely pre-fitted to the original training manifold. These parameters are serialized and loaded directly into RAM at server startup. The system never dynamically scales based on the input batch, completely preventing temporal data leakage and ensuring 100% mathematical consistency with the training phase.
 4. **FP16 GPU Autocast and Tensor Construction:** The scaled $X_{scaled}$ vectors are transformed into dense PyTorch Tensors and pushed to the GPU VRAM (`device="cuda"`). To drastically minimize VRAM bandwidth overhead and maximize tensor core utilization, the entire inference pass is wrapped within a `torch.no_grad()` context manager (disabling gradient graph construction) and an Automatic Mixed Precision (AMP) `torch.amp.autocast('cuda')` context manager. This dynamically casts computationally intensive linear algebra operations from 32-bit floating point (FP32) to 16-bit floating point (FP16) where numerically safe, essentially doubling inference throughput.
 5. **Deterministic Meta-Resolution:** The PyTorch models (`dl_bio.pt` and `dl_deep.pt`) consume the tensors and output their respective $P_{bio}$ and $P_{deep}$ logits. A Sigmoid function bounds the values to a $[0, 1]$ probability space. The system calculates the absolute disagreement, max, and min values, generating the 5-element meta-vector. This vector is piped into the highly calibrated `meta_classifier.pkl` (XGBoost), traversing the decision tree ensemble in microseconds to generate the final, deterministic binary classification.
