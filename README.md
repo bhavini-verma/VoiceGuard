@@ -80,7 +80,7 @@ concatenating the 4,096-dimensional deep feature vector with the 97-dimensional 
 This single vector would then be fed into a massive Deep Neural Network.
 This architecture is mathematically flawed due to the Curse of Dimensionality and feature drowning. 
 The deep features outnumber the biological features by a ratio of roughly 42:1. 
-When initializing the weights of the first hidden layer (e.g., $W \in \mathbb{R}^{4193 	imes 1024}$), the forward pass calculation is heavily dominated by the deep feature subspace. 
+When initializing the weights of the first hidden layer (e.g., $W \in \mathbb{R}^{4193 \times 1024}$), the forward pass calculation is heavily dominated by the deep feature subspace. 
 During backpropagation, any gradient descent-based optimizer (such as Adam or Stochastic Gradient Descent) will predominantly update weights associated with the massive 4,096-D subspace, as it represents the path of least resistance to minimizing the loss function. 
 The network will effectively ignore the critical physical constraints provided by the 97 biological markers, treating them as low-magnitude noise.
 
@@ -121,15 +121,15 @@ VoiceGuard AI extracts the embeddings specifically from the 12th hidden layer (t
 In the context of spoofing detection, the final hidden state provides the ultimate synthesis of low-level acoustic properties and high-level linguistic semantics, allowing the downstream classifier to detect subtle mismatches between what is being said (semantics) and how it sounds (acoustics).
 
 ### 5.3 Statistical Pooling and Dimensionality Expansion
-For a given audio segment of length $T$, the 12th hidden layer produces a temporal sequence of embeddings $H \in \mathbb{R}^{T 	imes 1024}$. 
+For a given audio segment of length $T$, the 12th hidden layer produces a temporal sequence of embeddings $H \in \mathbb{R}^{T \times 1024}$. 
 Feeding a variable-length sequence directly into a standard Multi-Layer Perceptron (MLP) is impossible, as MLPs require static-sized input vectors. 
 While Recurrent Neural Networks (RNNs) or GRUs could consume the temporal sequence, they are computationally prohibitive for high-throughput real-time APIs.
 Therefore, VoiceGuard AI applies rigorous Global Statistical Pooling across the temporal axis to collapse the time dimension while preserving the essential statistical distribution of the latent space.
 For each of the 1024 embedding dimensions $d$:
 1. **Global Average Pooling (Mean):** We calculate the mean activation across all time steps. This captures the average semantic "position" of the audio segment in the latent space.
-   $$ \mu_d = rac{1}{T} \sum_{t=1}^{T} H_{t,d} $$
+   $$ \mu_d = \frac{1}{T} \sum_{t=1}^{T} H_{t,d} $$
 2. **Global Standard Deviation (Std):** We calculate the standard deviation across all time steps. This captures the dynamic variance and acoustic volatility of the speech segment. Generative AI often struggles to replicate the exact variance distribution of authentic human speech over time.
-   $$ \sigma_d = \sqrt{rac{1}{T} \sum_{t=1}^{T} (H_{t,d} - \mu_d)^2} $$
+   $$ \sigma_d = \sqrt{\frac{1}{T} \sum_{t=1}^{T} (H_{t,d} - \mu_d)^2} $$
 The concatenation of the 1,024 Mean values and the 1,024 Standard Deviation values yields a 2,048-dimensional vector. 
 To further maximize robustness, the system extracts parallel representations resulting in an exact **4,096-dimensional static vector**. 
 This massive representational space serves as the deep acoustic fingerprint of the audio, capturing sub-perceptual anomalies that are entirely invisible to standard digital signal processing techniques.
@@ -153,15 +153,15 @@ Jitter measures the short-term, cycle-to-cycle variation of the fundamental peri
 We utilize a sophisticated pitch tracking algorithm (e.g., YIN or pYIN) to extract the fundamental frequency contour, isolating the exact duration of each glottal cycle $T_i$.
 VoiceGuard AI computes multiple Jitter metrics to capture different temporal scales of instability:
 - **Absolute Jitter:** The mean absolute difference between consecutive periods.
-  $$ 	ext{Jita} = rac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}| $$
+  $$ \text{Jita} = \frac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}| $$
 - **Relative Jitter (Jitter Local):** The absolute jitter normalized by the average period.
-  $$ 	ext{Jitt} = rac{rac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}|}{rac{1}{N} \sum_{i=1}^{N} T_i} 	imes 100\% $$
+  $$ \text{Jitt} = \frac{\frac{1}{N-1} \sum_{i=1}^{N-1} |T_i - T_{i+1}|}{\frac{1}{N} \sum_{i=1}^{N} T_i} \times 100\% $$
 - **RAP (Relative Average Perturbation) / PPQ5:** Measures the variation of a period relative to a smoothed moving average of 3 or 5 adjacent periods, capturing slower micro-tremors in the voice.
 
 **B. Shimmer (Amplitude Instability):**
 Shimmer measures the short-term, cycle-to-cycle variation in the peak amplitude ($A_i$) of the glottal pulses. Synthetic speech often maintains unnatural amplitude consistency.
 - **Absolute Shimmer:** The mean absolute difference in logarithmic amplitude (decibels) between consecutive cycles.
-  $$ 	ext{ShdB} = rac{1}{N-1} \sum_{i=1}^{N-1} |20 \log_{10}(A_i) - 20 \log_{10}(A_{i+1})| $$
+  $$ \text{ShdB} = \frac{1}{N-1} \sum_{i=1}^{N-1} |20 \log_{10}(A_i) - 20 \log_{10}(A_{i+1})| $$
 - **Relative Shimmer (Shimmer Local):** The absolute amplitude difference normalized by the mean amplitude.
 - **APQ3 / APQ5 / APQ11:** Amplitude Perturbation Quotients using moving averages of 3, 5, and 11 cycles.
 
@@ -237,13 +237,13 @@ The BioDNN maps the highly dense, $97$-dimensional physical feature space into a
 **Exact Architectural Formulation:**
 - **Input Layer:** $X_{bio} \in \mathbb{R}^{97}$
 - **Hidden Block 1:** 
-  - Linear Transformation: $W_1 \in \mathbb{R}^{97 	imes 256}, b_1 \in \mathbb{R}^{256}$
+  - Linear Transformation: $W_1 \in \mathbb{R}^{97 \times 256}, b_1 \in \mathbb{R}^{256}$
   - 1D Batch Normalization: Mitigates internal covariate shift by normalizing the batch activations to zero mean and unit variance.
-  - Activation: Rectified Linear Unit ($	ext{ReLU}(x) = \max(0, x)$). Introduces the necessary non-linearity while preventing the vanishing gradient problem.
+  - Activation: Rectified Linear Unit ($\text{ReLU}(x) = \max(0, x)$). Introduces the necessary non-linearity while preventing the vanishing gradient problem.
   - Regularization: Dropout ($p=0.3$). Randomly zeroes 30% of the elements during training to prevent complex co-adaptations (memorization) on the small dataset.
-- **Hidden Block 2:** Linear (256 $ightarrow$ 128) $ightarrow$ 1D BatchNorm $ightarrow$ ReLU $ightarrow$ Dropout ($p=0.3$)
-- **Hidden Block 3:** Linear (128 $ightarrow$ 64) $ightarrow$ 1D BatchNorm $ightarrow$ ReLU $ightarrow$ Dropout ($p=0.3$)
-- **Output Layer:** Linear (64 $ightarrow$ 1). Yields the raw, un-normalized logit representing the biological authenticity score.
+- **Hidden Block 2:** Linear (256 $\rightarrow$ 128) $\rightarrow$ 1D BatchNorm $\rightarrow$ ReLU $\rightarrow$ Dropout ($p=0.3$)
+- **Hidden Block 3:** Linear (128 $\rightarrow$ 64) $\rightarrow$ 1D BatchNorm $\rightarrow$ ReLU $\rightarrow$ Dropout ($p=0.3$)
+- **Output Layer:** Linear (64 $\rightarrow$ 1). Yields the raw, un-normalized logit representing the biological authenticity score.
 
 **Design Philosophy:** The BioDNN utilizes a sharp "funnel" architecture. 
 Because 97 dimensions is a relatively small and highly dense representation, a massive, wide network would simply memorize the training dataset perfectly, resulting in zero generalization to unseen deepfakes. 
@@ -256,36 +256,36 @@ Because this feature space is incredibly high-dimensional and highly sparse, the
 
 **Exact Architectural Formulation:**
 - **Input Layer:** $X_{deep} \in \mathbb{R}^{4096}$
-- **Hidden Block 1:** Linear (4096 $ightarrow$ 1024) $ightarrow$ 1D BatchNorm $ightarrow$ ReLU $ightarrow$ Dropout ($p=0.4$)
-- **Hidden Block 2:** Linear (1024 $ightarrow$ 512) $ightarrow$ 1D BatchNorm $ightarrow$ ReLU $ightarrow$ Dropout ($p=0.4$)
-- **Hidden Block 3:** Linear (512 $ightarrow$ 128) $ightarrow$ 1D BatchNorm $ightarrow$ ReLU $ightarrow$ Dropout ($p=0.4$)
-- **Output Layer:** Linear (128 $ightarrow$ 1). Yields the raw logit representing the deep semantic authenticity score.
+- **Hidden Block 1:** Linear (4096 $\rightarrow$ 1024) $\rightarrow$ 1D BatchNorm $\rightarrow$ ReLU $\rightarrow$ Dropout ($p=0.4$)
+- **Hidden Block 2:** Linear (1024 $\rightarrow$ 512) $\rightarrow$ 1D BatchNorm $\rightarrow$ ReLU $\rightarrow$ Dropout ($p=0.4$)
+- **Hidden Block 3:** Linear (512 $\rightarrow$ 128) $\rightarrow$ 1D BatchNorm $\rightarrow$ ReLU $\rightarrow$ Dropout ($p=0.4$)
+- **Output Layer:** Linear (128 $\rightarrow$ 1). Yields the raw logit representing the deep semantic authenticity score.
 
 **Design Philosophy:** The absolute primary challenge with a 4,096-dimensional input on a limited dataset is catastrophic overfitting. 
-The model possesses enough parameters in the first layer alone ($4096 	imes 1024 pprox 4.1$ million parameters) to memorize the entire acoustic structure of every file. 
+The model possesses enough parameters in the first layer alone ($4096 \times 1024 \approx 4.1$ million parameters) to memorize the entire acoustic structure of every file. 
 To counter this, the DeepDNN utilizes extremely high dropout rates (40%) and rigorous Batch Normalization. 
 The network rapidly compresses the 4,096 dimensions down to 1024, forcing the model to discard irrelevant acoustic noise and identify only the most highly salient latent anomaly vectors generated by the Wav2Vec2 transformer.
 
 ### 7.3 Loss Optimization and Backpropagation
 Both the BioDNN and DeepDNN output raw, unbounded logits $z \in (-\infty, \infty)$. 
 During training, these logits are evaluated using **Binary Cross-Entropy with Logits Loss (`BCEWithLogitsLoss`)**. 
-This function mathematically combines a Sigmoid activation layer ($\sigma(z) = rac{1}{1 + e^{-z}}$) and the standard Binary Cross-Entropy Loss into a single, unified class. 
+This function mathematically combines a Sigmoid activation layer ($\sigma(z) = \frac{1}{1 + e^{-z}}$) and the standard Binary Cross-Entropy Loss into a single, unified class. 
 This provides dramatically superior numerical stability (via the log-sum-exp trick) compared to applying a Sigmoid followed by a BCELoss, preventing underflow/overflow errors during gradient calculation.
 
-$$ L(y, z) = - \left[ y \cdot \log(\sigma(z)) + (1-y) \cdot \log(1 - \sigma(z)) ight] $$
+$$ L(y, z) = - \left[ y \cdot \log(\sigma(z)) + (1-y) \cdot \log(1 - \sigma(z)) \right] $$
 
 Optimization is handled entirely by the **AdamW optimizer** (Adam with Decoupled Weight Decay). 
 Unlike standard Adam, which implements $L_2$ regularization inside the gradient calculation (which interacts poorly with adaptive learning rates), AdamW decouples the weight decay ($\lambda = 1e^{-4}$), applying it directly to the weight update step. 
 This yields superior generalization bounds. 
-The network operates at an initial learning rate of $lpha = 1e^{-3}$. 
-A `ReduceLROnPlateau` scheduler actively monitors the validation ROC-AUC score, halving the learning rate ($	ext{factor} = 0.5$) if the AUC plateaus for 5 consecutive epochs, ensuring optimal convergence into local minima.
+The network operates at an initial learning rate of $\alpha = 1e^{-3}$. 
+A `ReduceLROnPlateau` scheduler actively monitors the validation ROC-AUC score, halving the learning rate ($\text{factor} = 0.5$) if the AUC plateaus for 5 consecutive epochs, ensuring optimal convergence into local minima.
 
 ---
 
 ## 8. Chapter 7: The Decision Matrix - XGBoost Meta-Classifier
 
 The final, and arguably most critical, component of the Late Fusion pipeline is the Meta-Classifier. 
-In traditional Late Fusion or ensemble methods, the probabilistic outputs of the individual models are simply averaged ($P_{final} = rac{p_{bio} + p_{deep}}{2}$). 
+In traditional Late Fusion or ensemble methods, the probabilistic outputs of the individual models are simply averaged ($P_{final} = \frac{p_{bio} + p_{deep}}{2}$). 
 This is mathematically suboptimal and highly vulnerable. 
 For example, if a sophisticated zero-day AI model perfectly replicates pitch and shimmer (resulting in a BioDNN score of 0.99), but completely fails to replicate high-level semantic acoustics (resulting in a DeepDNN score of 0.01), a simple average would yield an ambiguous 0.50 confidence. 
 This leads directly to a catastrophic False Acceptance or False Rejection.
@@ -343,7 +343,7 @@ When a client application (e.g., a banking portal or mobile app) transmits an au
 1. **Ingestion & Standardization:** The incoming binary audio stream (transmitted via Base64 JSON or multipart/form-data) is temporarily cached in high-speed RAM. It is aggressively resampled and normalized to a single-channel 16kHz WAV format using FFMPEG/Librosa, actively rejecting unsupported or corrupted proprietary codecs.
 2. **Parallel Extraction Architecture:** Time is the most critical constraint in real-time inference. The 97 Biological features and 4,096 Deep features are completely independent of one another. The backend triggers parallel asynchronous execution threads. While the massive `indicwav2vec-hindi` transformer processes the deep semantics on the GPU, the CPU simultaneously executes the complex DSP mathematics required for the biological features.
 3. **Z-Score Normalization (StandardScaler):** Deep Neural Networks require normalized inputs for stable activation values. The raw extracted feature vectors ($X_{raw}$) are scaled utilizing strict Z-Score normalization:
-   $$ X_{scaled} = rac{X_{raw} - \mu_{train}}{\sigma_{train}} $$
+   $$ X_{scaled} = \frac{X_{raw} - \mu_{train}}{\sigma_{train}} $$
    Crucially, the $\mu_{train}$ (mean) and $\sigma_{train}$ (variance) parameters are completely pre-fitted to the original training manifold. These parameters are serialized and loaded directly into RAM at server startup. The system never dynamically scales based on the input batch, completely preventing temporal data leakage and ensuring 100% mathematical consistency with the training phase.
 4. **FP16 GPU Autocast and Tensor Construction:** The scaled $X_{scaled}$ vectors are transformed into dense PyTorch Tensors and pushed to the GPU VRAM (`device="cuda"`). To drastically minimize VRAM bandwidth overhead and maximize tensor core utilization, the entire inference pass is wrapped within a `torch.no_grad()` context manager (disabling gradient graph construction) and an Automatic Mixed Precision (AMP) `torch.amp.autocast('cuda')` context manager. This dynamically casts computationally intensive linear algebra operations from 32-bit floating point (FP32) to 16-bit floating point (FP16) where numerically safe, essentially doubling inference throughput.
 5. **Deterministic Meta-Resolution:** The PyTorch models (`dl_bio.pt` and `dl_deep.pt`) consume the tensors and output their respective $P_{bio}$ and $P_{deep}$ logits. A Sigmoid function bounds the values to a $[0, 1]$ probability space. The system calculates the absolute disagreement, max, and min values, generating the 5-element meta-vector. This vector is piped into the highly calibrated `meta_classifier.pkl` (XGBoost), traversing the decision tree ensemble in microseconds to generate the final, deterministic binary classification.
