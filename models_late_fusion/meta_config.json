@@ -1,0 +1,14 @@
+{
+  "threshold_high": 0.54,
+  "threshold_mid": 0.3,
+  "feature_order": [
+    "bio_score",
+    "deep_score",
+    "disagreement",
+    "max_score",
+    "min_score"
+  ],
+  "architecture": "PyTorch Late Fusion DL + XGBoost Meta",
+  "meta_auc": 1.0,
+  "meta_acc": 1.0
+}

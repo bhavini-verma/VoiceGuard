@@ -1,0 +1,191 @@
+[
+  {
+    "category": "threats",
+    "label": "Threat vectors",
+    "articles": [
+      {
+        "q": "What is an AI Voice Clone (Deepfake)?",
+        "a": "An AI voice clone is a synthetic replica of a genuine customer's voice generated using advanced deep learning text-to-speech (TTS) models (e.g., ElevenLabs, XTTS). Attackers only need a 3-5 second sample of the victim's real voice (often scraped from social media) to generate a model that can speak any typed script in real-time.",
+        "isSop": false,
+        "lastReviewed": "14 Jul 2026",
+        "sourceRef": "VG-THREAT-01"
+      },
+      {
+        "q": "How is a Replay Attack executed?",
+        "a": "A fraudster secretly records a legitimate customer speaking (via compromised devices or previous phone calls). When the bank requires voice authentication, the fraudster plays the recording back. While biometrically identical to the victim, replay attacks lack natural conversational fluidity and often contain secondary room acoustic signatures.",
+        "isSop": false,
+        "lastReviewed": "14 Jul 2026",
+        "sourceRef": "VG-THREAT-02"
+      },
+      {
+        "q": "What is Real-Time Voice Conversion?",
+        "a": "Unlike text-to-speech, real-time voice conversion (RVC) allows a fraudster to speak into their microphone and instantly have their voice transformed into the victim's voice. VoiceGuard flags these by detecting the sub-millisecond processing latency and phase distortions introduced by the conversion algorithm.",
+        "isSop": false,
+        "lastReviewed": "22 Aug 2026",
+        "sourceRef": "VG-THREAT-03"
+      },
+      {
+        "q": "Vishing (Voice Phishing) & Social Engineering",
+        "a": "Voice phishing involves a human fraudster manipulating a victim or bank officer into authorizing a transaction or sharing OTPs. Even if the voice is entirely human, VoiceGuard's secondary behavioral engine can detect micro-tremors and stress patterns associated with active coercion or deceptive intent.",
+        "isSop": false,
+        "lastReviewed": "02 Mar 2026",
+        "sourceRef": "VG-INT-09"
+      },
+      {
+        "q": "Audio Injection / Man-in-the-Middle (MitM)",
+        "a": "Sophisticated attackers may bypass the phone microphone entirely, injecting digital synthetic audio directly into the communication stream via compromised VoIP software. The system detects this by identifying the complete absence of natural analog transmission noise.",
+        "isSop": false,
+        "lastReviewed": "10 May 2026",
+        "sourceRef": "VG-THREAT-05"
+      }
+    ]
+  },
+  {
+    "category": "forensics",
+    "label": "Forensics",
+    "articles": [
+      {
+        "q": "How does the Deep Spectral Engine (Wav2Vec2) work?",
+        "a": "The Deep Spectral Engine is the core of VoiceGuard. It analyzes the incoming audio spectrogram using a dual-pass Wav2Vec2 transformer neural network. It looks for phase discontinuities, frequency bleeding, and synthetic artifacts that occur when AI models piece phonemes together—imperfections completely invisible to the human ear.",
+        "isSop": false,
+        "lastReviewed": "15 Jun 2026",
+        "sourceRef": "VG-CORE-V3"
+      },
+      {
+        "q": "Understanding Jitter, Shimmer, and HNR",
+        "a": "These are biological acoustic metrics extracted from the vocal tract:<br><br>- <b>Jitter:</b> Measures micro-variations in vocal cord pitch cycles.<br>- <b>Shimmer:</b> Measures micro-variations in amplitude (volume).<br>- <b>HNR (Harmonics-to-Noise Ratio):</b> Measures breathiness and tone clarity.<br><br>Authentic human voices have natural, chaotic variations. AI clones often appear mathematically \"too perfect\" in these dimensions.",
+        "isSop": false,
+        "lastReviewed": "15 Jun 2026",
+        "sourceRef": "VG-BIO-01"
+      },
+      {
+        "q": "What is Temporal Continuity Analysis?",
+        "a": "VoiceGuard continually checks the audio stream for microscopic splicing boundaries. If a fraudster is playing multiple pre-recorded clips back-to-back, the background room tone will abruptly shift at the splice point. The temporal continuity module flags these invisible acoustic boundary breaks.",
+        "isSop": false,
+        "lastReviewed": "01 Apr 2026",
+        "sourceRef": "VG-CORE-V3"
+      },
+      {
+        "q": "Why do background noises trigger false positives?",
+        "a": "Extremely noisy environments (like a busy street or wind hitting a microphone) can distort the natural harmonics of a legitimate voice, causing the biological engine to struggle to extract Jitter/Shimmer accurately. Always request the customer to move to a quieter area if the Biological Score drops unpredictably.",
+        "isSop": false,
+        "lastReviewed": "20 Jul 2026",
+        "sourceRef": "VG-USER-FAQ"
+      }
+    ]
+  },
+  {
+    "category": "procedures",
+    "label": "Procedures",
+    "articles": [
+      {
+        "q": "High-Risk Alert SOP (Transaction Freeze)",
+        "a": "Mandatory protocol when VoiceGuard flags an active call as HIGH RISK (Fusion Score > 50%):",
+        "steps": [
+          "Do not alert the caller that they have failed a voice biometric security check.",
+          "State calmly: \"For regulatory compliance, this transaction requires a quick secondary verification.\"",
+          "Initiate an out-of-band verification by sending a system-generated SMS OTP to the registered mobile number.",
+          "If the caller becomes hostile, provides an incorrect OTP, or disconnects, immediately execute a Transaction Freeze in the core banking portal.",
+          "Log the event in the Audit Ledger with status BLOCKED."
+        ],
+        "isSop": true,
+        "lastReviewed": "01 Jan 2026",
+        "sourceRef": "UCO-SEC-POL-04"
+      },
+      {
+        "q": "Fraud Cell Handoff SOP",
+        "a": "Protocol for escalating highly sophisticated attacks (e.g., Real-Time Voice Conversion) where the transaction exceeds ₹1 Lakh:",
+        "steps": [
+          "Place the suspicious caller on a brief hold (maximum 2 minutes).",
+          "Open the VoiceGuard AI Investigator panel and click \"Export Case Report\".",
+          "Transfer the active call to the Tier-2 Fraud Intelligence Team via internal extension 9990.",
+          "Forward the exported VoiceGuard PDF report to cyberfraud@ucobank.co.in.",
+          "Notify the Branch Manager of a high-value active escalation."
+        ],
+        "isSop": true,
+        "lastReviewed": "01 Jan 2026",
+        "sourceRef": "UCO-SEC-POL-05"
+      },
+      {
+        "q": "False Positive Resolution Protocol",
+        "a": "Protocol for handling situations where a legitimate customer is repeatedly flagged by the system due to illness (e.g., severe sore throat) or extreme background noise:",
+        "steps": [
+          "Request the customer to move to a quieter environment or disable speakerphone.",
+          "If the issue persists, trigger a Video KYC link via the UCO Bank mobile app.",
+          "Once identity is visually confirmed, manually override the VoiceGuard verdict in the dashboard.",
+          "Submit the audio snippet via the \"Report False Positive\" button to retrain the model on the customer's altered vocal profile."
+        ],
+        "isSop": true,
+        "lastReviewed": "12 Feb 2026",
+        "sourceRef": "UCO-SEC-POL-08"
+      },
+      {
+        "q": "VIP Client Verification Procedure",
+        "a": "For High Net Worth (HNI) and Corporate VIP clients, security friction must be minimized:",
+        "steps": [
+          "Run VoiceGuard silently in the background during the initial greeting.",
+          "If the VoiceGuard score is CLEARED (< 15%), bypass standard security questions (DOB, Mother's Maiden Name).",
+          "If the score is SUSPICIOUS (15% - 49%), proceed with standard security questions.",
+          "If the score is HIGH RISK (> 50%), immediately trigger the VIP Fraud Escalation Handoff SOP."
+        ],
+        "isSop": true,
+        "lastReviewed": "05 Mar 2026",
+        "sourceRef": "UCO-VIP-02"
+      }
+    ]
+  },
+  {
+    "category": "compliance",
+    "label": "Compliance",
+    "articles": [
+      {
+        "q": "What is the ₹1 Lakh Reporting Threshold?",
+        "a": "Under the revised RBI Cyber Security Framework (2025), any attempted or successful fraudulent transaction exceeding ₹1,00,000 must be reported to the central RBI Fraud Registry within 24 hours of detection. Failure to report carries severe branch-level penalties.",
+        "isSop": false,
+        "lastReviewed": "18 Jul 2026",
+        "sourceRef": "RBI/2025-26/112"
+      },
+      {
+        "q": "Audio Evidence Retention Rules (CERT-In)",
+        "a": "CERT-In guidelines mandate that audio recordings of flagged fraud attempts must be retained in an encrypted, read-only format for a minimum of 7 years. Local branch officers are strictly prohibited from downloading or storing raw audio files on personal workstations.",
+        "isSop": false,
+        "lastReviewed": "10 Feb 2026",
+        "sourceRef": "CERT-IN-2026-A"
+      },
+      {
+        "q": "Customer Data Privacy (DPDP Act 2023)",
+        "a": "The Digital Personal Data Protection (DPDP) Act of 2023 classifies voice biometrics as Sensitive Personal Data. VoiceGuard processes all audio strictly in memory (RAM). Audio features are discarded immediately after the Fusion Score is generated, unless explicitly flagged as fraud for evidentiary retention.",
+        "isSop": false,
+        "lastReviewed": "01 Nov 2025",
+        "sourceRef": "GOI-DPDP-23"
+      },
+      {
+        "q": "Mandatory Audit Log Export Requirements",
+        "a": "Branch managers must export the VoiceGuard System Activity & Security Ledger (Audit Logs) at the end of every business day. This log must be securely transmitted to the central SIEM (Security Information and Event Management) server at UCO Bank HQ.",
+        "isSop": false,
+        "lastReviewed": "15 Jan 2026",
+        "sourceRef": "UCO-AUDIT-01"
+      }
+    ]
+  },
+  {
+    "category": "troubleshooting",
+    "label": "Troubleshooting",
+    "articles": [
+      {
+        "q": "Error: \"Audio File Unreadable or Corrupt\"",
+        "a": "This occurs if the uploaded audio file is not a standard WAV or MP3, or if the bitrate is too low. VoiceGuard requires a minimum sample rate of 16kHz to perform accurate spectral analysis. Convert the file to 16kHz Mono WAV and try again.",
+        "isSop": false,
+        "lastReviewed": "01 Jun 2026",
+        "sourceRef": "VG-TECH-SUP"
+      },
+      {
+        "q": "Error: \"Model Synchronization Failure\"",
+        "a": "This indicates your local VoiceGuard node has lost connection to the UCO Bank central neural network registry. Check your VPN connection. The system will continue to operate using the cached local weights, but you will not benefit from real-time global threat updates until reconnected.",
+        "isSop": false,
+        "lastReviewed": "01 Jun 2026",
+        "sourceRef": "VG-TECH-SUP"
+      }
+    ]
+  }
+]
